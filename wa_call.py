@@ -50,6 +50,9 @@ RESENT = {"hi": "जी, रास्ते का नक्शा फिर स
           "en": "Yes, I've sent the route map to your WhatsApp chat again."}
 NO_MAP = {"hi": "जी, बताइए कहाँ जाना है, मैं रास्ता आपके WhatsApp चैट में भेज दूँगी।",
           "en": "Sure. Tell me where you want to go, and I'll send the route to your WhatsApp chat."}
+# after a call with the hosted agent (it can't send anything into the chat): the routes asked about, from our data
+AFTER_CALL = {"hi": "📞 आपकी कॉल में पूछे गए रास्ते, लिखकर और नक्शे पर:", "en": "📞 The routes from your call, in writing and on the map:"}
+MAX_ROUTES = 3
 
 
 class Speaker(MediaStreamTrack):
@@ -76,6 +79,7 @@ class Speaker(MediaStreamTrack):
         now = time.monotonic()
         if self.dry_at is not None and now - self.dry_at < 0.5:
             self.gaps += 1
+            print(f"[wa-call] a word was cut short: the next voice came {now - self.dry_at:.2f} s late", flush=True)
         self.dry_at, self.last_push = None, now
         self.buf += pcm48
 
@@ -123,6 +127,7 @@ class Bridge:
         self.maps = set()
         self.tasks = set()
         self.up, self.up_sr = None, None   # one resampler per call, so 0.1 s pieces join without a click
+        self.heard = []                # the caller's words (captions), for the routes sent after an agent call
 
     def to_speaker(self, pcm, sr):
         """Bot audio (PCM16 at any rate) -> 48 kHz for the phone."""
@@ -147,7 +152,9 @@ class Bridge:
 
     async def send_json(self, m):
         kind = m.get("type")
-        if kind == "audio":
+        if kind == "transcript" and "user" in str(m.get("role", "")).lower() and m.get("text"):
+            self.heard.append(m["text"])
+        elif kind == "audio":
             self.to_speaker(base64.b64decode(m["b64"]), m.get("sr") or voice_call.SR)
         elif kind == "event" and "interrupt" in m.get("name", "").lower():   # ours: "interrupt"; the agent's: "…user_interrupt"
             self.speaker.clear()                               # the caller started talking: stop the bot at once
@@ -236,7 +243,7 @@ class Session:
         return store.new_session(p["id"], "whatsapp-call") if p and p.get("consent_at") else ""
 
     async def run(self, minutes, engine="local"):
-        token, call = self.token(), None
+        token, call, st = self.token(), None, None
         if engine == "sarvam_agent" and samvaad_call.ready():
             # the same hosted agent as the web page's 📞; someone who hasn't agreed yet gets a throwaway caller id
             pid = store.patient_for_session(token) if token else None
@@ -255,6 +262,41 @@ class Session:
             if call:
                 await call.close()
             await self.close()
+            if st is not None and self.bridge.heard:           # an agent call: the routes into the chat, after it
+                task = asyncio.create_task(self.send_routes(st))
+                _SENDS.add(task)
+                task.add_done_callback(_SENDS.discard)
+
+    async def send_routes(self, st):
+        """Each place the caller asked about, as the written route and the map with arrows (the same answer the WhatsApp
+        chat gives, from hospital.json), since the hosted agent can't send anything into the chat (asked for, 4 Nov 2026)."""
+        hosp = st.get("hospital")
+        if not hosp and st.get("pid"):
+            hosp = (store.get(st["pid"], actor="whatsapp-call") or {}).get("hospital")
+        if hosp != "tata-parel" or not whatsapp.public_base():
+            return
+        state = {"pid": None, "mode": "chat", "awaiting": None, "where": None, "place": None, "hospital": hosp}
+        routes, lang = {}, "hi"
+        for text in self.bridge.heard:                         # in order, so "wahan kaise jaun" follows the place before it
+            try:
+                out = await brain.respond(text[:500], state)
+            except Exception as e:
+                print(f"[wa-call] route summary: {e!r}", flush=True)
+                continue
+            if out.get("map"):
+                routes[out["map"]["to"]] = out
+                lang = out["lang"]
+        if not routes:
+            return
+        to = self.bridge.to
+        head = AFTER_CALL.get(lang) or await brain.translate(AFTER_CALL["en"], "en-IN", core.LANG_CODE.get(lang, "hi-IN")) or AFTER_CALL["hi"]
+        await whatsapp.send(to, body=head)
+        for dest, out in list(routes.items())[-MAX_ROUTES:]:
+            name = brain.place_name(dest, out["lang"])
+            text = out["text"] if out["text"].startswith(name) else f"*{name}*: {out['text']}"
+            r1 = await whatsapp.send(to, body=text)
+            r2 = await whatsapp.send(to, body=out["map"].get("caption", ""), media_url=whatsapp.public_base() + out["map"]["url"])
+            print(f"[wa-call] -> {whatsapp.mask(to)}: route to {dest} after the call: text {r1[:40]}, map {r2[:40]}", flush=True)
 
     async def close(self):
         if CALLS.pop(self.id, None) is None:

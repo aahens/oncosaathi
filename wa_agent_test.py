@@ -146,7 +146,7 @@ async def main():
     print(f"     after talking over: {users(t2)[-1:]} -> {bots(t2)[-1:]}")
     await wait_for(lambda: time.monotonic() - last_loud() > 1.5, 30)
 
-    check("no map is sent from an agent call", not sent, sent)
+    check("nothing is sent into the chat during the call", not sent, sent)
     t0 = said[0][0] if said else 0
     where = [(round(t - t0, 2), dry, [x[:30] for tt, r, x in said if r != "user" and tt <= t][-1:]) for t, dry in gap_log]
     check("her streamed voice reached the caller with no word cut short", session and session.bridge.speaker.gaps == 0,
@@ -157,6 +157,15 @@ async def main():
     check("hang-up closes the call", ok)
     check("no terminate sent after the caller hung up", not actions, actions)
     await caller.close()
+
+    # after the call: the routes asked about, written and on the map with arrows (from hospital.json)
+    maps = lambda: [u for to, _, u in sent if u and "/map/route.jpg" in u and to == "whatsapp:+919000000010"]
+    await wait_for(lambda: len(maps()) >= 2, 30)
+    texts = [b or "" for _, b, u in sent if not u]
+    print(f"     after the call: {[t[:60] for t in texts]}\n     maps: {maps()}")
+    check("after the call, the chat gets the routes header", any("📞" in t for t in texts), texts)
+    check("...the CT scan route in writing and on the map", any("to=C-1-CT" in u for u in maps()) and any("C-101" in t for t in texts), sent)
+    check("...and the pharmacy route too", any("to=CORE-G-PHARM" in u for u in maps()), maps())
 
 
 asyncio.run(main())
