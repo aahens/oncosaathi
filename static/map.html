@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Hospital map</title>
+<style>
+  :root { --ink:#1F2A30; --muted:#5B6B73; --line:#D5DDE1; --bg:#F4F6F7; --card:#fff; --brand:#075E54;
+          --opd:#0F6E56; --opd-bg:#E1F5EE; --diagnostic:#185FA5; --diagnostic-bg:#E6F1FB; --treatment:#534AB7; --treatment-bg:#EEEDFE;
+          --emergency:#A32D2D; --emergency-bg:#FCEBEB; --support:#854F0B; --support-bg:#FAEEDA; --ward:#5F5E5A; --ward-bg:#F1EFE8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--ink); font-family:-apple-system, "Segoe UI", Helvetica, Arial, "Noto Sans Devanagari", sans-serif; font-size:15px; line-height:1.45; }
+  header { background:var(--brand); color:#fff; padding:14px 16px; }
+  header h1 { font-size:19px; font-weight:600; } header p { font-size:12.5px; color:#CFE9E4; margin-top:2px; }
+  .wrap { max-width:1180px; margin:0 auto; padding:14px 16px 40px; }
+  .bar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:12px; }
+  .seg { display:flex; background:#fff; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  .seg button, .floors button { border:none; background:none; padding:8px 12px; font:inherit; font-size:14px; color:var(--ink); cursor:pointer; }
+  .seg button.on { background:var(--brand); color:#fff; }
+  .floors { display:flex; flex-wrap:wrap; gap:6px; }
+  .floors button { border:1px solid var(--line); background:#fff; border-radius:8px; min-width:40px; }
+  .floors button.on { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .search { position:relative; flex:1; min-width:220px; }
+  .search input { width:100%; padding:9px 12px; border:1px solid var(--line); border-radius:10px; font:inherit; background:#fff; color:var(--ink); }
+  .results { position:absolute; left:0; right:0; top:42px; background:#fff; border:1px solid var(--line); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.12); z-index:5; max-height:320px; overflow:auto; display:none; }
+  .results.on { display:block; }
+  .results button { display:block; width:100%; text-align:left; border:none; background:none; padding:9px 12px; font:inherit; color:var(--ink); cursor:pointer; border-bottom:1px solid #EEF2F3; }
+  .results button:hover { background:#F4F6F7; } .results small { color:var(--muted); display:block; font-size:12.5px; }
+  .legend { display:flex; flex-wrap:wrap; gap:10px 16px; font-size:12.5px; color:var(--muted); margin:2px 0 12px; }
+  .legend span { display:inline-flex; align-items:center; gap:6px; } .legend i { width:12px; height:12px; border-radius:3px; display:inline-block; }
+  .layout { display:grid; grid-template-columns: minmax(0, 1fr) 300px; gap:14px; align-items:start; }
+  .layout > * { min-width:0; }
+  .det { position:sticky; top:12px; }
+  @media (max-width: 980px) { .layout { grid-template-columns: minmax(0, 1fr); } .det { position:static; } }
+  .panel { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; }
+
+  /* building (elevation) view */
+  .elev { display:grid; grid-template-columns: 74px repeat(5, minmax(0, 1fr)); gap:6px; }
+  .elev .h { font-size:12.5px; color:var(--muted); text-align:center; padding:2px 0 4px; }
+  .elev .h b { display:block; color:var(--ink); font-size:13.5px; }
+  .elev .fl { font-size:13px; font-weight:600; display:flex; align-items:center; justify-content:center; background:#fff; border:1px solid var(--line); border-radius:8px; cursor:pointer; }
+  .elev .fl:hover { border-color:var(--ink); }
+  .elev .cell { background:#FAFBFB; border:1px dashed var(--line); border-radius:8px; padding:5px; display:flex; flex-direction:column; gap:4px; min-height:54px; }
+  @media (max-width: 700px) { .elev { grid-template-columns: 46px repeat(5, minmax(84px, 1fr)); overflow-x:auto; } }
+
+  .chip { border:1px solid; border-radius:6px; padding:3px 6px; font-size:12px; line-height:1.25; text-align:left; cursor:pointer; font-family:inherit; }
+  .chip.restricted { border-style:dashed; opacity:.75; }
+  .chip.hit { outline:3px solid #F2A623; outline-offset:1px; }
+  .chip.sel { box-shadow:0 0 0 2px var(--ink); }
+  .c-opd { color:var(--opd); background:var(--opd-bg); border-color:#9FE1CB; }
+  .c-diagnostic { color:var(--diagnostic); background:var(--diagnostic-bg); border-color:#B5D4F4; }
+  .c-treatment { color:var(--treatment); background:var(--treatment-bg); border-color:#CECBF6; }
+  .c-emergency { color:var(--emergency); background:var(--emergency-bg); border-color:#F7C1C1; }
+  .c-support { color:var(--support); background:var(--support-bg); border-color:#FAC775; }
+  .c-ward { color:var(--ward); background:var(--ward-bg); border-color:#D3D1C7; }
+
+  /* floor plan view */
+  .plan-title { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; gap:8px; flex-wrap:wrap; }
+  .plan-title h2 { font-size:17px; } .plan-title span { color:var(--muted); font-size:13px; }
+  .plan { position:relative; display:grid; grid-template-columns: 2.6fr 1.1fr 2fr 2fr 2.2fr; gap:0; border:2px solid #8A9AA2; border-radius:10px; background:#fff; overflow:hidden; }
+  .blk { padding:10px 8px 8px; border-right:2px solid #8A9AA2; display:flex; flex-direction:column; min-height:330px; }
+  .blk:last-child { border-right:none; }
+  .blk h3 { font-size:13.5px; } .blk .role { font-size:11.5px; color:var(--muted); margin-bottom:8px; }
+  .rooms { display:grid; grid-template-columns: 1fr 1fr; gap:6px; align-content:start; flex:1; }
+  .core .rooms { grid-template-columns: 1fr; }
+  .room { border:1.5px solid; border-radius:6px; padding:6px; font-size:12.5px; line-height:1.25; cursor:pointer; text-align:left; font-family:inherit; min-height:56px; }
+  .room small { display:block; font-size:11px; opacity:.85; margin-top:3px; }
+  .room.restricted { border-style:dashed; }
+  .room.hit { outline:3px solid #F2A623; outline-offset:1px; } .room.sel { box-shadow:0 0 0 2px var(--ink); }
+  .corridor { grid-column: 1 / -1; background:repeating-linear-gradient(90deg, #E9EEF0 0 14px, #F3F6F7 14px 28px); border-top:2px solid #8A9AA2; padding:7px 10px; font-size:12px; color:var(--muted); display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .gate { font-weight:600; color:var(--ink); background:#fff; border:1.5px solid var(--ink); border-radius:6px; padding:2px 7px; }
+  .gate.er { color:var(--emergency); border-color:var(--emergency); }
+  .lift { display:inline-block; font-size:11px; background:#263238; color:#fff; border-radius:4px; padding:1px 5px; margin-top:6px; align-self:flex-start; }
+  @media (max-width: 760px) { .plan { grid-template-columns: 1fr; } .blk { border-right:none; border-bottom:2px solid #8A9AA2; min-height:0; } }
+
+  /* campus */
+  .campus svg { width:100%; height:auto; display:block; }
+  .campus text { font-family:inherit; }
+
+  /* details */
+  .det h2 { font-size:17px; } .det .hi { color:var(--muted); font-size:14px; margin-top:1px; }
+  .det .badge { display:inline-block; font-size:12px; border-radius:6px; padding:2px 8px; margin:8px 0; border:1px solid; }
+  .det dl { display:grid; grid-template-columns: 74px 1fr; gap:6px 10px; font-size:14px; margin-top:6px; }
+  .det dt { color:var(--muted); } .det dd { color:var(--ink); }
+  .det .route { margin-top:12px; background:#F4F6F7; border-radius:10px; padding:10px; font-size:14px; }
+  .det .route b { display:block; font-size:12.5px; color:var(--muted); font-weight:600; margin-bottom:3px; }
+  .det .empty { color:var(--muted); font-size:14px; }
+  .note { font-size:12px; color:var(--muted); margin-top:14px; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="hname">Hospital map</h1>
+  <p id="hsub">Loading…</p>
+</header>
+<div class="wrap">
+  <div class="bar">
+    <div class="seg" id="views">
+      <button data-v="building" class="on">Building</button>
+      <button data-v="floor">Floor plan</button>
+      <button data-v="campus">Campus</button>
+    </div>
+    <div class="floors" id="floorBtns"></div>
+    <div class="search"><input id="q" placeholder="Search: CT scan, chemo, Room 12, बिलिंग…" autocomplete="off"><div class="results" id="results"></div></div>
+  </div>
+  <div class="legend" id="legend"></div>
+  <div class="layout">
+    <div class="panel" id="main"></div>
+    <div class="panel det" id="det"><p class="empty">Tap any department to see where it is, timings, what to bring and how to get there.</p></div>
+  </div>
+  <p class="note" id="disc"></p>
+</div>
+
+<script>
+let H, view = "building", floor = "G", selected = null, hits = new Set();
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const blockById = (id) => H.blocks.find((b) => b.id === id);
+const floorById = (id) => H.floors.find((f) => f.id === id);
+const unitsAt = (b, f) => H.units.filter((u) => u.block === b && u.floor === f);
+const restricted = (u) => u.public === false;
+
+function route(u) {
+  if (u.path) return esc(u.path);                       // hospital.json carries a walking path for every public room
+  const b = blockById(u.block), f = floorById(u.floor);
+  if (u.cat === "emergency") return "Use Gate 2 (Emergency), open 24×7. It opens straight into Wing D ground floor. If you are at home, call 108.";
+  if (u.floor === "G") {
+    if (u.block === "A") return `From Gate 1, go into the main lobby. ${esc(u.name)} is at ${esc(u.rooms)}.`;
+    if (u.block === "CORE") return `From Gate 1, walk straight through the main lobby to the main lift. ${esc(u.name)}: ${esc(u.rooms)}.`;
+    return `From Gate 1, walk through the main lobby past the main lift and pharmacy into ${esc(b.name)}. ${esc(u.name)}: ${esc(u.rooms)}.`;
+  }
+  const lift = u.floor === "B" && (u.block === "C" || u.block === "D") ? `the ${b.name} lift` : "the main lift (centre of the lobby)";
+  const dir = u.block === "A" ? "turn left into Wing A" : u.block === "CORE" ? "it is beside the lift" : `walk right along the corridor to ${b.name}`;
+  return `From Gate 1, take ${lift} to the ${f.name.toLowerCase()}, then ${dir}. Look for ${esc(u.rooms)}.`;
+}
+
+function select(id, jump) {
+  selected = id;
+  const u = H.units.find((x) => x.id === id) || H.campus.find((x) => x.id === id);
+  if (jump && u.floor) { floor = u.floor; view = "floor"; }
+  renderMain(); renderDetails(u);
+  if (window.innerWidth < 900) $("det").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderDetails(u) {
+  if (!u) return;
+  const cat = H.categories[u.cat] || {};
+  const b = u.block && blockById(u.block), f = u.floor && floorById(u.floor);
+  const rows = [];
+  if (b) rows.push(["Where", `${esc(b.name)} · ${esc(f.name)}`]);
+  if (u.rooms) rows.push(["Room", esc(u.rooms)]);
+  if (u.hours) rows.push(["Timings", esc(u.hours)]);
+  if (u.bring) rows.push(["Bring", esc(u.bring)]);
+  if (u.note) rows.push(["Note", esc(u.note)]);
+  $("det").innerHTML = `<h2>${esc(u.name)}</h2>${u.name_hi ? `<div class="hi">${esc(u.name_hi)}</div>` : ""}
+    <span class="badge c-${u.cat}">${esc(cat.label || "")}${restricted(u) ? " · staff / restricted" : ""}</span>
+    <dl>${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>
+    ${u.block && !restricted(u) ? `<div class="route"><b>How to get there</b>${route(u)}</div>` : ""}`;
+}
+
+function chipClass(u) { return `c-${u.cat}${restricted(u) ? " restricted" : ""}${hits.has(u.id) ? " hit" : ""}${selected === u.id ? " sel" : ""}`; }
+
+function renderBuilding() {
+  let h = `<div class="elev"><div></div>${H.blocks.map((b) => `<div class="h"><b>${esc(b.name)}</b>${esc(b.role)}</div>`).join("")}`;
+  for (const f of H.floors) {
+    h += `<button class="fl" data-floor="${f.id}" title="Open ${esc(f.name)} plan">${f.id === "G" ? "G" : f.id === "B" ? "B" : f.id}</button>`;
+    for (const b of H.blocks) {
+      h += `<div class="cell">${unitsAt(b.id, f.id).map((u) => `<button class="chip ${chipClass(u)}" data-id="${u.id}">${esc(u.name)}</button>`).join("")}</div>`;
+    }
+  }
+  return h + "</div>";
+}
+
+function renderFloor() {
+  const f = floorById(floor);
+  let h = `<div class="plan-title"><h2>${esc(f.name)} <span>· ${esc(f.name_hi)}</span></h2><span>West ← → East</span></div><div class="plan">`;
+  for (const b of H.blocks) {
+    const us = unitsAt(b.id, floor);
+    const lifts = H.lifts.filter((l) => l.block === b.id).map((l) => `<span class="lift">⇅ ${esc(l.name)}</span>`).join(" ");
+    h += `<div class="blk ${b.id === "CORE" ? "core" : ""}"><h3>${esc(b.name)}</h3><div class="role">${esc(b.role)}</div><div class="rooms">
+      ${us.map((u) => `<button class="room ${chipClass(u)}" data-id="${u.id}">${esc(u.name)}<small>${esc(u.rooms || "")}</small></button>`).join("") || `<span style="color:var(--muted);font-size:12px">—</span>`}
+      </div>${lifts}</div>`;
+  }
+  const left = floor === "G" ? `<span class="gate">⇢ Gate 1 · Main entrance</span>` : `<span>Main corridor</span>`;
+  const right = floor === "G" ? `<span class="gate er">Gate 2 · Emergency ⇠</span>` : `<span>Washrooms & water at both ends</span>`;
+  h += `<div class="corridor">${left}<span>Main corridor · washrooms at both ends</span>${right}</div></div>`;
+  return h;
+}
+
+function renderCampus() {
+  const c = (id) => `data-id="${id}" style="cursor:pointer"`;
+  return `<div class="campus"><svg viewBox="0 0 900 560" role="img" aria-label="Campus site plan">
+    <rect x="0" y="0" width="900" height="560" fill="#EEF3EE"/>
+    <rect x="0" y="470" width="900" height="50" fill="#C9D1D4"/><text x="450" y="500" text-anchor="middle" font-size="14" fill="#37474F">Main road</text>
+    <line x1="0" y1="495" x2="900" y2="495" stroke="#fff" stroke-width="2" stroke-dasharray="18 14"/>
+    <rect x="0" y="0" width="900" height="34" fill="#DDE3E5"/><text x="450" y="22" text-anchor="middle" font-size="13" fill="#455A64">Service lane</text>
+    <g ${c("A-G-REG")}><rect x="70" y="120" width="230" height="300" rx="8" fill="${"#E1F5EE"}" stroke="#0F6E56" stroke-width="2"/><text x="185" y="260" text-anchor="middle" font-size="18" font-weight="600" fill="#0F6E56">Wing A</text><text x="185" y="282" text-anchor="middle" font-size="13" fill="#0F6E56">OPD Block · B + G + 5</text></g>
+    <g ${c("CORE-G-PHARM")}><rect x="300" y="200" width="100" height="140" fill="#FAEEDA" stroke="#854F0B" stroke-width="2"/><text x="350" y="262" text-anchor="middle" font-size="13" font-weight="600" fill="#854F0B">Core</text><text x="350" y="280" text-anchor="middle" font-size="12" fill="#854F0B">Main lift</text></g>
+    <g ${c("B-G-SAMPLE")}><rect x="400" y="80" width="150" height="190" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="2"/><text x="475" y="170" text-anchor="middle" font-size="17" font-weight="600" fill="#185FA5">Wing B</text><text x="475" y="190" text-anchor="middle" font-size="12" fill="#185FA5">Labs & diagnostics</text></g>
+    <g ${c("C-G-CT")}><rect x="400" y="270" width="150" height="150" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="2"/><text x="475" y="340" text-anchor="middle" font-size="17" font-weight="600" fill="#534AB7">Wing C</text><text x="475" y="360" text-anchor="middle" font-size="12" fill="#534AB7">Imaging · wards</text></g>
+    <g ${c("D-G-ER")}><rect x="550" y="120" width="220" height="300" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="2"/><text x="660" y="250" text-anchor="middle" font-size="18" font-weight="600" fill="#A32D2D">Wing D</text><text x="660" y="272" text-anchor="middle" font-size="12" fill="#A32D2D">Radiation · Emergency</text><text x="660" y="290" text-anchor="middle" font-size="12" fill="#A32D2D">OT · ICU</text></g>
+    <g ${c("GATE1")}><rect x="140" y="440" width="110" height="30" rx="6" fill="#fff" stroke="#263238" stroke-width="2"/><text x="195" y="460" text-anchor="middle" font-size="13" font-weight="600" fill="#263238">Gate 1 · Main</text><path d="M195 420 V438" stroke="#263238" stroke-width="2"/></g>
+    <g ${c("GATE2")}><rect x="640" y="440" width="120" height="30" rx="6" fill="#fff" stroke="#A32D2D" stroke-width="2"/><text x="700" y="460" text-anchor="middle" font-size="13" font-weight="600" fill="#A32D2D">Gate 2 · Emergency</text><path d="M700 420 V438" stroke="#A32D2D" stroke-width="2"/></g>
+    <g ${c("GATE3")}><rect x="560" y="40" width="130" height="28" rx="6" fill="#fff" stroke="#607D8B" stroke-width="2"/><text x="625" y="59" text-anchor="middle" font-size="12.5" fill="#455A64">Gate 3 · Service / exit</text></g>
+    <g ${c("PARK")}><rect x="790" y="120" width="90" height="140" rx="6" fill="#ECEFF1" stroke="#90A4AE" stroke-dasharray="5 4"/><text x="835" y="185" text-anchor="middle" font-size="13" fill="#455A64">Parking</text><text x="835" y="203" text-anchor="middle" font-size="11.5" fill="#607D8B">(basement)</text></g>
+    <g ${c("A-G-CANT")}><rect x="90" y="60" width="150" height="50" rx="6" fill="#FFF8EC" stroke="#BA7517"/><text x="165" y="90" text-anchor="middle" font-size="12.5" fill="#854F0B">Canteen (behind lobby)</text></g>
+    <g ${c("STAND")}><rect x="20" y="526" width="150" height="28" rx="6" fill="#fff" stroke="#90A4AE"/><text x="95" y="545" text-anchor="middle" font-size="12.5" fill="#455A64">Bus & auto stand</text></g>
+    <g ${c("REST")}><rect x="250" y="526" width="230" height="28" rx="6" fill="#FFF8EC" stroke="#BA7517"/><text x="365" y="545" text-anchor="middle" font-size="12.5" fill="#854F0B">Saathi Rest House (across road)</text></g>
+    <text x="890" y="550" text-anchor="end" font-size="12" fill="#607D8B">N ↑</text>
+  </svg></div>`;
+}
+
+function renderMain() {
+  document.querySelectorAll("#views button").forEach((b) => b.classList.toggle("on", b.dataset.v === view));
+  $("floorBtns").style.display = view === "floor" ? "flex" : "none";
+  $("floorBtns").innerHTML = H.floors.map((f) => `<button data-f="${f.id}" class="${f.id === floor ? "on" : ""}" title="${esc(f.name)}">${f.id}</button>`).join("");
+  $("main").innerHTML = view === "building" ? renderBuilding() : view === "floor" ? renderFloor() : renderCampus();
+}
+
+function search(q) {
+  q = q.trim().toLowerCase();
+  hits = new Set();
+  if (!q) { $("results").classList.remove("on"); renderMain(); return; }
+  const all = [...H.units, ...H.campus];
+  const found = all.filter((u) => [u.name, u.name_hi, u.rooms, u.note, H.categories[u.cat]?.label].join(" ").toLowerCase().includes(q)).slice(0, 12);
+  found.forEach((u) => hits.add(u.id));
+  $("results").innerHTML = found.length ? found.map((u) => {
+    const where = u.block ? `${blockById(u.block).name} · ${floorById(u.floor).name}${u.rooms ? " · " + u.rooms : ""}` : "Campus";
+    return `<button data-id="${u.id}">${esc(u.name)}<small>${esc(where)}</small></button>`;
+  }).join("") : `<button disabled>No match. Try "scan", "chemo", "billing"…</button>`;
+  $("results").classList.add("on");
+  renderMain();
+}
+
+document.addEventListener("click", (e) => {
+  const v = e.target.closest("#views button"); if (v) { view = v.dataset.v; renderMain(); return; }
+  const f = e.target.closest("#floorBtns button"); if (f) { floor = f.dataset.f; renderMain(); return; }
+  const fl = e.target.closest(".elev .fl"); if (fl) { floor = fl.dataset.floor; view = "floor"; renderMain(); return; }
+  const r = e.target.closest("#results button[data-id]"); if (r) { $("results").classList.remove("on"); select(r.dataset.id, true); return; }
+  const u = e.target.closest("[data-id]"); if (u && $("main").contains(u)) { select(u.dataset.id, false); return; }
+  if (!e.target.closest(".search")) $("results").classList.remove("on");
+});
+$("q").addEventListener("input", (e) => search(e.target.value));
+
+fetch("/api/hospital").then((r) => r.json()).then((data) => {
+  H = data;
+  $("hname").textContent = `${H.name} · Hospital map`;
+  $("hsub").textContent = `${H.name_hi} · demo layout · ${H.units.length} departments across ${H.blocks.length - 1} wings and ${H.floors.length} floors`;
+  $("disc").textContent = H.disclaimer;
+  $("legend").innerHTML = Object.entries(H.categories).map(([k, c]) => `<span><i class="c-${k}" style="border:1px solid"></i>${esc(c.label)}</span>`).join("") + `<span><i style="border:1.5px dashed #888"></i>Staff only / restricted</span>`;
+  const q = new URLSearchParams(location.search);
+  if (q.get("floor")) { floor = q.get("floor"); view = "floor"; }
+  if (q.get("view")) view = q.get("view");
+  renderMain();
+  if (q.get("find")) { $("q").value = q.get("find"); search(q.get("find")); }
+}).catch(() => { $("hsub").textContent = "Could not load hospital data."; });
+</script>
+</body>
+</html>

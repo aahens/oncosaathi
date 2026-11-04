@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OncoSaathi Demo</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#1d2433; --muted:#667085; --accent:#5b4b9a; --ok:#1f7a4d; --warn:#b42318; --line:#e4e7ec; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 system-ui, "Segoe UI", sans-serif; }
+  main { max-width:640px; margin:0 auto; padding:24px 16px 48px; }
+  h1 { margin:0 0 4px; font-size:26px; color:var(--accent); }
+  p.sub { margin:0 0 20px; color:var(--muted); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:16px; }
+  #banner { display:none; background:#fef3f2; border:1px solid #fecdca; color:var(--warn); border-radius:12px; padding:14px; margin-bottom:16px; }
+  #banner code { background:#fff; padding:1px 5px; border-radius:4px; }
+  #mic { width:100%; padding:22px; font-size:20px; border:0; border-radius:12px; background:var(--accent); color:#fff; cursor:pointer; }
+  #mic.rec { background:var(--warn); }
+  #mic:disabled { opacity:.6; cursor:wait; }
+  .meter { height:12px; background:#eef0f4; border-radius:999px; overflow:hidden; margin-top:12px; }
+  .meter div { height:100%; width:0; background:var(--ok); transition:width 60ms linear; }
+  #status { margin-top:10px; color:var(--muted); min-height:24px; }
+  #status.err { color:var(--warn); }
+  form { display:flex; gap:8px; flex-wrap:wrap; }
+  input[type=text] { flex:1 1 260px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; font-size:16px; }
+  select, button.small { padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:#fff; font-size:15px; cursor:pointer; }
+  .samples { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .samples button { border:1px solid var(--line); background:#fafafa; border-radius:999px; padding:5px 10px; font-size:13px; cursor:pointer; }
+  dl { margin:0; display:grid; grid-template-columns:110px 1fr; gap:6px 10px; }
+  dt { color:var(--muted); } dd { margin:0; word-break:break-word; }
+  .intent { display:inline-block; padding:1px 8px; border-radius:999px; background:#eef; font-size:14px; }
+  .intent.clinical, .intent.emergency { background:#fde8e7; color:var(--warn); }
+  audio { width:100%; margin-top:12px; }
+  .notice { font-size:14px; color:var(--muted); background:#f2f0fa; border-radius:12px; padding:12px 14px; margin-bottom:16px; }
+  .notice strong { color:var(--ink); }
+  h2 { margin:0 0 4px; font-size:17px; }
+  .hint { margin:0 0 12px; font-size:13px; color:var(--muted); }
+  #map { display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:6px; align-items:end; }
+  .bldg { display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .bldg b { text-align:center; font-size:14px; margin-top:3px; }
+  .bldg small { text-align:center; font-size:11px; line-height:1.2; color:var(--muted); min-height:27px; }
+  .floor { text-align:center; font-size:12px; padding:5px 0; border:1px solid var(--line); border-radius:5px; background:#fafafa; color:var(--muted); }
+  .floor.blank { background:none; border-color:transparent; }
+  .floor.general { background:var(--ok); border-color:var(--ok); color:#fff; font-weight:700; }
+  .floor.private { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:700; }
+  .floor.all { background:#b54708; border-color:#b54708; color:#fff; font-weight:700; }
+  .legend { display:flex; flex-wrap:wrap; gap:12px; margin-top:12px; font-size:13px; color:var(--muted); }
+  .legend i { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:5px; vertical-align:-1px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>OncoSaathi</h1>
+  <p class="sub">Ask where to go in your own language; the answer comes back in the same language. Tap the button, speak, then tap again to send.</p>
+
+  <div id="banner"></div>
+
+  <div class="notice">
+    <strong>AI service, not medical advice.</strong> It can make mistakes, so please confirm at the help desk.
+    Prototype using Tata Memorial Hospital, Parel locations from its <a id="source" target="_blank" rel="noopener">public 2025 Patient Booklet</a>. Not verified or endorsed by the hospital.
+  </div>
+
+  <div class="card">
+    <button id="mic">🎤 Tap to speak</button>
+    <div class="meter"><div id="level"></div></div>
+    <div id="status">Checking the server…</div>
+  </div>
+
+  <div class="card">
+    <form id="textForm">
+      <input id="q" type="text" placeholder="Or type: CBC test kahan hoga?">
+      <select id="lang">
+        <option value="auto">Auto-detect</option>
+        <option value="hi-IN">Hindi</option><option value="mr-IN">Marathi</option><option value="ta-IN">Tamil</option>
+        <option value="te-IN">Telugu</option><option value="kn-IN">Kannada</option><option value="ml-IN">Malayalam</option>
+        <option value="bn-IN">Bengali</option><option value="gu-IN">Gujarati</option><option value="pa-IN">Punjabi</option>
+        <option value="od-IN">Odia</option><option value="en-IN">English</option>
+      </select>
+      <button class="small" type="submit">Ask</button>
+    </form>
+    <div class="samples" id="samples"></div>
+  </div>
+
+  <div class="card" id="result" hidden>
+    <dl>
+      <dt>We heard</dt><dd id="heard"></dd>
+      <dt>Language</dt><dd id="language"></dd>
+      <dt>Intent</dt><dd><span id="intent" class="intent"></span></dd>
+      <dt>Answer</dt><dd id="answer"></dd>
+      <dt>Time</dt><dd id="time"></dd>
+    </dl>
+    <audio id="player" controls></audio>
+  </div>
+
+  <div class="card">
+    <h2>Campus map</h2>
+    <p class="hint">Which building and floor to go to. A diagram, not to scale. It shows only the floors the booklet lists, and it does not show corridors.</p>
+    <div id="map"></div>
+    <div class="legend">
+      <span><i style="background:var(--ok)"></i>General patients</span>
+      <span><i style="background:var(--accent)"></i>Private patients</span>
+      <span><i style="background:#b54708"></i>All patients</span>
+    </div>
+  </div>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+// Works whether this page comes from the FastAPI server itself or from VS Code Live Server (port 5500).
+const SERVER = location.port === "5500" ? "http://127.0.0.1:8000" : "";
+const MAX_SECONDS = 25;  // Sarvam's quick endpoint accepts up to 30 s
+
+function status(text, isError = false) {
+  $("status").textContent = text;
+  $("status").className = isError ? "err" : "";
+}
+function banner(html) {
+  $("banner").innerHTML = html;
+  $("banner").style.display = html ? "block" : "none";
+}
+
+// The page only works when served by the FastAPI server, not opened as a file.
+async function checkServer() {
+  if (!location.protocol.startsWith("http")) {
+    banner('This page was opened as a file, so it cannot reach the server or the microphone. ' +
+           'In the VS Code terminal run <code>python -m uvicorn main:app --reload</code>, then open ' +
+           '<a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a> in Chrome or Edge.');
+    status("Not connected.", true);
+    $("mic").disabled = true;
+    return;
+  }
+  try {
+    const r = await fetch(SERVER + "/health");
+    if (!r.ok) throw new Error(r.status);
+    banner("");
+    status("Ready. Tap the button and speak.");
+  } catch {
+    banner('The OncoSaathi server is not answering. In the VS Code terminal run ' +
+           '<code>python -m uvicorn main:app --reload</code> and reload this page.');
+    status("Server not running.", true);
+  }
+}
+checkServer();
+
+// ---- campus map: one column per building, lowest floor at the bottom ----
+const FLOOR_LABEL = { B: "Basement", G: "Ground" };
+const FLOOR_ROWS = ["8", "7", "6", "5", "4", "3", "2", "1", "G", "B"];
+let buildings = {};
+
+function drawMap(locations = []) {
+  $("map").replaceChildren(...Object.entries(buildings).map(([code, b]) => {
+    const col = document.createElement("div");
+    col.className = "bldg";
+    FLOOR_ROWS.forEach((f) => {
+      const cell = document.createElement("div");
+      // Keep a blank cell for unlisted floors so each floor lines up across buildings.
+      if (!b.floors.includes(f)) {
+        cell.className = "floor blank";
+        cell.textContent = " ";
+        col.appendChild(cell);
+        return;
+      }
+      const hit = locations.filter((l) => l.building === code && l.floor === f);
+      // A floor serving both groups counts as "all patients".
+      const kinds = new Set(hit.map((l) => l.category));
+      const kind = kinds.size > 1 ? "all" : [...kinds][0] || "";
+      cell.className = "floor " + kind;
+      cell.textContent = FLOOR_LABEL[f] || "Floor " + f;
+      col.appendChild(cell);
+    });
+    const name = document.createElement("b");
+    name.textContent = code;
+    const full = document.createElement("small");
+    full.textContent = b.en;
+    col.append(name, full);
+    return col;
+  }));
+}
+
+async function loadHospital() {
+  try {
+    const h = await (await fetch(SERVER + "/hospital")).json();
+    buildings = h.buildings;
+    $("source").href = h.source_url;
+    drawMap();
+  } catch { /* checkServer already tells the user the server is down */ }
+}
+loadHospital();
+
+const samples = [
+  "Doctor ne chemo se pehle CBC blood test bola hai, kahan jayein?",
+  "chemo room kahan hai?",
+  "pathology department kahan hai?",
+  "naye patient ka registration kahan hoga?",
+  "mujhe bahut dard ho raha hai",
+  "saans nahi aa rahi",
+  "MRI scan kidhar hota hai?",
+];
+samples.forEach((s) => {
+  const b = document.createElement("button");
+  b.type = "button"; b.textContent = s;
+  b.onclick = () => { $("q").value = s; ask(s); };
+  $("samples").appendChild(b);
+});
+
+function show(out) {
+  $("result").hidden = false;
+  $("heard").textContent = out.heard || "(nothing heard)";
+  $("language").textContent = out.language + (out.language_probability != null ? ` (sure: ${out.language_probability})` : "");
+  $("intent").textContent = out.intent;
+  $("intent").className = "intent " + out.intent;
+  $("answer").textContent = out.answer;
+  $("time").textContent = Object.entries(out.seconds || {}).map(([k, v]) => `${k} ${v}s`).join(" · ");
+  drawMap(out.locations);
+  $("player").src = "data:audio/ogg;base64," + out.audio_ogg_base64;
+  $("player").play().catch(() => status("Answer ready. Press play to hear it."));
+}
+
+async function post(url, opts) {
+  status("Sending to Sarvam… (2 to 4 seconds)");
+  $("mic").disabled = true;
+  try {
+    const r = await fetch(SERVER + url, opts);
+    if (!r.ok) throw new Error(`server said ${r.status}: ${(await r.text()).slice(0, 200)}`);
+    show(await r.json());
+    status("Done. Tap the button to ask again.");
+  } catch (e) {
+    status("Error: " + e.message + " (check the server terminal for details)", true);
+  } finally {
+    $("mic").disabled = false;
+  }
+}
+
+function ask(text) {
+  post("/navigate-text", { method: "POST", headers: { "Content-Type": "application/json" },
+                           body: JSON.stringify({ text, lang: $("lang").value }) });
+}
+$("textForm").onsubmit = (e) => { e.preventDefault(); if ($("q").value.trim()) ask($("q").value.trim()); };
+
+// ---- microphone: tap to start, tap to stop ----
+let recorder = null, chunks = [], stream = null, audioCtx = null, raf = 0, timer = 0, started = 0, loudest = 0;
+
+function pickMime() {
+  for (const m of ["audio/webm;codecs=opus", "audio/ogg;codecs=opus", "audio/webm", "audio/mp4"]) {
+    if (window.MediaRecorder && MediaRecorder.isTypeSupported(m)) return m;
+  }
+  return "";
+}
+
+function startMeter() {
+  audioCtx = new AudioContext();
+  const analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 512;
+  audioCtx.createMediaStreamSource(stream).connect(analyser);
+  const data = new Uint8Array(analyser.fftSize);
+  const tick = () => {
+    analyser.getByteTimeDomainData(data);
+    let peak = 0;
+    for (const v of data) peak = Math.max(peak, Math.abs(v - 128));
+    const pct = Math.min(100, (peak / 128) * 250);
+    loudest = Math.max(loudest, pct);
+    $("level").style.width = pct + "%";
+    raf = requestAnimationFrame(tick);
+  };
+  tick();
+}
+
+async function startRecording() {
+  if (!navigator.mediaDevices || !window.MediaRecorder) {
+    status("This browser can't record audio. Use Chrome or Edge.", true);
+    return;
+  }
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (e) {
+    status("Microphone blocked: " + e.message + ". Click the lock icon in the address bar and allow the microphone.", true);
+    return;
+  }
+  const mime = pickMime();
+  recorder = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+  chunks = []; loudest = 0;
+  recorder.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+  recorder.onstop = sendRecording;
+  recorder.start();
+  startMeter();
+  started = Date.now();
+  $("mic").classList.add("rec");
+  timer = setInterval(() => {
+    const s = Math.round((Date.now() - started) / 1000);
+    $("mic").textContent = `● Listening… ${s}s (tap to send)`;
+    if (s >= MAX_SECONDS) stopRecording();
+  }, 250);
+  $("mic").textContent = "● Listening… 0s (tap to send)";
+  status("Listening. The green bar should move when you speak.");
+}
+
+function stopRecording() {
+  if (!recorder || recorder.state !== "recording") return;
+  recorder.stop();
+  clearInterval(timer);
+  cancelAnimationFrame(raf);
+  stream.getTracks().forEach((t) => t.stop());
+  if (audioCtx) audioCtx.close();
+  $("level").style.width = "0";
+  $("mic").classList.remove("rec");
+  $("mic").textContent = "🎤 Tap to speak";
+}
+
+function sendRecording() {
+  const seconds = (Date.now() - started) / 1000;
+  const blob = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
+  if (seconds < 1 || blob.size < 1000) {
+    status("That was too short. Tap, speak your full question, then tap again.", true);
+    return;
+  }
+  if (loudest < 5) {
+    status("I couldn't hear anything: the green bar didn't move. Check that the right microphone is selected in Windows sound settings.", true);
+    return;
+  }
+  const ext = blob.type.includes("ogg") ? "ogg" : blob.type.includes("mp4") ? "m4a" : "webm";
+  const fd = new FormData();
+  fd.append("audio", blob, "question." + ext);
+  post("/navigate-voice", { method: "POST", body: fd });
+}
+
+$("mic").addEventListener("click", () => {
+  if (recorder && recorder.state === "recording") stopRecording();
+  else startRecording();
+});
+</script>
+</body>
+</html>

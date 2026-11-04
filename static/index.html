@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>OncoSaathi</title>
+<link rel="icon" href="/logo.png">
+<style>
+  :root { --wa-dark:#075E54; --wa-green:#25D366; --wa-teal:#00A884; --bg:#EFEAE2; --me:#D9FDD3; --ink:#111B21; --muted:#667781; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { height:100%; background:#D1D7DB; color:var(--ink); font-family:-apple-system, "Segoe UI", Helvetica, Arial, "Noto Sans Devanagari", sans-serif; }
+  body { display:flex; justify-content:center; align-items:center; }
+  .phone { position:relative; width:100%; max-width:420px; height:100dvh; max-height:860px; display:flex; flex-direction:column; background:var(--bg); overflow:hidden; }
+  @media (min-width:480px) { .phone { height:92dvh; border-radius:24px; box-shadow:0 12px 40px rgba(0,0,0,.25); } }
+  @media (min-width:700px) { .phone { max-width:600px; max-height:none; } }
+
+  header { background:var(--wa-dark); color:#fff; display:flex; align-items:center; gap:10px; padding:10px 8px 10px 6px; flex-shrink:0; }
+  .icon-btn { background:none; border:none; color:inherit; width:40px; height:40px; border-radius:50%; display:grid; place-items:center; cursor:pointer; flex-shrink:0; }
+  .icon-btn:active { background:rgba(255,255,255,.15); }
+  .icon-btn svg { width:24px; height:24px; fill:currentColor; }
+  .avatar { width:40px; height:40px; border-radius:50%; background:var(--wa-green); display:grid; place-items:center; font-size:22px; flex-shrink:0; }
+  .who { flex:1; min-width:0; }
+  .who .name { font-size:17px; font-weight:600; color:#fff; }
+  .who .status { font-size:13px; color:#D7F0EC; }
+
+  #chat { flex:1; overflow-y:auto; padding:10px 12px 6px; display:flex; flex-direction:column; gap:6px;
+          background-color:var(--bg); background-image:radial-gradient(#D6CFC4 1px, transparent 1px); background-size:20px 20px; }
+  .row { display:flex; } .row.me { justify-content:flex-end; } .row.bot { justify-content:flex-start; }
+  .bubble { max-width:82%; background:#fff; color:var(--ink); border-radius:10px; padding:7px 9px 5px; font-size:15px; line-height:1.4;
+            box-shadow:0 1px .5px rgba(11,20,26,.13); word-wrap:break-word; }
+  .row.me .bubble { background:var(--me); }
+  .text { white-space:pre-wrap; }
+  .meta { display:flex; justify-content:flex-end; align-items:center; gap:3px; font-size:11px; color:var(--muted); margin-top:3px; }
+  .ticks { color:#53BDEB; font-size:13px; letter-spacing:-3px; padding-right:3px; }
+  .bubble img { display:block; max-width:240px; width:100%; border-radius:6px; }
+  .daychip { align-self:center; background:#fff; color:var(--muted); font-size:12px; padding:4px 10px; border-radius:8px; box-shadow:0 1px .5px rgba(11,20,26,.1); margin:4px 0; }
+  .found { font-size:13.5px; }
+  .bubble.photo { padding:3px 3px 5px; width:96%; max-width:96%; }
+  .bubble.photo img.route { display:block; width:100%; max-width:none; border-radius:7px; cursor:zoom-in; background:#E9EDEF; min-height:150px; }
+  .bubble.photo .caption { padding:6px 7px 0; font-size:14.5px; white-space:pre-wrap; }
+  .bubble.photo .meta { padding-right:6px; }
+  .bubble.photo select { margin:7px 7px 0; width:calc(100% - 14px); padding:8px; font:inherit; font-size:14px; color:var(--ink); background:#F0F2F5; border:0; border-radius:8px; }
+  #viewer { position:fixed; inset:0; z-index:40; background:#000; display:none; flex-direction:column; }
+  #viewer.on { display:flex; }
+  #viewer header { display:flex; align-items:center; gap:10px; padding:10px 12px; color:#fff; font-size:15px; }
+  #viewer button { background:none; border:0; color:#fff; font-size:24px; cursor:pointer; line-height:1; padding:4px 8px; }
+  #viewer .pan { flex:1; min-height:0; overflow:auto; display:flex; }
+  #viewer img { display:block; margin:auto; max-width:100%; max-height:calc(100dvh - 60px); cursor:zoom-in; }
+  #viewer img.zoom { max-width:none; max-height:none; cursor:zoom-out; }
+  #captions img.route { display:block; width:100%; border-radius:8px; }
+
+  .vn { display:flex; align-items:center; gap:10px; min-width:230px; padding:2px 0 4px; }
+  .vn .play { width:34px; height:34px; border:none; background:none; color:#54656F; cursor:pointer; display:grid; place-items:center; flex-shrink:0; }
+  .vn .play svg { width:26px; height:26px; fill:currentColor; }
+  .vn .track { flex:1; display:flex; flex-direction:column; gap:4px; }
+  .vn .bar { position:relative; height:4px; background:#C9D2D6; border-radius:2px; cursor:pointer; }
+  .vn .fill { position:absolute; left:0; top:0; bottom:0; width:0; background:var(--wa-teal); border-radius:2px; }
+  .vn .dot { position:absolute; top:50%; width:12px; height:12px; margin:-6px 0 0 -6px; left:0; border-radius:50%; background:var(--wa-teal); }
+  .vn .dur { font-size:11px; color:var(--muted); }
+  .vn .mini { width:38px; height:38px; border-radius:50%; background:var(--wa-green); display:grid; place-items:center; font-size:20px; flex-shrink:0; }
+  .row.me .vn .mini { background:#A5B6BD; }
+
+  .typing span { display:inline-block; width:7px; height:7px; margin:0 2px; border-radius:50%; background:#9AA6AC; animation:blink 1.2s infinite; }
+  .typing span:nth-child(2) { animation-delay:.2s; } .typing span:nth-child(3) { animation-delay:.4s; }
+  @keyframes blink { 0%,80%,100% { opacity:.3 } 40% { opacity:1 } }
+
+  footer { display:flex; align-items:flex-end; gap:6px; padding:6px 8px calc(8px + env(safe-area-inset-bottom)); flex-shrink:0; background:var(--bg); }
+  .pill { flex:1; min-width:0; display:flex; align-items:center; background:#fff; border-radius:24px; padding:4px 6px 4px 16px; min-height:48px; box-shadow:0 1px .5px rgba(11,20,26,.13); }
+  .pill textarea { flex:1; min-width:0; border:none; outline:none; resize:none; background:transparent; color:var(--ink); font:inherit; font-size:16px; line-height:22px; max-height:110px; padding:9px 0; }
+  .pill textarea::placeholder { color:var(--muted); }
+  .pill .icon-btn { color:#54656F; width:38px; height:38px; }
+  .fab { width:48px; height:48px; border-radius:50%; border:none; background:var(--wa-teal); color:#fff; display:grid; place-items:center; cursor:pointer; flex-shrink:0; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+  .fab svg { width:24px; height:24px; fill:currentColor; }
+  .rec { display:none; flex:1; align-items:center; gap:10px; background:#fff; border-radius:24px; min-height:48px; padding:0 8px 0 16px; color:var(--ink); }
+  .rec .reddot { width:10px; height:10px; border-radius:50%; background:#F15C6D; animation:blink 1s infinite; }
+  .rec .time { flex:1; font-size:16px; font-variant-numeric:tabular-nums; }
+  .rec .icon-btn { color:#54656F; }
+  footer.recording .pill { display:none; } footer.recording .rec { display:flex; }
+
+  /* call screen */
+  #call { position:absolute; inset:0; display:none; flex-direction:column; align-items:center; background:linear-gradient(#0B3D36, #062A25); color:#fff; padding:56px 20px 36px; z-index:5; }
+  #call.on { display:flex; }
+  #call .big { width:112px; height:112px; border-radius:50%; background:var(--wa-green); display:grid; place-items:center; font-size:56px; margin-top:24px; }
+  #call .cname { font-size:24px; font-weight:600; margin-top:18px; }
+  #call .cstate { font-size:15px; color:#CFE9E4; margin-top:6px; min-height:20px; }
+  #captions { flex:1; width:100%; overflow-y:auto; margin:22px 0; display:flex; flex-direction:column; gap:8px; font-size:15px; }
+  #captions .c { padding:7px 11px; border-radius:10px; max-width:88%; background:rgba(255,255,255,.12); color:#fff; }
+  #captions .c.user { align-self:flex-end; background:rgba(37,211,102,.28); }
+  .callbar { display:flex; gap:36px; }
+  .callbar button { width:62px; height:62px; border-radius:50%; border:none; display:grid; place-items:center; cursor:pointer; }
+  .callbar svg { width:28px; height:28px; fill:#fff; }
+  #muteBtn { background:rgba(255,255,255,.18); } #muteBtn.on { background:#fff; } #muteBtn.on svg { fill:#062A25; }
+  #endBtn { background:#F15C6D; }
+  .menu { position:absolute; top:58px; right:8px; background:#fff; color:var(--ink); border-radius:10px; box-shadow:0 6px 24px rgba(0,0,0,.2); min-width:230px; padding:6px 0; display:none; z-index:6; }
+  .menu.on { display:block; }
+  .menu .mhead { font-size:12px; color:var(--muted); padding:6px 16px 4px; }
+  .menu button { display:block; width:100%; text-align:left; background:none; border:none; padding:10px 16px; font:inherit; font-size:15px; color:var(--ink); cursor:pointer; }
+  .menu button small { display:block; font-size:12px; color:var(--muted); }
+  .menu button.sel { background:#E7F6EE; }
+  .toast { position:absolute; left:50%; bottom:84px; transform:translateX(-50%); background:#323739; color:#fff; padding:9px 14px; border-radius:8px; font-size:14px; opacity:0; transition:opacity .2s; pointer-events:none; max-width:90%; text-align:center; z-index:9; }
+  .toast.show { opacity:1; }
+  .signin { position:absolute; inset:0; z-index:8; background:var(--bg); display:none; flex-direction:column; align-items:center; padding:48px 24px 24px; gap:14px; text-align:center; }
+  .signin.on { display:flex; }
+  .signin img { width:96px; height:96px; border-radius:50%; background:#fff; }
+  .signin h2 { font-size:22px; color:var(--wa-dark); }
+  .signin p { font-size:15px; color:#3B4A54; line-height:1.45; }
+  .signin input[type=tel] { width:100%; max-width:300px; font:inherit; font-size:20px; letter-spacing:1px; padding:12px 14px; border:1px solid #C9D2D6; border-radius:12px; text-align:center; background:#fff; color:var(--ink); }
+  .signin label { display:flex; gap:10px; align-items:flex-start; text-align:left; font-size:13.5px; color:#3B4A54; max-width:320px; line-height:1.4; }
+  .signin label input { margin-top:3px; width:18px; height:18px; flex-shrink:0; }
+  .signin button { background:var(--wa-teal); color:#fff; border:none; border-radius:24px; padding:12px 28px; font:inherit; font-size:16px; font-weight:600; cursor:pointer; }
+  .signin .err { color:#C62828; font-size:14px; min-height:18px; }
+  .acts { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+  .acts a { display:inline-block; background:#E7F6EE; color:#0B5C52; border-radius:16px; padding:6px 12px; font-size:14px; font-weight:600; text-decoration:none; }
+  .remind .bubble { background:#FFF6D6; }
+  .avatar img, #call .big img, .vn .mini img { width:100%; height:100%; object-fit:cover; border-radius:50%; display:block; background:#fff; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <header>
+    <button class="icon-btn" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M12 4l1.4 1.4L7.8 11H20v2H7.8l5.6 5.6L12 20l-8-8z"/></svg></button>
+    <div class="avatar"><img src="/logo.png" alt="" onerror="this.replaceWith('🛶')"></div>
+    <div class="who"><div class="name">OncoSaathi</div><div class="status" id="status">online</div></div>
+    <button class="icon-btn" id="callBtn" aria-label="Voice call"><svg viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 013 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z"/></svg></button>
+    <button class="icon-btn" id="menuBtn" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M12 7a2 2 0 110-4 2 2 0 010 4zm0 7a2 2 0 110-4 2 2 0 010 4zm0 7a2 2 0 110-4 2 2 0 010 4z"/></svg></button>
+  </header>
+
+  <div class="menu" id="menu">
+    <button onclick="window.open('/map', '_blank')">🗺 Hospital map<small>Every floor and department</small></button>
+    <button id="signOutBtn">🔓 Sign out<small>Your steps stay saved</small></button>
+    <button id="deleteBtn">🗑 Delete my data<small>Erase your name and steps</small></button></div>
+
+  <section class="signin" id="signin">
+    <img src="/logo.png" alt="" onerror="this.replaceWith('🛶')">
+    <h2>OncoSaathi</h2>
+    <p>अस्पताल में आपका साथी। अपना मोबाइल नंबर डालिए, ताकि अगली बार मैं आपको और आपके अगले कदम याद रख सकूँ।<br><small>Enter your mobile number so I can remember you and your next steps.</small></p>
+    <input type="tel" id="phoneIn" inputmode="numeric" maxlength="14" placeholder="98765 43210" autocomplete="tel">
+    <label><input type="checkbox" id="consentIn"> <span>मैं सहमत हूँ कि OncoSaathi मेरा नाम, नंबर और अस्पताल के अगले कदम (कोई मेडिकल जानकारी नहीं) सुरक्षित रूप से सेव करे। मैं ⋮ मेनू से कभी भी डिलीट कर सकता/सकती हूँ।<br><small>I agree that OncoSaathi saves my name, number and hospital steps (no medical details), securely. I can delete them any time from the ⋮ menu.</small></span></label>
+    <div class="err" id="signErr"></div>
+    <button id="signBtn">शुरू करें · Start</button>
+  </section>
+  <main id="chat"><div class="daychip">Today</div><div class="daychip" style="max-width:88%;text-align:center">🤖 OncoSaathi is an AI service, not medical advice. It can make mistakes, so please confirm at the help desk. The map is a sample layout, not the real floor plan.</div></main>
+
+  <footer id="footer">
+    <div class="pill">
+      <textarea id="msg" rows="1" placeholder="Message"></textarea>
+      <button class="icon-btn" id="attachBtn" aria-label="Attach"><svg viewBox="0 0 24 24"><path d="M16.5 6.5v10.6a4.5 4.5 0 01-9 0V5.6a3 3 0 016 0v10.5a1.5 1.5 0 01-3 0V6.5H9v9.6a3 3 0 006 0V5.6a4.5 4.5 0 00-9 0v11.5a6 6 0 0012 0V6.5z" transform="rotate(40 12 12)"/></svg></button>
+      <button class="icon-btn" id="camBtn" aria-label="Camera"><svg viewBox="0 0 24 24"><path d="M12 15.2a3.2 3.2 0 100-6.4 3.2 3.2 0 000 6.4zM9 2L7.2 4H4a2 2 0 00-2 2v12c0 1.1.9 2 2 2h16a2 2 0 002-2V6a2 2 0 00-2-2h-3.2L15 2H9zm3 15a5 5 0 110-10 5 5 0 010 10z"/></svg></button>
+    </div>
+    <div class="rec">
+      <div class="reddot"></div><div class="time" id="recTime">0:00</div>
+      <button class="icon-btn" id="recCancel" aria-label="Delete recording"><svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+    </div>
+    <button class="fab" id="fab" aria-label="Record voice note"></button>
+    <input type="file" id="fileIn" accept="image/*,application/pdf" hidden>
+    <input type="file" id="camIn" accept="image/*" capture="environment" hidden>
+  </footer>
+
+  <section id="call">
+    <div class="big"><img src="/logo.png" alt="" onerror="this.replaceWith('🛶')"></div>
+    <div class="cname">OncoSaathi</div>
+    <div class="cstate" id="cstate">Calling…</div>
+    <div id="captions"></div>
+    <div class="callbar">
+      <button id="muteBtn" aria-label="Mute"><svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.9V21h2v-3.1a7 7 0 006-6.9h-2z"/></svg></button>
+      <button id="endBtn" aria-label="End call"><svg viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.1.3-4.6.7v3.1c0 .4-.2.7-.6.9-1 .5-1.9 1.1-2.7 1.8-.2.2-.4.3-.7.3s-.5-.1-.7-.3L.3 13.1A1 1 0 010 12.4c0-.3.1-.5.3-.7A16.9 16.9 0 0112 7c4.5 0 8.6 1.8 11.7 4.7.2.2.3.4.3.7s-.1.5-.3.7l-2.5 2.4c-.2.2-.4.3-.7.3s-.5-.1-.7-.3c-.8-.7-1.7-1.3-2.7-1.8-.3-.2-.6-.5-.6-.9V9.7C15.1 9.3 13.6 9 12 9z"/></svg></button>
+    </div>
+  </section>
+  <section id="viewer">
+    <header><button id="viewerClose" aria-label="Back">←</button><span>Your route · tap the map to zoom in or out</span></header>
+    <div class="pan"><img id="viewerImg" alt="Walkthrough map"></div>
+  </section>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const chat = $("chat"), msg = $("msg"), fab = $("fab"), footer = $("footer");
+const ICON_MIC = '<svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.9V21h2v-3.1a7 7 0 006-6.9h-2z"/></svg>';
+const ICON_SEND = '<svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>';
+const ICON_PLAY = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+const ICON_PAUSE = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+let lastLang = "hi", busy = 0;
+let token = (() => { try { return localStorage.getItem("onco_token") || ""; } catch { return ""; } })();
+function saveToken(t) { token = t; try { t ? localStorage.setItem("onco_token", t) : localStorage.removeItem("onco_token"); } catch {} }
+
+const now = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+function toast(t) { const el = $("toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 3200); }
+function scroll() { chat.scrollTop = chat.scrollHeight; }
+function setBusy(d) { busy = Math.max(0, busy + d); $("status").textContent = busy ? "typing…" : "online"; }
+
+function add(side, html) {
+  const row = document.createElement("div");
+  row.className = "row " + side;
+  const ticks = side === "me" ? '<span class="ticks">✓✓</span>' : "";
+  row.innerHTML = `<div class="bubble">${html}<div class="meta">${now()}${ticks}</div></div>`;
+  chat.appendChild(row); scroll();
+  return row;
+}
+function typing() { const r = add("bot", '<div class="typing"><span></span><span></span><span></span></div>'); r.querySelector(".meta").remove(); return r; }
+
+function voiceNote(src, side, autoplay) {
+  const id = "a" + Math.random().toString(36).slice(2);
+  const html = `<div class="vn"><button class="play" data-a="${id}">${ICON_PLAY}</button>
+     <div class="track"><div class="bar"><div class="fill"></div><div class="dot"></div></div><div class="dur">0:00</div></div>
+     <div class="mini">${side === "me" ? "👤" : `<img src="/logo.png" alt="" onerror="this.replaceWith('🛶')">`}</div></div><audio id="${id}" preload="auto" src="${src}"></audio>`;
+  return { html, id, autoplay };
+}
+function wireVoice(row, id, autoplay) {
+  const a = row.querySelector("#" + id), btn = row.querySelector(".play"), fill = row.querySelector(".fill"),
+        dot = row.querySelector(".dot"), dur = row.querySelector(".dur"), bar = row.querySelector(".bar");
+  const fmt = (s) => isFinite(s) ? `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}` : "0:00";
+  a.addEventListener("loadedmetadata", () => dur.textContent = fmt(a.duration));
+  a.addEventListener("timeupdate", () => { const p = a.duration ? a.currentTime / a.duration * 100 : 0; fill.style.width = p + "%"; dot.style.left = p + "%"; dur.textContent = fmt(a.currentTime || a.duration); });
+  a.addEventListener("play", () => btn.innerHTML = ICON_PAUSE);
+  a.addEventListener("pause", () => btn.innerHTML = ICON_PLAY);
+  a.addEventListener("ended", () => { btn.innerHTML = ICON_PLAY; dur.textContent = fmt(a.duration); });
+  btn.onclick = () => { document.querySelectorAll("audio").forEach((o) => o !== a && o.pause()); a.paused ? a.play() : a.pause(); };
+  bar.onclick = (e) => { if (a.duration) a.currentTime = (e.offsetX / bar.clientWidth) * a.duration; };
+  if (autoplay) { document.querySelectorAll("audio").forEach((o) => o !== a && o.pause()); a.play().catch(() => {}); }
+}
+
+function botReply(j) {
+  if (j.error) { add("bot", `<div class="text">⚠️ ${esc(j.error)}</div>`); return; }
+  if (j.lang) lastLang = j.lang;
+  let html = "", vn = null;
+  if (j.audio_b64) { vn = voiceNote("data:audio/wav;base64," + j.audio_b64, "bot", true); html += vn.html; }
+  html += `<div class="text">${esc(j.text)}</div>`;
+  if (j.actions && j.actions.length) html += `<div class="acts">${j.actions.map((a) => `<a href="tel:${esc(a.tel)}">${esc(a.label)}</a>`).join("")}</div>`;
+  const row = add("bot", html);
+  if (vn) wireVoice(row, vn.id, true);
+  if (j.map) mapMessage(j.map);
+}
+
+// ---------- walkthrough map: a WhatsApp photo message, sent right after the text ----------
+let placesHtml = "";
+async function loadPlaces() {
+  if (placesHtml) return placesHtml;
+  const p = await fetch("/api/places").then((r) => r.json());
+  const groups = Object.keys(p.floors).map((f) => `<optgroup label="${esc(p.floors[f])}">${p.places.filter((x) => x.floor === f).map((x) => `<option value="${esc(x.id)}">${esc(x.name)}</option>`).join("")}</optgroup>`);
+  return placesHtml = groups.join("");
+}
+function mapMessage(m) {
+  const row = add("bot", `<img class="route" src="${esc(m.url)}" alt="Map of the route to your room"><div class="caption">${esc(m.caption)}</div>
+    <select aria-label="Where are you standing?"><option value="">📍 I'm standing somewhere else…</option></select>`);
+  const bubble = row.querySelector(".bubble"), img = row.querySelector("img.route"), pick = row.querySelector("select");
+  bubble.classList.add("photo");
+  img.onload = scroll;
+  img.onclick = () => { $("viewerImg").src = img.src; $("viewerImg").classList.remove("zoom"); $("viewer").classList.add("on"); };
+  loadPlaces().then((h) => pick.insertAdjacentHTML("beforeend", h)).catch(() => pick.remove());
+  pick.onchange = async () => {
+    if (!pick.value) return;
+    const fd = new FormData(); fd.append("place", pick.value);
+    pick.value = "";
+    const t = typing(); setBusy(1);
+    const j = await post("/api/here", fd).catch((e) => ({ error: e.message }));
+    t.remove(); setBusy(-1); botReply(j);
+  };
+}
+$("viewerClose").onclick = () => $("viewer").classList.remove("on");
+$("viewerImg").onclick = () => $("viewerImg").classList.toggle("zoom");
+
+async function post(url, fd) {
+  fd.append("token", token);
+  const r = await fetch(url, { method: "POST", body: fd });
+  if (r.status === 401) { showSignin(); return { error: "Please sign in again." }; }
+  try { return await r.json(); } catch { return { error: `Server error (${r.status})` }; }
+}
+
+// ---------- text ----------
+function updateFab() { fab.innerHTML = msg.value.trim() ? ICON_SEND : ICON_MIC; fab.setAttribute("aria-label", msg.value.trim() ? "Send" : "Record voice note"); }
+msg.addEventListener("input", () => { msg.style.height = "auto"; msg.style.height = Math.min(msg.scrollHeight, 110) + "px"; updateFab(); });
+msg.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendText(); } });
+async function sendText() {
+  const q = msg.value.trim(); if (!q) return;
+  msg.value = ""; msg.style.height = "auto"; updateFab();
+  add("me", `<div class="text">${esc(q)}</div>`);
+  const t = typing(); setBusy(1);
+  const fd = new FormData(); fd.append("q", q);
+  const j = await post("/api/message", fd).catch((e) => ({ error: e.message }));
+  t.remove(); setBusy(-1); botReply(j);
+}
+
+// ---------- voice notes ----------
+let rec = null, recChunks = [], recStart = 0, recTimer = null, recCancelled = false;
+fab.onclick = () => { if (msg.value.trim()) return sendText(); if (rec) return stopRec(); startRec(); };
+$("recCancel").onclick = () => { recCancelled = true; stopRec(); };
+async function startRec() {
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+  catch (e) { return toast("Microphone permission is needed for voice notes."); }
+  const type = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"].find((t) => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || "";
+  rec = new MediaRecorder(stream, type ? { mimeType: type } : undefined);
+  recChunks = []; recCancelled = false;
+  rec.ondataavailable = (e) => e.data.size && recChunks.push(e.data);
+  rec.onstop = () => { stream.getTracks().forEach((t) => t.stop()); if (!recCancelled) sendVoice(new Blob(recChunks, { type: rec.mimeType || "audio/webm" })); rec = null; };
+  rec.start();
+  recStart = Date.now(); footer.classList.add("recording"); fab.innerHTML = ICON_SEND; fab.setAttribute("aria-label", "Send voice note");
+  recTimer = setInterval(() => { const s = Math.floor((Date.now() - recStart) / 1000); $("recTime").textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; if (s >= 29) stopRec(); }, 250);
+}
+function stopRec() { clearInterval(recTimer); footer.classList.remove("recording"); $("recTime").textContent = "0:00"; updateFab(); if (rec && rec.state !== "inactive") rec.stop(); }
+async function sendVoice(blob) {
+  if (blob.size < 1200) return toast("Hold on a little longer while speaking.");
+  const url = URL.createObjectURL(blob), vn = voiceNote(url, "me", false);
+  const row = add("me", vn.html); wireVoice(row, vn.id, false);
+  const t = typing(); setBusy(1);
+  const ext = (blob.type.includes("mp4") ? "m4a" : blob.type.includes("ogg") ? "ogg" : "webm");
+  const fd = new FormData(); fd.append("file", blob, "note." + ext);
+  const j = await post("/api/voice", fd).catch((e) => ({ error: e.message }));
+  t.remove(); setBusy(-1);
+  if (j.transcript) { const tx = document.createElement("div"); tx.className = "text"; tx.style.cssText = "font-size:13px;color:#54656F;margin-top:2px"; tx.textContent = j.transcript; row.querySelector(".bubble").insertBefore(tx, row.querySelector(".meta")); }
+  botReply(j);
+}
+
+// ---------- slip photos ----------
+$("attachBtn").onclick = () => $("fileIn").click();
+$("camBtn").onclick = () => $("camIn").click();
+[$("fileIn"), $("camIn")].forEach((inp) => inp.onchange = () => { const f = inp.files[0]; inp.value = ""; if (f) sendSlip(f); });
+async function sendSlip(file) {
+  const isImg = file.type.startsWith("image/");
+  add("me", isImg ? `<img src="${URL.createObjectURL(file)}" alt="Uploaded slip">` : `<div class="text">📄 ${esc(file.name)}</div>`);
+  const t = typing(); setBusy(1);
+  const fd = new FormData(); fd.append("file", file, file.name || "slip.jpg"); fd.append("lang", lastLang);
+  const j = await post("/api/slip", fd).catch((e) => ({ error: e.message }));
+  t.remove(); setBusy(-1); botReply(j);
+  if (j.found && j.found.length) add("bot", `<div class="text found">📋 Found on slip: ${esc(j.found.join(" · "))}</div>`);
+}
+
+// ---------- live call with the Sarvam Voice Agent ----------
+let ws = null, actx = null, micStream = null, worklet = null, playHead = 0, sources = [], muted = false, callStart = 0, callTick = null, callLog = [], callMaps = [];
+$("callBtn").onclick = startCall;
+$("endBtn").onclick = () => endCall();
+$("muteBtn").onclick = () => { muted = !muted; $("muteBtn").classList.toggle("on", muted); };
+
+function caption(role, text) {
+  const c = document.createElement("div"); c.className = "c " + (role === "user" ? "user" : "bot"); c.textContent = text;
+  $("captions").appendChild(c); $("captions").scrollTop = 1e9; callLog.push([role, text]);
+}
+function callMap(m) {
+  const c = document.createElement("div"); c.className = "c bot";
+  c.innerHTML = `<img class="route" src="${esc(m.url)}" alt="Map of the route to your room">`;
+  c.querySelector("img").onload = () => { $("captions").scrollTop = 1e9; };
+  $("captions").appendChild(c); callMaps.push(m);
+}
+function stopPlayback() { sources.forEach((s) => { try { s.stop(); } catch {} }); sources = []; playHead = actx ? actx.currentTime : 0; }
+function playPcm(b64, sr) {
+  if (!b64 || !actx) return;
+  const bin = atob(b64), n = bin.length >> 1;
+  if (n < 1) return;                       // the agent sometimes sends empty chunks; Firefox/Chrome reject 0-length buffers
+  const f = new Float32Array(n);
+  for (let i = 0; i < n; i++) { let v = bin.charCodeAt(2 * i) | (bin.charCodeAt(2 * i + 1) << 8); if (v >= 32768) v -= 65536; f[i] = v / 32768; }
+  const buf = actx.createBuffer(1, n, sr || 16000); buf.copyToChannel(f, 0);
+  const src = actx.createBufferSource(); src.buffer = buf; src.connect(actx.destination);
+  // a reply starts 0.3 s late on purpose: the hosted agent streams 0.1 s pieces, and a late one would cut a word
+  playHead = Math.max(playHead, actx.currentTime + 0.3); src.start(playHead); playHead += buf.duration;
+  sources.push(src); src.onended = () => { sources = sources.filter((s) => s !== src); };
+}
+
+// Browser errors go to the server log so failures on any device are visible.
+function report(where, err) {
+  const m = (err && (err.message || err.name)) || String(err);
+  fetch("/api/log", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ where, message: m, ua: navigator.userAgent }) }).catch(() => {});
+  return m;
+}
+window.addEventListener("error", (e) => report("window", e.error || e.message));
+window.addEventListener("unhandledrejection", (e) => report("promise", e.reason));
+
+// Mic capture at the device's native rate, downsampled to 16 kHz PCM16 in 100 ms frames.
+const WORKLET = `class P extends AudioWorkletProcessor{constructor(){super();this.r=sampleRate/16000;this.a=0;this.s=0;this.n=0;this.o=[];}
+process(i){const c=i[0]&&i[0][0];if(c){for(let k=0;k<c.length;k++){this.s+=c[k];this.n++;this.a+=1;if(this.a>=this.r){this.a-=this.r;this.o.push(this.s/this.n);this.s=0;this.n=0;}}
+if(this.o.length>=1600){const b=new Int16Array(this.o.length);for(let k=0;k<this.o.length;k++){const v=Math.max(-1,Math.min(1,this.o[k]));b[k]=v<0?v*32768:v*32767;}this.port.postMessage(b.buffer,[b.buffer]);this.o=[];}}return true;}}
+registerProcessor("pcm",P);`;
+
+async function startCall() {
+  if ($("call").classList.contains("on")) return;
+  // Create and unlock audio inside the tap itself (Safari / iPhone require this before any await).
+  const AC = window.AudioContext || window.webkitAudioContext;
+  actx = new AC(); actx.resume().catch(() => {});
+  $("captions").innerHTML = ""; callLog = []; callMaps = []; muted = false; $("muteBtn").classList.remove("on");
+  $("cstate").textContent = "Connecting…"; $("call").classList.add("on");
+  try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("Microphone isn't available here. Open the https link in Chrome or Safari.");
+    if (!window.AudioWorkletNode) throw new Error("This browser is too old for calls. Please update Chrome or Safari.");
+    const cfg = await fetch("/api/config").then((r) => r.json());
+    if (!cfg.agent_ready) throw new Error("Voice agent isn't connected yet.");
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 } });
+    await actx.resume();
+    await actx.audioWorklet.addModule(URL.createObjectURL(new Blob([WORKLET], { type: "application/javascript" })));
+    worklet = new AudioWorkletNode(actx, "pcm");
+    actx.createMediaStreamSource(micStream).connect(worklet);
+    $("cstate").textContent = "Calling…";
+    ws = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws/call?token=" + encodeURIComponent(token));
+    ws.binaryType = "arraybuffer";
+    worklet.port.onmessage = (e) => { if (ws && ws.readyState === 1) ws.send(muted ? new ArrayBuffer(e.data.byteLength) : e.data); };
+    ws.onmessage = (e) => {
+      const m = JSON.parse(e.data);
+      if (m.type === "connected") { callStart = Date.now(); callTick = setInterval(() => { const s = Math.floor((Date.now() - callStart) / 1000); $("cstate").textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; }, 500); }
+      else if (m.type === "audio") playPcm(m.b64, m.sr);
+      else if (m.type === "transcript") caption(m.role.toLowerCase().includes("user") ? "user" : "bot", m.text);
+      else if (m.type === "map") callMap(m);
+      else if (m.type === "event" && /interrupt/i.test(m.name)) stopPlayback();
+      else if (m.type === "error") { report("server", m.message); toast(m.message); endCall(); }
+      else if (m.type === "ended") endCall();
+    };
+    ws.onerror = () => report("ws", "WebSocket error");
+    ws.onclose = () => endCall();
+  } catch (e) {
+    const m = report("call-start", e);
+    toast(e && e.name === "NotAllowedError" ? "Please allow microphone access to call." : e && e.name === "NotFoundError" ? "No microphone found." : m);
+    endCall();
+  }
+}
+function endCall() {
+  if (!$("call").classList.contains("on")) return;
+  $("call").classList.remove("on"); clearInterval(callTick);
+  const secs = callStart ? Math.floor((Date.now() - callStart) / 1000) : 0; callStart = 0;
+  try { ws && ws.close(); } catch {} ws = null;
+  try { worklet && worklet.disconnect(); } catch {} worklet = null;
+  micStream && micStream.getTracks().forEach((t) => t.stop()); micStream = null;
+  stopPlayback(); try { actx && actx.close(); } catch {} actx = null;
+  if (secs) add("bot", `<div class="text">📞 Voice call · ${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}${callLog.length ? "\n\n" + callLog.map(([r, t]) => (r === "user" ? "You: " : "OncoSaathi: ") + t).map(esc).join("\n") : ""}</div>`);
+  if (secs && callMaps.length) mapMessage(callMaps[callMaps.length - 1]);   // the last route stays in the chat after the call
+}
+
+// ---------- ⋮ menu ----------
+$("menuBtn").onclick = (e) => { e.stopPropagation(); $("menu").classList.toggle("on"); };
+document.addEventListener("click", (e) => { if (!$("menu").contains(e.target)) $("menu").classList.remove("on"); });
+
+// ---------- start ----------
+updateFab();
+// ---------- sign-in, memory, reminders ----------
+function showSignin() { saveToken(""); $("signin").classList.add("on"); }
+$("signBtn").onclick = async () => {
+  const phone = $("phoneIn").value.trim(), consent = $("consentIn").checked;
+  if (phone.replace(/\D/g, "").length < 10) { $("signErr").textContent = "10 अंकों का मोबाइल नंबर डालिए · Enter a 10-digit mobile number"; return; }
+  if (!consent) { $("signErr").textContent = "आगे बढ़ने के लिए सहमति ज़रूरी है · Please tick the consent box"; return; }
+  $("signErr").textContent = "";
+  const fd = new FormData(); fd.append("phone", phone); fd.append("consent", "1");
+  const r = await fetch("/api/session", { method: "POST", body: fd }).then((x) => x.json()).catch(() => ({ message: "Network error" }));
+  if (!r.token) { $("signErr").textContent = r.message || "Could not sign in"; return; }
+  saveToken(r.token); $("phoneIn").value = ""; $("signin").classList.remove("on");
+  add("bot", `<div class="text">${esc(r.text)}</div>`);
+};
+$("phoneIn").addEventListener("input", () => { $("signErr").textContent = ""; });
+$("signOutBtn").onclick = () => { $("menu").classList.remove("on"); showSignin(); };
+$("deleteBtn").onclick = async () => {
+  $("menu").classList.remove("on");
+  if (!confirm("आपका नाम, नंबर और सारे कदम हमेशा के लिए मिट जाएँगे। पक्का?\nYour name, number and all steps will be erased. Continue?")) return;
+  const fd = new FormData(); fd.append("token", token);
+  await fetch("/api/me/delete", { method: "POST", body: fd }).catch(() => {});
+  toast("Your data has been deleted"); showSignin();
+};
+async function pollOutbox() {
+  if (!token) return;
+  const r = await fetch("/api/outbox?token=" + encodeURIComponent(token)).then((x) => x.ok ? x.json() : null).catch(() => null);
+  (r && r.messages || []).forEach((m) => { add("bot", `<div class="text">${esc(m.text)}</div>`).classList.add("remind"); });
+}
+setInterval(pollOutbox, 20000);
+(async () => {
+  if (!token) return showSignin();
+  const r = await fetch("/api/hello?token=" + encodeURIComponent(token)).then((x) => x.ok ? x.json() : null).catch(() => null);
+  if (!r) return showSignin();
+  add("bot", `<div class="text">${esc(r.text)}</div>`);
+  pollOutbox();
+})();
+</script>
+</body>
+</html>

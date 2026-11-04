@@ -1,0 +1,18 @@
+﻿# secrets and patient data: never in GitHub
+.env
+.env.*
+!.env.example
+*.db
+data/
+.share_token
+# local tools and backups
+.venv/
+__pycache__/
+.gradio/
+.claude/
+.DS_Store
+*.bak.*
+*.before_*
+app.before_ui_cleanup.py
+SARVAM_API_KEY.txt
+oncosaathi-main.zip

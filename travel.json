@@ -1,0 +1,58 @@
+{
+ "checked_on": "2026-10-20",
+ "address": "Tata Memorial Hospital, Dr. E. Borges Road, Parel (East), Mumbai 400012",
+ "address_hi": "टाटा मेमोरियल हॉस्पिटल, डॉ. ई. बोर्जेस रोड, परेल (पूर्व), मुंबई 400012",
+ "phone": "022-2417 7000",
+ "by_train": "Come to Mumbai by train and get down at Dadar (closest), or CSMT / LTT. From Dadar TT, Tata Memorial runs a free shuttle to the hospital, 8 am to 6:30 pm, and shared taxis also go there.",
+ "by_train_hi": "ट्रेन से मुंबई आइए और दादर स्टेशन पर उतरिए (सबसे पास), या CSMT / LTT पर। दादर TT से टाटा मेमोरियल की मुफ़्त शटल बस सुबह 8 से शाम 6:30 तक चलती है, शेयर टैक्सी भी मिलती है।",
+ "local": "By local train: Parel station (Central line) is about 1 km away; Prabhadevi (Western line) is about a 10-minute walk.",
+ "local_hi": "लोकल ट्रेन से: परेल स्टेशन (सेंट्रल लाइन) लगभग 1 किलोमीटर, प्रभादेवी (वेस्टर्न लाइन) से लगभग 10 मिनट पैदल।",
+ "by_air": "By air: from Mumbai airport a taxi takes about 25 to 40 minutes.",
+ "by_air_hi": "हवाई जहाज़ से: मुंबई एयरपोर्ट से टैक्सी में लगभग 25 से 40 मिनट।",
+ "concession": "Cancer patients, with one companion, get a railway fare concession for treatment visits. Take the certificate from your treating cancer hospital and show it at the station ticket counter; the discount depends on the class.",
+ "concession_hi": "कैंसर मरीज़ और एक साथी को इलाज के लिए रेल किराए में छूट मिलती है। अपने कैंसर अस्पताल से सर्टिफ़िकेट लेकर स्टेशन के टिकट काउंटर पर दिखाइए, छूट क्लास के हिसाब से होती है।",
+ "check": "Check train timings on IRCTC or at the station before you travel.",
+ "check_hi": "यात्रा से पहले ट्रेन का समय IRCTC या स्टेशन पर देख लीजिए।",
+ "states": {
+  "odisha": {
+   "names": [
+    "odisha",
+    "orissa",
+    "odisa",
+    "bhubaneswar",
+    "cuttack",
+    "puri",
+    "berhampur",
+    "balasore",
+    "sambalpur",
+    "rourkela",
+    "उड़ीसा",
+    "ओडिशा",
+    "उडीसा",
+    "भुवनेश्वर",
+    "कटक",
+    "पुरी"
+   ],
+   "train": "From Odisha, trains such as the Konark Express run from Bhubaneswar to Mumbai and stop at Dadar.",
+   "train_hi": "ओडिशा से कोणार्क एक्सप्रेस जैसी ट्रेनें भुवनेश्वर से मुंबई आती हैं और दादर पर रुकती हैं।",
+   "help": "Konark Cancer Foundation helps patients from Odisha coming to Tata Memorial, including finding a place to stay: Mumbai 88798 87088.",
+   "help_hi": "कोणार्क कैंसर फ़ाउंडेशन ओडिशा से टाटा मेमोरियल आने वाले मरीज़ों की मदद करता है, रहने की जगह ढूँढने में भी: मुंबई नंबर 88798 87088।",
+   "return": {
+    "en": "Trains such as the Konark Express leave Mumbai for Bhubaneswar and stop at Dadar.",
+    "hi": "कोणार्क एक्सप्रेस जैसी ट्रेनें मुंबई से भुवनेश्वर जाती हैं और दादर पर रुकती हैं।"
+   }
+  }
+ },
+ "sources": [
+  "https://tmc.gov.in/TMH/index.php/how-to-reach-us-new",
+  "https://kem.edu/how-to-get-to-gsmc",
+  "https://www.railmitra.com/train-schedule/konark-express-11020",
+  "https://factly.in/complete-list-railway-concessions",
+  "https://www.cancerassist.in/search.php?act=1&ct=Mumbai"
+ ],
+ "note": "The shuttle timing and concession rules come from public pages and can change; the agent always says to check before travelling.",
+ "return": {
+  "en": "To go back: from the hospital, take the free shuttle (8 am to 6:30 pm) or a taxi to Dadar station. The rail fare concession applies to the return journey too; show the hospital's certificate at the ticket counter.",
+  "hi": "वापस जाने के लिए: अस्पताल से मुफ़्त शटल (सुबह 8 से शाम 6:30) या टैक्सी से दादर स्टेशन जाइए। रेल किराए की छूट वापसी में भी मिलती है, टिकट काउंटर पर अस्पताल का सर्टिफ़िकेट दिखाइए।"
+ }
+}

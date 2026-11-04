@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "OncoSaathi server",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/server.py",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": true
+    },
+    {
+      "name": "Route map tests",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/route_test.py",
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

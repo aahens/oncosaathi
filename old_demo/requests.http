@@ -1,0 +1,19 @@
+### Click "Send Request" above each block (needs the REST Client extension). Start the server first.
+
+### Health
+GET http://127.0.0.1:8000/health
+
+### Typed question (Hindi)
+POST http://127.0.0.1:8000/navigate-text
+Content-Type: application/json
+
+{"text": "Doctor ne chemo se pehle CBC blood test bola hai, kahan jayein?", "lang": "hi-IN"}
+
+### Clinical question -> should say "speak to your doctor"
+POST http://127.0.0.1:8000/navigate-text
+Content-Type: application/json
+
+{"text": "mujhe bukhar hai, kaun si dawai loon?", "lang": "hi-IN"}
+
+### Meta's webhook handshake (token must match WA_VERIFY_TOKEN in .env)
+GET http://127.0.0.1:8000/webhook?hub.mode=subscribe&hub.verify_token=oncosaathi-verify-123&hub.challenge=12345

@@ -1,0 +1,28 @@
+# Render blueprint: every push to GitHub's main branch redeploys the public link automatically.
+services:
+  - type: web
+    name: oncosaathi
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server.py
+    healthCheckPath: /api/config
+    autoDeploy: true
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: CALL_ENGINE
+        value: local
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      # Secrets: Render asks for these once, in its dashboard. They are never stored in GitHub.
+      - key: SARVAM_API_KEY
+        sync: false
+      - key: PATIENT_DATA_KEY
+        sync: false
+      - key: PATIENT_HASH_KEY
+        sync: false
+      - key: STAFF_API_KEY
+        sync: false
+      - key: TOOLS_API_KEY
+        sync: false

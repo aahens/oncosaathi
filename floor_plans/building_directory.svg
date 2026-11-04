@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="1180" viewBox="0 0 1700 1180" font-family="Arial, Helvetica, sans-serif">
+<rect width="1700" height="1180" fill="#fff"/>
+<text x="60" y="78" font-size="40" font-weight="700" fill="#1E2B5C">Tata Memorial Hospital, Parel: building directory</text>
+<text x="60" y="116" font-size="16" fill="#B3261E">Sample layout for the OncoSaathi demo. Not the real floor plan.</text>
+<text x="335.0" y="150" font-size="16" font-weight="700" fill="#1E2B5C" text-anchor="middle">Wing A · OPD &amp; services</text>
+<text x="580.0" y="150" font-size="16" font-weight="700" fill="#1E2B5C" text-anchor="middle">Core</text>
+<text x="785.0" y="150" font-size="16" font-weight="700" fill="#1E2B5C" text-anchor="middle">Wing B · Labs</text>
+<text x="1075.0" y="150" font-size="16" font-weight="700" fill="#1E2B5C" text-anchor="middle">Wing C · Imaging &amp; wards</text>
+<text x="1430.0" y="150" font-size="16" font-weight="700" fill="#1E2B5C" text-anchor="middle">Wing D · Radiation, ER, ICU</text>
+<rect x="60" y="166" width="80" height="168" rx="8" fill="#1E2B5C"/><text x="100" y="250.0" font-size="30" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="central">4</text>
+<rect x="154" y="166" width="362" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="162" y="176" width="346" height="22" rx="4" fill="#DCE8F7"/>
+<text x="170" y="191" font-size="13" fill="#1F2A44">Psycho-oncology &amp; counselling</text>
+<rect x="162" y="202" width="346" height="22" rx="4" fill="#FBD9CB"/>
+<text x="170" y="217" font-size="13" fill="#1F2A44">Palliative care &amp; pain clinic</text>
+<rect x="162" y="228" width="346" height="22" rx="4" fill="#DCE8F7"/>
+<text x="170" y="243" font-size="13" fill="#1F2A44">Nutrition clinic</text>
+<rect x="162" y="254" width="346" height="22" rx="4" fill="#DCE8F7"/>
+<text x="170" y="269" font-size="13" fill="#1F2A44">Tobacco cessation clinic</text>
+<rect x="524" y="166" width="112" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<text x="580.0" y="196" font-size="14" fill="#1F2A44" text-anchor="middle">⇅ Main lift</text>
+<rect x="644" y="166" width="282" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="652" y="176" width="266" height="22" rx="4" fill="#D9D3FB"/>
+<text x="660" y="191" font-size="13" fill="#1F2A44">Genetic counselling</text>
+<rect x="934" y="166" width="282" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="942" y="176" width="266" height="22" rx="4" fill="#E9E7E1"/>
+<text x="950" y="191" font-size="13" fill="#1F2A44">Medical oncology ward</text>
+<rect x="1224" y="166" width="412" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="1232" y="176" width="396" height="22" rx="4" fill="#DCE8F7"/>
+<text x="1240" y="191" font-size="13" fill="#1F2A44">Administration &amp; Medical Superintendent</text>
+<rect x="60" y="344" width="80" height="168" rx="8" fill="#1E2B5C"/><text x="100" y="428.0" font-size="30" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="central">3</text>
+<rect x="154" y="344" width="362" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="162" y="354" width="346" height="22" rx="4" fill="#D9D3FB"/>
+<text x="170" y="369" font-size="13" fill="#1F2A44">Head &amp; Neck clinic</text>
+<rect x="162" y="380" width="346" height="22" rx="4" fill="#D9D3FB"/>
+<text x="170" y="395" font-size="13" fill="#1F2A44">Breast clinic</text>
+<rect x="162" y="406" width="346" height="22" rx="4" fill="#D9D3FB"/>
+<text x="170" y="421" font-size="13" fill="#1F2A44">Gynaecologic oncology clinic</text>
+<rect x="524" y="344" width="112" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<text x="580.0" y="374" font-size="14" fill="#1F2A44" text-anchor="middle">⇅ Main lift</text>
+<rect x="644" y="344" width="282" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="652" y="354" width="266" height="22" rx="4" fill="#C9EDE1"/>
+<text x="660" y="369" font-size="13" fill="#1F2A44">Pre-anaesthesia check-up (PAC)</text>
+<rect x="652" y="380" width="266" height="22" rx="4" fill="#C9EDE1"/>
+<text x="660" y="395" font-size="13" fill="#1F2A44">ECG, Echo &amp; lung function tests</text>
+<rect x="934" y="344" width="282" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="942" y="354" width="266" height="22" rx="4" fill="#E9E7E1"/>
+<text x="950" y="369" font-size="13" fill="#1F2A44">Surgical wards</text>
+<rect x="1224" y="344" width="412" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="60" y="522" width="80" height="168" rx="8" fill="#1E2B5C"/><text x="100" y="606.0" font-size="30" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="central">2</text>
+<rect x="154" y="522" width="362" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="162" y="532" width="346" height="22" rx="4" fill="#FBD9CB"/>
+<text x="170" y="547" font-size="13" fill="#1F2A44">Chemotherapy Day Care</text>
+<rect x="162" y="558" width="346" height="22" rx="4" fill="#FBD9CB"/>
+<text x="170" y="573" font-size="13" fill="#1F2A44">Paediatric oncology (children)</text>
+<rect x="524" y="522" width="112" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<text x="580.0" y="552" font-size="14" fill="#1F2A44" text-anchor="middle">⇅ Main lift</text>
+<rect x="644" y="522" width="282" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="652" y="532" width="266" height="22" rx="4" fill="#C9EDE1"/>
+<text x="660" y="547" font-size="13" fill="#1F2A44">Endoscopy</text>
+<rect x="934" y="522" width="282" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="942" y="532" width="266" height="22" rx="4" fill="#C9EDE1"/>
+<text x="950" y="547" font-size="13" fill="#1F2A44">PET-CT &amp; nuclear medicine</text>
+<rect x="1224" y="522" width="412" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="1232" y="532" width="396" height="22" rx="4" fill="#E9E7E1"/>
+<text x="1240" y="547" font-size="13" fill="#1F2A44">ICU &amp; HDU</text>
+<rect x="60" y="700" width="80" height="168" rx="8" fill="#1E2B5C"/><text x="100" y="784.0" font-size="30" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="central">1</text>
+<rect x="154" y="700" width="362" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="162" y="710" width="346" height="22" rx="4" fill="#D9D3FB"/>
+<text x="170" y="725" font-size="13" fill="#1F2A44">Medical Oncology OPD</text>
+<rect x="162" y="736" width="346" height="22" rx="4" fill="#D9D3FB"/>
+<text x="170" y="751" font-size="13" fill="#1F2A44">Surgical Oncology OPD</text>
+<rect x="162" y="762" width="346" height="22" rx="4" fill="#D9D3FB"/>
+<text x="170" y="777" font-size="13" fill="#1F2A44">Radiation Oncology OPD</text>
+<rect x="524" y="700" width="112" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<text x="580.0" y="730" font-size="14" fill="#1F2A44" text-anchor="middle">⇅ Main lift</text>
+<rect x="644" y="700" width="282" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="652" y="710" width="266" height="22" rx="4" fill="#C9EDE1"/>
+<text x="660" y="725" font-size="13" fill="#1F2A44">Histopathology &amp; cytology (slides…</text>
+<rect x="934" y="700" width="282" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="942" y="710" width="266" height="22" rx="4" fill="#C9EDE1"/>
+<text x="950" y="725" font-size="13" fill="#1F2A44">Radiology reception (all scans)</text>
+<rect x="942" y="736" width="266" height="22" rx="4" fill="#C9EDE1"/>
+<text x="950" y="751" font-size="13" fill="#1F2A44">CT scan</text>
+<rect x="942" y="762" width="266" height="22" rx="4" fill="#C9EDE1"/>
+<text x="950" y="777" font-size="13" fill="#1F2A44">MRI</text>
+<rect x="942" y="788" width="266" height="22" rx="4" fill="#C9EDE1"/>
+<text x="950" y="803" font-size="13" fill="#1F2A44">Ultrasound &amp; mammography</text>
+<rect x="1224" y="700" width="412" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="1232" y="710" width="396" height="22" rx="4" fill="#DCE8F7"/>
+<text x="1240" y="725" font-size="13" fill="#1F2A44">Surgery family waiting area</text>
+<rect x="1232" y="736" width="396" height="22" rx="4" fill="#E9E7E1" stroke-dasharray="4 3" stroke="#999"/>
+<text x="1240" y="751" font-size="13" fill="#1F2A44">Operation theatres</text>
+<rect x="60" y="878" width="80" height="168" rx="8" fill="#1E2B5C"/><text x="100" y="962.0" font-size="30" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="central">G</text>
+<rect x="154" y="878" width="362" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="162" y="888" width="346" height="22" rx="4" fill="#DCE8F7"/>
+<text x="170" y="903" font-size="13" fill="#1F2A44">Help desk &amp; wheelchairs</text>
+<rect x="162" y="914" width="346" height="22" rx="4" fill="#DCE8F7"/>
+<text x="170" y="929" font-size="13" fill="#1F2A44">Registration (new patients)</text>
+<rect x="162" y="940" width="346" height="22" rx="4" fill="#DCE8F7"/>
+<text x="170" y="955" font-size="13" fill="#1F2A44">Billing</text>
+<rect x="162" y="966" width="346" height="22" rx="4" fill="#DCE8F7"/>
+<text x="170" y="981" font-size="13" fill="#1F2A44">Ayushman Bharat (PM-JAY) desk</text>
+<rect x="162" y="992" width="346" height="22" rx="4" fill="#DCE8F7"/>
+<text x="170" y="1007" font-size="13" fill="#1F2A44">Social work &amp; financial aid</text>
+<rect x="162" y="1018" width="346" height="22" rx="4" fill="#DCE8F7"/>
+<text x="170" y="1033" font-size="13" fill="#1F2A44">Canteen &amp; drinking water</text>
+<rect x="524" y="878" width="112" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<text x="580.0" y="908" font-size="14" fill="#1F2A44" text-anchor="middle">⇅ Main lift</text>
+<rect x="532" y="912" width="96" height="22" rx="4" fill="#DCE8F7"/>
+<text x="540" y="927" font-size="13" fill="#1F2A44">Pharmacy</text>
+<rect x="644" y="878" width="282" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="652" y="888" width="266" height="22" rx="4" fill="#C9EDE1"/>
+<text x="660" y="903" font-size="13" fill="#1F2A44">Blood &amp; urine sample collection</text>
+<rect x="652" y="914" width="266" height="22" rx="4" fill="#C9EDE1"/>
+<text x="660" y="929" font-size="13" fill="#1F2A44">Report counter</text>
+<rect x="934" y="878" width="282" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="942" y="888" width="266" height="22" rx="4" fill="#C9EDE1"/>
+<text x="950" y="903" font-size="13" fill="#1F2A44">X-ray</text>
+<rect x="1224" y="878" width="412" height="168" rx="8" fill="#F3F6FA" stroke="#D5DEEA"/>
+<rect x="1232" y="888" width="396" height="22" rx="4" fill="#FBD9CB"/>
+<text x="1240" y="903" font-size="13" fill="#1F2A44">Radiation therapy (treatment)</text>
+<rect x="1232" y="914" width="396" height="22" rx="4" fill="#F7C1C1"/>
+<text x="1240" y="929" font-size="13" fill="#1F2A44">Emergency &amp; triage</text>
+</svg>

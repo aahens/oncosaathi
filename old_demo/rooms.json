@@ -1,0 +1,50 @@
+{
+  "blood_test": {
+    "keywords": ["blood test", "cbc", "blood sample", "blood collection", "khoon ki jaanch", "खून की जांच", "खून की जाँच", "रक्त जांच", "रक्त तपासणी"],
+    "reply": {
+      "hi-IN": "Namaste! Blood collection lab Ground Floor, Room 12 mein hai. Lift ke bagal se Token B le lijiye.",
+      "mr-IN": "नमस्कार! रक्त तपासणी लॅब तळमजल्यावर, खोली क्रमांक 12 मध्ये आहे. लिफ्टजवळून टोकन B घ्या.",
+      "en-IN": "Hello! The blood collection lab is on the Ground Floor, Room 12. Take Token B next to the lift."
+    }
+  },
+  "chemo_daycare": {
+    "keywords": ["chemo", "chemotherapy", "daycare", "day care", "chemo room", "कीमो", "केमो"],
+    "reply": {
+      "hi-IN": "Chemo daycare First Floor, Room 105 mein hai. Pehle reception par apni file jama kijiye.",
+      "mr-IN": "केमो डेकेअर पहिल्या मजल्यावर, खोली क्रमांक 105 मध्ये आहे. आधी रिसेप्शनला तुमची फाईल जमा करा.",
+      "en-IN": "Chemo daycare is on the First Floor, Room 105. Hand in your file at reception first."
+    }
+  },
+  "pharmacy": {
+    "keywords": ["pharmacy", "medical store", "chemist", "dawai ki dukaan", "davai ki dukaan", "dawai counter", "davai counter", "दवाई की दुकान", "दवा की दुकान", "औषध दुकान"],
+    "reply": {
+      "hi-IN": "Pharmacy Ground Floor par main gate ke paas hai, Counter 3.",
+      "mr-IN": "फार्मसी तळमजल्यावर मुख्य दरवाजाजवळ, काउंटर 3 वर आहे.",
+      "en-IN": "The pharmacy is on the Ground Floor near the main gate, Counter 3."
+    }
+  },
+  "registration": {
+    "keywords": ["registration", "register", "new patient", "opd card", "case paper", "रजिस्ट्रेशन", "पंजीकरण", "नोंदणी"],
+    "reply": {
+      "hi-IN": "Registration counter Ground Floor par entrance ke saamne hai, Counter 1. Aadhaar card aur referral letter saath rakhiye.",
+      "mr-IN": "नोंदणी काउंटर तळमजल्यावर प्रवेशद्वारासमोर, काउंटर 1 वर आहे. आधार कार्ड आणि रेफरल पत्र सोबत ठेवा.",
+      "en-IN": "The registration counter is on the Ground Floor opposite the entrance, Counter 1. Keep your Aadhaar card and referral letter with you."
+    }
+  },
+  "scan": {
+    "keywords": ["scan", "ct scan", "pet ct", "pet-ct", "mri", "x-ray", "xray", "radiology", "स्कैन", "स्कॅन"],
+    "reply": {
+      "hi-IN": "Scan aur Radiology vibhaag Second Floor, Room 210 mein hai. Scan se pehle reception par slip dikhaiye.",
+      "mr-IN": "स्कॅन आणि रेडिओलॉजी विभाग दुसऱ्या मजल्यावर, खोली क्रमांक 210 मध्ये आहे. स्कॅनपूर्वी रिसेप्शनला स्लिप दाखवा.",
+      "en-IN": "Scan and Radiology is on the Second Floor, Room 210. Show your slip at reception before the scan."
+    }
+  },
+  "report_collection": {
+    "keywords": ["report kahan", "report kab", "report kidhar", "report collection", "report lena", "रिपोर्ट कहाँ", "रिपोर्ट कब"],
+    "reply": {
+      "hi-IN": "Reports Ground Floor par Counter 5 se milti hain, subah 10 se shaam 4 baje tak. Apni token slip saath laaiye.",
+      "mr-IN": "रिपोर्ट तळमजल्यावर काउंटर 5 वर सकाळी 10 ते संध्याकाळी 4 पर्यंत मिळतात. तुमची टोकन स्लिप सोबत आणा.",
+      "en-IN": "Reports are given at Counter 5 on the Ground Floor, from 10 am to 4 pm. Bring your token slip."
+    }
+  }
+}

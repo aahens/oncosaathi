@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="1180" viewBox="0 0 1700 1180" font-family="Arial, Helvetica, sans-serif">
+<rect width="1700" height="1180" fill="#ffffff"/>
+<text x="60" y="78" font-size="40" font-weight="700" fill="#1E2B5C">Tata Memorial Hospital, Parel</text>
+<text x="60" y="122" font-size="30" fill="#1F2A44">First floor</text>
+<text x="1640" y="78" font-size="44" font-weight="700" fill="#1E2B5C" text-anchor="end">LEVEL 1</text>
+<text x="1640" y="112" font-size="16" fill="#B3261E" text-anchor="end">Sample layout for the OncoSaathi demo. Not the real floor plan.</text>
+<rect x="150" y="230" width="1420" height="560" rx="18" fill="#AFC6E4" stroke="#5B7BA8" stroke-width="3"/>
+<circle cx="315.0" cy="196" r="20" fill="#1B7A4C"/><text x="315.0" y="197" font-size="20" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="central">A</text>
+<text x="343.0" y="204" font-size="22" font-weight="700" fill="#1B7A4C">WING</text>
+<line x1="560" y1="230" x2="560" y2="790" stroke="#5B7BA8" stroke-width="2"/>
+<circle cx="620.0" cy="196" r="20" fill="#1B7A4C"/><text x="620.0" y="197" font-size="20" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="central">⇅</text>
+<line x1="680" y1="230" x2="680" y2="790" stroke="#5B7BA8" stroke-width="2"/>
+<circle cx="780.0" cy="196" r="20" fill="#1B7A4C"/><text x="780.0" y="197" font-size="20" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="central">B</text>
+<text x="808.0" y="204" font-size="22" font-weight="700" fill="#1B7A4C">WING</text>
+<line x1="960" y1="230" x2="960" y2="790" stroke="#5B7BA8" stroke-width="2"/>
+<circle cx="1060.0" cy="196" r="20" fill="#1B7A4C"/><text x="1060.0" y="197" font-size="20" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="central">C</text>
+<text x="1088.0" y="204" font-size="22" font-weight="700" fill="#1B7A4C">WING</text>
+<line x1="1240" y1="230" x2="1240" y2="790" stroke="#5B7BA8" stroke-width="2"/>
+<circle cx="1365.0" cy="196" r="20" fill="#1B7A4C"/><text x="1365.0" y="197" font-size="20" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="central">D</text>
+<text x="1393.0" y="204" font-size="22" font-weight="700" fill="#1B7A4C">WING</text>
+<rect x="158" y="480" width="1404" height="60" fill="#E9F1FB" stroke="#5B7BA8" stroke-width="1"/>
+<text x="960.0" y="511.0" font-size="15" fill="#5F6B7A" text-anchor="middle" dominant-baseline="central" letter-spacing="3">MAIN CORRIDOR</text>
+<rect x="162.0" y="246" width="189.0" height="220" rx="6" fill="#D9D3FB" stroke="#5B7BA8" stroke-width="1.5"/><text x="256.5" y="344.0" font-size="15" font-weight="700" fill="#1F2A44" text-anchor="middle">Medical Oncology OPD</text><rect x="223.375" y="434" width="66.25" height="22" rx="4" fill="#1E2B5C"/><text x="256.5" y="445" font-size="12.5" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">101–105</text>
+<rect x="359.0" y="246" width="189.0" height="220" rx="6" fill="#D9D3FB" stroke="#5B7BA8" stroke-width="1.5"/><text x="453.5" y="335.0" font-size="15" font-weight="700" fill="#1F2A44" text-anchor="middle">Surgical Oncology</text><text x="453.5" y="353.0" font-size="15" font-weight="700" fill="#1F2A44" text-anchor="middle">OPD</text><rect x="420.375" y="434" width="66.25" height="22" rx="4" fill="#1E2B5C"/><text x="453.5" y="445" font-size="12.5" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">106–110</text>
+<rect x="162.0" y="554" width="386.0" height="220" rx="6" fill="#D9D3FB" stroke="#5B7BA8" stroke-width="1.5"/><text x="355.0" y="652.0" font-size="15" font-weight="700" fill="#1F2A44" text-anchor="middle">Radiation Oncology OPD</text><rect x="321.875" y="742" width="66.25" height="22" rx="4" fill="#1E2B5C"/><text x="355.0" y="753" font-size="12.5" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">111–113</text>
+<rect x="692.0" y="246" width="256.0" height="220" rx="6" fill="#C9EDE1" stroke="#5B7BA8" stroke-width="1.5"/><text x="820.0" y="335.0" font-size="15" font-weight="700" fill="#1F2A44" text-anchor="middle">Histopathology &amp; cytology</text><text x="820.0" y="353.0" font-size="15" font-weight="700" fill="#1F2A44" text-anchor="middle">(slides, FNAC)</text><rect x="771.375" y="434" width="97.25" height="22" rx="4" fill="#1E2B5C"/><text x="820.0" y="445" font-size="12.5" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">B-101–B-104</text>
+<rect x="972.0" y="246" width="124.0" height="220" rx="6" fill="#C9EDE1" stroke="#5B7BA8" stroke-width="1.5"/><text x="1034.0" y="326.0" font-size="15" font-weight="700" fill="#1F2A44" text-anchor="middle">Radiology</text><text x="1034.0" y="344.0" font-size="15" font-weight="700" fill="#1F2A44" text-anchor="middle">reception</text><text x="1034.0" y="362.0" font-size="15" font-weight="700" fill="#1F2A44" text-anchor="middle">(all scans)</text><rect x="1008.625" y="434" width="50.75" height="22" rx="4" fill="#1E2B5C"/><text x="1034.0" y="445" font-size="12.5" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">C-100</text>
+<rect x="1104.0" y="246" width="124.0" height="220" rx="6" fill="#C9EDE1" stroke="#5B7BA8" stroke-width="1.5"/><text x="1166.0" y="344.0" font-size="15" font-weight="700" fill="#1F2A44" text-anchor="middle">CT scan</text><rect x="1140.625" y="434" width="50.75" height="22" rx="4" fill="#1E2B5C"/><text x="1166.0" y="445" font-size="12.5" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">C-101</text>
+<rect x="972.0" y="554" width="124.0" height="220" rx="6" fill="#C9EDE1" stroke="#5B7BA8" stroke-width="1.5"/><text x="1034.0" y="652.0" font-size="15" font-weight="700" fill="#1F2A44" text-anchor="middle">MRI</text><rect x="1008.625" y="742" width="50.75" height="22" rx="4" fill="#1E2B5C"/><text x="1034.0" y="753" font-size="12.5" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">C-103</text>
+<rect x="1104.0" y="554" width="124.0" height="220" rx="6" fill="#C9EDE1" stroke="#5B7BA8" stroke-width="1.5"/><text x="1166.0" y="643.0" font-size="15" font-weight="700" fill="#1F2A44" text-anchor="middle">Ultrasound &amp;</text><text x="1166.0" y="661.0" font-size="15" font-weight="700" fill="#1F2A44" text-anchor="middle">mammography</text><rect x="1117.375" y="742" width="97.25" height="22" rx="4" fill="#1E2B5C"/><text x="1166.0" y="753" font-size="12.5" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">C-105–C-107</text>
+<rect x="1252.0" y="246" width="306.0" height="220" rx="6" fill="#DCE8F7" stroke="#5B7BA8" stroke-width="1.5"/><text x="1405.0" y="344.0" font-size="15" font-weight="700" fill="#1F2A44" text-anchor="middle">Surgery family waiting area</text><rect x="1379.625" y="434" width="50.75" height="22" rx="4" fill="#1E2B5C"/><text x="1405.0" y="445" font-size="12.5" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">D-101</text>
+<rect x="1252.0" y="554" width="306.0" height="220" rx="6" fill="#E9E7E1" stroke="#5B7BA8" stroke-width="1.5" stroke-dasharray="6 4"/><text x="1405.0" y="652.0" font-size="15" font-weight="700" fill="#1F2A44" text-anchor="middle">Operation theatres</text><rect x="1360.25" y="742" width="89.5" height="22" rx="4" fill="#7A7A74"/><text x="1405.0" y="753" font-size="12.5" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">Staff only</text>
+<rect x="578" y="360" width="84" height="100" rx="8" fill="#ffffff" stroke="#5B7BA8" stroke-width="1.5"/>
+<g><rect x="605.0" y="372" width="30" height="30" rx="5" fill="#1E2B5C"/><text x="620.0" y="388.0" font-size="17" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">⇅</text></g>
+<text x="620.0" y="428" font-size="14" font-weight="700" fill="#1F2A44" text-anchor="middle">Main lift</text>
+<text x="620.0" y="446" font-size="12" fill="#5F6B7A" text-anchor="middle">4 cars, G–4</text>
+<g><rect x="164" y="495" width="30" height="30" rx="5" fill="#1E2B5C"/><text x="179.0" y="511.0" font-size="17" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">≡</text></g>
+<g><rect x="1526" y="495" width="30" height="30" rx="5" fill="#1E2B5C"/><text x="1541.0" y="511.0" font-size="17" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">≡</text></g>
+<g><rect x="200" y="495" width="30" height="30" rx="5" fill="#1E2B5C"/><text x="215.0" y="511.0" font-size="12" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">WC</text></g>
+<g><rect x="1490" y="495" width="30" height="30" rx="5" fill="#1E2B5C"/><text x="1505.0" y="511.0" font-size="12" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">WC</text></g>
+<g><rect x="1264" y="495" width="30" height="30" rx="5" fill="#4A5A7A"/><text x="1279.0" y="511.0" font-size="17" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">⇅</text></g>
+<text x="60" y="920" font-size="22" font-weight="700" fill="#1E2B5C">KEY</text>
+<g><rect x="60" y="940" width="30" height="30" rx="5" fill="#1E2B5C"/><text x="75.0" y="956.0" font-size="17" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">⇅</text></g>
+<text x="102" y="960" font-size="16" fill="#1F2A44">Lift</text>
+<g><rect x="290" y="940" width="30" height="30" rx="5" fill="#1E2B5C"/><text x="305.0" y="956.0" font-size="17" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">≡</text></g>
+<text x="332" y="960" font-size="16" fill="#1F2A44">Stairs</text>
+<g><rect x="60" y="984" width="30" height="30" rx="5" fill="#1E2B5C"/><text x="75.0" y="1000.0" font-size="12" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">WC</text></g>
+<text x="102" y="1004" font-size="16" fill="#1F2A44">Washrooms &amp; water</text>
+<g><rect x="290" y="984" width="30" height="30" rx="5" fill="#1B7A4C"/><text x="305.0" y="1000.0" font-size="19" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">i</text></g>
+<text x="332" y="1004" font-size="16" fill="#1F2A44">Help desk</text>
+<rect x="60" y="1032" width="30" height="22" rx="4" fill="#D9D3FB" stroke="#5B7BA8"/>
+<text x="102" y="1048" font-size="16" fill="#1F2A44">OPD &amp; clinics</text>
+<rect x="290" y="1032" width="30" height="22" rx="4" fill="#C9EDE1" stroke="#5B7BA8"/>
+<text x="332" y="1048" font-size="16" fill="#1F2A44">Tests &amp; scans</text>
+<rect x="60" y="1068" width="30" height="22" rx="4" fill="#FBD9CB" stroke="#5B7BA8"/>
+<text x="102" y="1084" font-size="16" fill="#1F2A44">Treatment</text>
+<rect x="290" y="1068" width="30" height="22" rx="4" fill="#DCE8F7" stroke="#5B7BA8"/>
+<text x="332" y="1084" font-size="16" fill="#1F2A44">Patient services</text>
+<rect x="60" y="1104" width="30" height="22" rx="4" fill="#F7C1C1" stroke="#5B7BA8"/>
+<text x="102" y="1120" font-size="16" fill="#1F2A44">Emergency</text>
+<rect x="290" y="1104" width="30" height="22" rx="4" fill="#E9E7E1" stroke="#5B7BA8"/>
+<text x="332" y="1120" font-size="16" fill="#1F2A44">Wards / staff only (dashed)</text>
+<rect x="560" y="890" width="1080" height="230" rx="12" fill="#F6F8FB" stroke="#D5DEEA"/>
+<text x="584" y="926" font-size="20" font-weight="700" fill="#1E2B5C">Patient: Excuse me, where is CT scan?</text>
+<text x="584" y="966" font-size="18" fill="#1F2A44">OncoSaathi: From Gate 1, take the main lift in the centre of the lobby, opposite the</text>
+<text x="584" y="994" font-size="18" fill="#1F2A44">pharmacy, up to the first floor. Then turn right and walk past Wing B into Wing C. Look for</text>
+<text x="584" y="1022" font-size="18" fill="#1F2A44">Room C-101.</text>
+<text x="584" y="1100" font-size="14" fill="#5F6B7A">Directions come from hospital.json, the same data the OncoSaathi voice agent uses.</text>
+</svg>

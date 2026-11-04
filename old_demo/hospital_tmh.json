@@ -1,0 +1,296 @@
+{
+  "hospital": {
+    "name": "Tata Memorial Hospital, Parel, Mumbai",
+    "source": "TMH Patient Booklet 2025 (public PDF on tmc.gov.in)",
+    "source_url": "https://tmc.gov.in/event/upload/12112025_5/TMH_Brochure_%20patient%20booklet.pdf",
+    "status": "Prototype data copied from the public booklet. Not verified or endorsed by the hospital."
+  },
+  "buildings": {
+    "MB": {"en": "Main Building", "hi": "Main Building", "mr": "मुख्य इमारत", "floors": ["B", "G", "1", "2", "3"]},
+    "HBB": {"en": "Homi Bhabha Building", "hi": "Homi Bhabha Building", "mr": "होमी भाभा इमारत", "floors": ["G", "1", "2", "3", "4", "5"]},
+    "SB": {"en": "Service Building", "hi": "Service Building", "mr": "सर्व्हिस इमारत", "floors": ["1", "3", "4", "5", "6"]},
+    "AB": {"en": "Annexe Building", "hi": "Annexe Building", "mr": "ॲनेक्स इमारत", "floors": ["G", "5", "6", "7", "8"]},
+    "GJB": {"en": "Golden Jubilee Building", "hi": "Golden Jubilee Building", "mr": "गोल्डन ज्युबिली इमारत", "floors": ["B", "G", "1", "3", "5", "7"]}
+  },
+  "emergency_locations": [
+    {"category": "all", "building": "MB", "floor": "G"}
+  ],
+  "places": {
+    "registration": {
+      "name": {"en": "New patient registration", "hi": "Naye patient ka registration", "mr": "नवीन रुग्णांची नोंदणी"},
+      "keywords": ["registration", "register", "new patient", "opd card", "case paper", "case file", "रजिस्ट्रेशन", "पंजीकरण", "नोंदणी"],
+      "locations": [
+        {"category": "general", "building": "GJB", "floor": "G"},
+        {"category": "private", "building": "HBB", "floor": "1"}
+      ],
+      "note": {
+        "en": "New patients report between 8 am and 11 am. Bring a government photo ID, your referral letter if you have one, and your old reports.",
+        "hi": "Naye patient subah 8 se 11 baje ke beech aayein. Sarkari photo ID, referral letter agar ho, aur purani reports saath laayein.",
+        "mr": "नवीन रुग्णांनी सकाळी 8 ते 11 या वेळेत यावे. सरकारी फोटो ओळखपत्र, रेफरल पत्र असल्यास आणि जुने रिपोर्ट सोबत आणा."
+      },
+      "source": "Sections 3.1, 3.6"
+    },
+    "blood_test": {
+      "name": {"en": "Blood collection", "hi": "Blood collection", "mr": "रक्त तपासणी केंद्र"},
+      "keywords": ["blood test", "cbc", "blood sample", "blood collection", "khoon ki jaanch", "खून की जांच", "खून की जाँच", "रक्त जांच", "रक्त तपासणी"],
+      "locations": [
+        {"category": "general", "building": "GJB", "floor": "1"},
+        {"category": "private", "building": "HBB", "floor": "1"}
+      ],
+      "source": "Section 2, item 6"
+    },
+    "chemo_daycare": {
+      "name": {"en": "Chemo daycare", "hi": "Chemo daycare", "mr": "केमो डेकेअर"},
+      "keywords": ["chemo", "chemotherapy", "daycare", "day care", "chemo room", "कीमो", "केमो", "डेकेअर"],
+      "locations": [
+        {"category": "general", "building": "AB", "floor": "6"},
+        {"category": "private", "building": "HBB", "floor": "5"}
+      ],
+      "note": {
+        "en": "Your token is issued one hour before your appointment, so please do not come earlier than that. Show your appointment slip at the entrance gate.",
+        "hi": "Token appointment se ek ghanta pehle milta hai, isliye usse pehle na aayein. Entrance gate par appointment slip dikhaiye.",
+        "mr": "टोकन अपॉइंटमेंटच्या एक तास आधी मिळते, त्यामुळे त्याआधी येऊ नका. प्रवेशद्वारावर अपॉइंटमेंट स्लिप दाखवा."
+      },
+      "source": "Section 2, item 13; Section 8.2"
+    },
+    "pharmacy": {
+      "name": {"en": "Dispensary", "hi": "Dawai ki dukaan", "mr": "औषध दुकान"},
+      "keywords": ["pharmacy", "dispensary", "medical store", "chemist", "dawai ki dukaan", "davai ki dukaan", "dawai counter", "davai counter", "दवाई की दुकान", "दवा की दुकान", "औषध दुकान"],
+      "locations": [
+        {"category": "general", "building": "GJB", "floor": "G", "room": "54-55"},
+        {"category": "private", "building": "HBB", "floor": "G"}
+      ],
+      "note": {
+        "en": "Bring your smart card. An online prescription is valid for 3 days.",
+        "hi": "Apna smart card saath laayein. Online prescription 3 din tak valid rehta hai.",
+        "mr": "तुमचे स्मार्ट कार्ड सोबत आणा. ऑनलाइन प्रिस्क्रिप्शन 3 दिवस वैध असते."
+      },
+      "source": "Sections 12.2, 12.6"
+    },
+    "scan": {
+      "name": {"en": "Scan token and booking", "hi": "Scan ka token aur booking", "mr": "स्कॅन टोकन आणि बुकिंग"},
+      "keywords": ["scan", "pet", "pet ct", "pet-ct", "spect", "स्कैन", "स्कॅन"],
+      "locations": [
+        {"category": "all", "building": "HBB", "floor": "1", "room": "Rotunda, counters 129 to 131"}
+      ],
+      "note": {
+        "en": "Bring the requisition from your doctor. Open from 8:30 am to 5:30 pm.",
+        "hi": "Doctor ka requisition saath laayein. Samay subah 8:30 se shaam 5:30 tak.",
+        "mr": "डॉक्टरांचे रिक्विझिशन सोबत आणा. वेळ सकाळी 8:30 ते संध्याकाळी 5:30."
+      },
+      "source": "Section 6.2"
+    },
+    "ct_scan": {
+      "name": {"en": "CT scan", "hi": "CT scan", "mr": "सीटी स्कॅन"},
+      "keywords": ["ct scan", "सीटी स्कैन", "सीटी स्कॅन"],
+      "locations": [
+        {"category": "all", "building": "MB", "floor": "B"},
+        {"category": "all", "building": "GJB", "floor": "B"}
+      ],
+      "note": {
+        "en": "First collect your token at the Rotunda, Homi Bhabha Building, First Floor.",
+        "hi": "Pehle Homi Bhabha Building, First Floor ke Rotunda se token lijiye.",
+        "mr": "आधी होमी भाभा इमारत, पहिला मजला येथील रोटुंडामधून टोकन घ्या."
+      },
+      "source": "Section 2, item 11; Section 6.2"
+    },
+    "mri": {
+      "name": {"en": "MRI scan", "hi": "MRI scan", "mr": "एमआरआय स्कॅन"},
+      "keywords": ["mri", "mri scan", "एमआरआई", "एमआरआय"],
+      "locations": [
+        {"category": "general", "building": "GJB", "floor": "B"},
+        {"category": "private", "building": "MB", "floor": "B"}
+      ],
+      "note": {
+        "en": "First collect your token at the Rotunda, Homi Bhabha Building, First Floor.",
+        "hi": "Pehle Homi Bhabha Building, First Floor ke Rotunda se token lijiye.",
+        "mr": "आधी होमी भाभा इमारत, पहिला मजला येथील रोटुंडामधून टोकन घ्या."
+      },
+      "source": "Section 2, item 36; Section 6.2"
+    },
+    "radiology": {
+      "name": {"en": "General radiology", "hi": "General radiology", "mr": "जनरल रेडिओलॉजी"},
+      "keywords": ["radiology", "x-ray", "xray", "एक्स रे", "रेडियोलॉजी", "रेडिओलॉजी"],
+      "locations": [
+        {"category": "general", "building": "GJB", "floor": "B"},
+        {"category": "private", "building": "MB", "floor": "G"}
+      ],
+      "source": "Section 2, item 20"
+    },
+    "mammography": {
+      "name": {"en": "Mammography", "hi": "Mammography", "mr": "मॅमोग्राफी"},
+      "keywords": ["mammography", "mammogram", "मैमोग्राफी", "मॅमोग्राफी"],
+      "locations": [
+        {"category": "general", "building": "MB", "floor": "G"},
+        {"category": "private", "building": "HBB", "floor": "1"}
+      ],
+      "source": "Section 2, item 29"
+    },
+    "pathology": {
+      "name": {"en": "Pathology", "hi": "Pathology", "mr": "पॅथॉलॉजी"},
+      "keywords": ["pathology", "पैथोलॉजी", "पॅथॉलॉजी"],
+      "locations": [
+        {"category": "all", "building": "AB", "floor": "8"}
+      ],
+      "source": "Section 2, item 42"
+    },
+    "report_collection": {
+      "name": {"en": "Report enquiry", "hi": "Report ki jaankari", "mr": "रिपोर्ट चौकशी"},
+      "keywords": ["report kahan", "report kab", "report kidhar", "report collection", "report lena", "रिपोर्ट कहाँ", "रिपोर्ट कब", "रिपोर्ट कुठे"],
+      "locations": [
+        {"category": "general", "building": "GJB", "floor": "G"},
+        {"category": "private", "building": "HBB", "floor": "1"}
+      ],
+      "note": {
+        "en": "The hospital does not give paper reports. See them online in Web EMR. Common lab reports also come on your registered WhatsApp number.",
+        "hi": "Hospital paper report nahi deta. Reports Web EMR par online dekhiye. Aam lab reports aapke registered WhatsApp number par bhi aati hain.",
+        "mr": "रुग्णालय कागदी रिपोर्ट देत नाही. रिपोर्ट वेब ईएमआरवर ऑनलाइन पाहा. नेहमीचे लॅब रिपोर्ट तुमच्या नोंदणीकृत व्हॉट्सॲप क्रमांकावरही येतात."
+      },
+      "source": "Section 6.3; Section 27"
+    },
+    "enquiry": {
+      "name": {"en": "Enquiry counter", "hi": "Enquiry counter", "mr": "चौकशी काउंटर"},
+      "keywords": ["enquiry", "inquiry", "help desk", "helpdesk", "पूछताछ", "चौकशी"],
+      "locations": [
+        {"category": "general", "building": "GJB", "floor": "G"},
+        {"category": "private", "building": "HBB", "floor": "1"}
+      ],
+      "source": "Section 27"
+    },
+    "kevat": {
+      "name": {"en": "Patient navigators, called Kevats", "hi": "Patient navigator, yaani Kevat", "mr": "रुग्ण मार्गदर्शक, म्हणजे केवट"},
+      "keywords": ["kevat", "navigator", "केवट"],
+      "locations": [
+        {"category": "general", "building": "GJB", "floor": "G", "room": "50"}
+      ],
+      "note": {
+        "en": "Each OPD also has its own Kevat. Look for a green or white uniform.",
+        "hi": "Har OPD ka apna Kevat bhi hota hai. Hari ya safed uniform dekhiye.",
+        "mr": "प्रत्येक ओपीडीचा स्वतःचा केवटही असतो. हिरवा किंवा पांढरा गणवेश पाहा."
+      },
+      "source": "Section 26"
+    },
+    "cash_counter": {
+      "name": {"en": "Cash counter for smart card top-up", "hi": "Smart card top-up ka cash counter", "mr": "स्मार्ट कार्ड टॉप-अपसाठी कॅश काउंटर"},
+      "keywords": ["cash counter", "cash deposit", "smart card", "smartcard", "top up", "topup", "paise jama", "स्मार्ट कार्ड", "कैश काउंटर", "कॅश काउंटर"],
+      "locations": [
+        {"category": "general", "building": "GJB", "floor": "G"},
+        {"category": "private", "building": "HBB", "floor": "1"}
+      ],
+      "source": "Section 14.1"
+    },
+    "social_worker": {
+      "name": {"en": "Medical Social Worker, for help with costs, schemes and stay", "hi": "Medical Social Worker, kharch, sarkari yojana aur rehne ki madad ke liye", "mr": "मेडिकल सोशल वर्कर, खर्च, सरकारी योजना आणि राहण्याच्या मदतीसाठी"},
+      "keywords": ["social worker", "msw", "ayushman", "mjpjay", "financial help", "paise ki madad", "dharamshala", "accommodation", "आयुष्मान", "आर्थिक मदद", "आर्थिक मदत", "धर्मशाला"],
+      "locations": [
+        {"category": "all", "building": "GJB", "floor": "G"}
+      ],
+      "source": "Sections 17, 18"
+    },
+    "admission": {
+      "name": {"en": "Admissions desk", "hi": "Admission desk", "mr": "ॲडमिशन डेस्क"},
+      "keywords": ["admission", "admit", "bharti", "भर्ती", "ॲडमिशन", "दाखल"],
+      "locations": [
+        {"category": "all", "building": "HBB", "floor": "1"}
+      ],
+      "note": {
+        "en": "Open from 9:30 am to 5:30 pm. Bring the written admission order from your doctor.",
+        "hi": "Samay subah 9:30 se shaam 5:30 tak. Doctor ka likha admission order saath laayein.",
+        "mr": "वेळ सकाळी 9:30 ते संध्याकाळी 5:30. डॉक्टरांचा लेखी ॲडमिशन आदेश सोबत आणा."
+      },
+      "source": "Section 7.1"
+    },
+    "travel_concession": {
+      "name": {"en": "Travel concession letter", "hi": "Travel concession letter", "mr": "प्रवास सवलत पत्र"},
+      "keywords": ["concession", "railway", "train ticket", "रेलवे", "रेल्वे", "सवलत"],
+      "locations": [
+        {"category": "all", "building": "GJB", "floor": "G"},
+        {"category": "all", "building": "HBB", "floor": "1"}
+      ],
+      "note": {
+        "en": "Open from 9:30 am to 5:30 pm.",
+        "hi": "Samay subah 9:30 se shaam 5:30 tak.",
+        "mr": "वेळ सकाळी 9:30 ते संध्याकाळी 5:30."
+      },
+      "source": "Section 19"
+    },
+    "pain_clinic": {
+      "name": {"en": "Pain clinic", "hi": "Pain clinic", "mr": "पेन क्लिनिक"},
+      "keywords": ["pain clinic", "पेन क्लिनिक"],
+      "locations": [
+        {"category": "general", "building": "GJB", "floor": "B"},
+        {"category": "private", "building": "HBB", "floor": "G"}
+      ],
+      "source": "Section 2, item 40"
+    },
+    "palliative": {
+      "name": {"en": "Palliative care", "hi": "Palliative care", "mr": "पॅलिएटिव्ह केअर"},
+      "keywords": ["palliative", "पैलिएटिव", "पॅलिएटिव्ह"],
+      "locations": [
+        {"category": "all", "building": "MB", "floor": "G"}
+      ],
+      "source": "Section 2, item 41"
+    },
+    "dental": {
+      "name": {"en": "Dental department", "hi": "Dental vibhaag", "mr": "दंत विभाग"},
+      "keywords": ["dental", "dentist", "दंत", "डेंटल"],
+      "locations": [
+        {"category": "general", "building": "GJB", "floor": "1"},
+        {"category": "private", "building": "HBB", "floor": "2"}
+      ],
+      "source": "Section 2, item 15"
+    },
+    "nutrition": {
+      "name": {"en": "Nutrition clinic", "hi": "Nutrition clinic", "mr": "न्यूट्रिशन क्लिनिक"},
+      "keywords": ["nutrition", "dietician", "dietitian", "न्यूट्रिशन", "आहार तज्ञ"],
+      "locations": [
+        {"category": "general", "building": "GJB", "floor": "1"},
+        {"category": "private", "building": "HBB", "floor": "3"}
+      ],
+      "source": "Section 2, item 38"
+    },
+    "physiotherapy": {
+      "name": {"en": "Physiotherapy", "hi": "Physiotherapy", "mr": "फिजिओथेरपी"},
+      "keywords": ["physiotherapy", "physio", "फिजियोथेरेपी", "फिजिओथेरपी"],
+      "locations": [
+        {"category": "all", "building": "MB", "floor": "G"}
+      ],
+      "source": "Section 2, item 43"
+    },
+    "preventive_oncology": {
+      "name": {"en": "Preventive Oncology", "hi": "Preventive Oncology", "mr": "प्रिव्हेंटिव्ह ऑन्कोलॉजी"},
+      "keywords": ["preventive", "screening", "स्क्रीनिंग"],
+      "locations": [
+        {"category": "all", "building": "SB", "floor": "3"}
+      ],
+      "source": "Section 5.1"
+    },
+    "blood_donation": {
+      "name": {"en": "Blood donation", "hi": "Blood donation", "mr": "रक्तदान"},
+      "keywords": ["blood donation", "donate blood", "blood bank", "khoon dena", "रक्तदान", "ब्लड बैंक"],
+      "locations": [
+        {"category": "all", "building": "SB", "floor": "6"}
+      ],
+      "source": "Section 13.2"
+    },
+    "cafeteria": {
+      "name": {"en": "Cafeteria", "hi": "Canteen", "mr": "कॅन्टीन"},
+      "keywords": ["canteen", "cafeteria", "khana kahan", "कैंटीन", "कॅन्टीन"],
+      "locations": [
+        {"category": "all", "building": "GJB", "floor": "G"},
+        {"category": "all", "building": "HBB", "floor": "1"}
+      ],
+      "source": "Section 22"
+    },
+    "atm": {
+      "name": {"en": "ATM", "hi": "ATM", "mr": "एटीएम"},
+      "keywords": ["atm", "एटीएम"],
+      "locations": [
+        {"category": "all", "building": "GJB", "floor": "G"},
+        {"category": "all", "building": "HBB", "floor": "G"},
+        {"category": "all", "building": "HBB", "floor": "1"}
+      ],
+      "source": "Section 22"
+    }
+  }
+}

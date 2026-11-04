@@ -1,0 +1,103 @@
+{
+ "documents": {
+  "always": [
+   [
+    "Aadhaar card",
+    "आधार कार्ड"
+   ],
+   [
+    "Referral letter from your doctor",
+    "डॉक्टर की रेफ़रल पर्ची"
+   ],
+   [
+    "All old reports (blood, scans) in one file",
+    "सारी पुरानी रिपोर्ट (खून, स्कैन) एक फ़ाइल में"
+   ],
+   [
+    "Scan CDs or films",
+    "स्कैन की CD या फ़िल्म"
+   ],
+   [
+    "Biopsy slides or blocks, with the biopsy report",
+    "बायोप्सी की स्लाइड या ब्लॉक, बायोप्सी रिपोर्ट के साथ"
+   ],
+   [
+    "List of medicines you take now",
+    "अभी जो दवाइयाँ चल रही हैं उनकी सूची"
+   ],
+   [
+    "Two passport-size photos",
+    "दो पासपोर्ट साइज़ फ़ोटो"
+   ],
+   [
+    "Mobile phone with charger",
+    "फ़ोन और चार्जर"
+   ]
+  ],
+  "if_applicable": [
+   [
+    "Ayushman Bharat (PM-JAY) card",
+    "आयुष्मान भारत कार्ड"
+   ],
+   [
+    "ABHA health ID",
+    "ABHA हेल्थ आईडी"
+   ],
+   [
+    "Income certificate and ration card (for financial help)",
+    "आय प्रमाण पत्र और राशन कार्ड (आर्थिक मदद के लिए)"
+   ],
+   [
+    "State health scheme card",
+    "राज्य की स्वास्थ्य योजना का कार्ड"
+   ]
+  ]
+ },
+ "stages": [
+  {
+   "id": "before_arrival",
+   "name": "Before arrival",
+   "name_hi": "अस्पताल आने से पहले"
+  },
+  {
+   "id": "registration",
+   "name": "Registration",
+   "name_hi": "रजिस्ट्रेशन"
+  },
+  {
+   "id": "first_opd",
+   "name": "First OPD visit",
+   "name_hi": "पहली ओपीडी"
+  },
+  {
+   "id": "tests",
+   "name": "Tests",
+   "name_hi": "जाँच"
+  },
+  {
+   "id": "review",
+   "name": "Review and plan",
+   "name_hi": "रिपोर्ट दिखाना और इलाज की योजना"
+  },
+  {
+   "id": "pre_treatment",
+   "name": "Getting ready for treatment",
+   "name_hi": "इलाज की तैयारी"
+  },
+  {
+   "id": "treatment",
+   "name": "Treatment",
+   "name_hi": "इलाज"
+  },
+  {
+   "id": "between",
+   "name": "Between sessions",
+   "name_hi": "दो सत्रों के बीच"
+  },
+  {
+   "id": "follow_up",
+   "name": "Follow-up",
+   "name_hi": "फ़ॉलो-अप"
+  }
+ ]
+}

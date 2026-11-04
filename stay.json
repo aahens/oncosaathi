@@ -1,0 +1,231 @@
+{
+ "hospital": "Tata Memorial Hospital, Parel (sample layout)",
+ "checked_on": "2026-10-20",
+ "source": "https://www.cancerassist.in/search.php?act=1&ct=Mumbai",
+ "note": "Real places near Tata Memorial, copied from the CancerAssist directory. Numbers and prices change: always ask the person to call and confirm. OncoSaathi never books a room.",
+ "note_hi": "ये टाटा मेमोरियल के पास की असली जगहें हैं। नंबर और किराया बदल सकते हैं, पहले फ़ोन करके पक्का कर लीजिए। ओन्कोसाथी कमरा बुक नहीं करती।",
+ "bands": {
+  "free": "Free or nearly free",
+  "under_300": "Under ₹300 a day",
+  "300_1000": "₹300–1,000 a day",
+  "unknown": "Price not listed"
+ },
+ "places": [
+  {
+   "id": "TMH-HOSTEL",
+   "name": "Tata Memorial Hospital hostels (Bhoiwada & Haffkine complex)",
+   "area": "Parel",
+   "phones": [
+    "022-2417 7000",
+    "022-2417 7300",
+    "022-2416 1413"
+   ],
+   "for_whom": "Tata Memorial patients; apply through the hospital's Medical Social Work (MSW) department",
+   "cost": "Free below poverty line; nominal charges for middle-income families",
+   "band": "free",
+   "source": "https://www.cancerassist.in/search.php?act=1&ct=Mumbai"
+  },
+  {
+   "id": "CPAA",
+   "name": "CPAA Hostel (Cancer Patients Aid Association)",
+   "area": "Mahalaxmi",
+   "phones": [
+    "79776 55400"
+   ],
+   "for_whom": "Outstation cancer patients treated at Tata Memorial",
+   "cost": "Free stay and meals. Helpline Mon–Fri, 11 am–4:30 pm",
+   "band": "free",
+   "source": "https://www.cancerassist.in/search.php?act=1&ct=Mumbai"
+  },
+  {
+   "id": "PARMARTH",
+   "name": "Rupalidevi Nuwal Seva Sadan (Parmarth Seva Samiti)",
+   "area": "Parel, near Tata Memorial",
+   "phones": [
+    "99604 16666",
+    "98924 41434",
+    "022-2417 3666"
+   ],
+   "for_whom": "Tata Memorial patients and attendants (64 patients)",
+   "cost": "Free food; ask about room charges",
+   "band": "free",
+   "source": "https://www.cancerassist.in/search.php?act=1&ct=Mumbai"
+  },
+  {
+   "id": "NANA-PALKAR",
+   "name": "Nana Palkar Smriti Samiti",
+   "area": "Parel East",
+   "phones": [
+    "022-4619 3400"
+   ],
+   "for_whom": "Patients from weaker sections at KEM, Tata Memorial and Wadia; 2 patients + 2 family per room. Asks for a recommendation letter from the hometown (see source)",
+   "cost": "Free food; ask about room charges",
+   "band": "free",
+   "source": "https://www.cancerassist.in/search.php?act=1&ct=Mumbai"
+  },
+  {
+   "id": "VCARE",
+   "name": "Aashray by V Care Foundation",
+   "area": "Parel, opposite Bhoiwada Court",
+   "phones": [
+    "98219 49401",
+    "98219 49402"
+   ],
+   "for_whom": "Patients from other cities and their caregivers",
+   "cost": "Ask on call",
+   "band": "unknown",
+   "source": "https://www.cancerassist.in/search.php?act=1&ct=Mumbai"
+  },
+  {
+   "id": "VISAWA",
+   "name": "Visawa dharamshala",
+   "area": "Parel, near KEM Hospital Gate 7",
+   "phones": [
+    "90048 06371",
+    "87092 55300",
+    "97025 57963"
+   ],
+   "for_whom": "Patients at KEM and Tata Memorial",
+   "cost": "Ask on call",
+   "band": "unknown",
+   "source": "https://www.cancerassist.in/search.php?act=1&ct=Mumbai"
+  },
+  {
+   "id": "SHRADDHA",
+   "name": "Shraddha Foundation shelter homes (Lucky Star, Parel; also Chembur, Kharghar)",
+   "area": "Parel",
+   "phones": [
+    "022-4000 3355",
+    "88505 39930"
+   ],
+   "for_whom": "Underprivileged patients and attendants",
+   "cost": "₹120 per bed per day, food free",
+   "band": "under_300",
+   "source": "https://www.cancerassist.in/search.php?act=1&ct=Mumbai"
+  },
+  {
+   "id": "KUMAVAT",
+   "name": "Shree Kumavat Seva Trust Dharamshala",
+   "area": "Parel, Dr. Ambedkar Road",
+   "phones": [
+    "022-2412 2554"
+   ],
+   "for_whom": "Patients and attendants (common hall)",
+   "cost": "₹250 per bed per day; kitchen for self-cooking",
+   "band": "under_300",
+   "source": "https://www.cancerassist.in/search.php?act=1&ct=Mumbai"
+  },
+  {
+   "id": "SANT-GADGE",
+   "name": "Sant Gadge Maharaj Mission Dharamshala",
+   "area": "Dadar East",
+   "phones": [
+    "022-2411 1496",
+    "93719 19006"
+   ],
+   "for_whom": "Patients with up to 2 attendants",
+   "cost": "₹70/day room, ₹50/day dormitory; meals free",
+   "band": "under_300",
+   "source": "https://www.cancerassist.in/search.php?act=1&ct=Mumbai"
+  },
+  {
+   "id": "SETH-DAMJI",
+   "name": "Seth Damji Laxmichand Jain Dharamshala",
+   "area": "Chinchpokli, near Parel",
+   "phones": [
+    "022-2372 5466"
+   ],
+   "for_whom": "Patients and kin",
+   "cost": "Economical; ask on call",
+   "band": "unknown",
+   "source": "https://www.cancerassist.in/search.php?act=1&ct=Mumbai"
+  },
+  {
+   "id": "AHUJA",
+   "name": "Ahuja Dharamshala (Shree M D Ahuja Trust)",
+   "area": "Dadar East, behind Hindmata Cinema",
+   "phones": [
+    "022-2416 2490",
+    "88504 40674"
+   ],
+   "for_whom": "Patients and kin",
+   "cost": "Ask on call",
+   "band": "unknown",
+   "source": "https://www.cancerassist.in/search.php?act=1&ct=Mumbai"
+  },
+  {
+   "id": "MAHA-GH",
+   "name": "Maharashtra Guest House",
+   "area": "Parel East, near Premier Cinema",
+   "phones": [
+    "022-2414 7987"
+   ],
+   "for_whom": "Cancer patients and their family only",
+   "cost": "₹950 per day for a 2-bed room",
+   "band": "300_1000",
+   "source": "https://www.cancerassist.in/search.php?act=1&ct=Mumbai"
+  },
+  {
+   "id": "GOPAL",
+   "name": "Gopal Mansion",
+   "area": "Dhobitalao (South Mumbai)",
+   "phones": [
+    "022-2205 5001",
+    "88799 86893"
+   ],
+   "for_whom": "Families of hospitalised patients",
+   "cost": "₹840 per day",
+   "band": "300_1000",
+   "source": "https://www.cancerassist.in/search.php?act=1&ct=Mumbai"
+  },
+  {
+   "id": "BORGES",
+   "name": "Dr. Ernest Borges Memorial Home",
+   "area": "Bandra East",
+   "phones": [
+    "022-2659 1404"
+   ],
+   "for_whom": "Underprivileged Tata Memorial patients (all stages, incl. palliative) and family",
+   "cost": "Ask on call",
+   "band": "unknown",
+   "source": "https://www.cancerassist.in/search.php?act=1&ct=Mumbai"
+  },
+  {
+   "id": "IMPACCT",
+   "name": "ImPaCCT Foundation (children)",
+   "area": "Tata Memorial, Paediatric Oncology",
+   "phones": [
+    "022-2417 7220",
+    "91678 80255"
+   ],
+   "for_whom": "A child patient and one parent",
+   "cost": "Ask on call",
+   "band": "unknown",
+   "source": "https://www.cancerassist.in/search.php?act=1&ct=Mumbai"
+  },
+  {
+   "id": "HELPING-HANDS",
+   "name": "The Helping Hands Foundation (children)",
+   "area": "Dharamshalas around Tata Memorial",
+   "phones": [
+    "81698 07621"
+   ],
+   "for_whom": "A child with cancer and the family",
+   "cost": "Free",
+   "band": "free",
+   "source": "https://www.cancerassist.in/search.php?act=1&ct=Mumbai"
+  },
+  {
+   "id": "STJUDE",
+   "name": "St. Jude India ChildCare Centres (children)",
+   "area": "Mumbai",
+   "phones": [
+    "022-6666 3152"
+   ],
+   "for_whom": "Children with cancer and parents",
+   "cost": "Ask on call",
+   "band": "unknown",
+   "source": "https://www.cancerassist.in/search.php?act=1&ct=Mumbai"
+  }
+ ]
+}

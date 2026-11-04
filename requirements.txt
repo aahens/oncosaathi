@@ -1,0 +1,13 @@
+fastapi==0.143.3
+uvicorn==0.54.0
+httpx==0.28.1
+requests==2.34.2
+python-dotenv==1.2.4
+python-multipart==0.0.32
+cryptography==48.0.1
+numpy==2.4.6
+pillow==13.0.0
+sarvamai==0.1.37
+websockets==17.2
+aiortc==1.15.0
+sarvam-conv-ai-sdk==1.1.1
