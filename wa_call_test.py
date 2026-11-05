@@ -146,7 +146,7 @@ async def main():
 
     # the caller (Meta's side)
     hospital, question, again, register, cbc = await asyncio.gather(
-        speech("मैं टाटा मेमोरियल हॉस्पिटल में हूँ।"), speech("एंडोस्कोपी कहाँ होती है?"), speech("ये मुझे मैसेज में मिलेगा?"),
+        speech("मैं टाटा मेमोरियल हॉस्पिटल में हूँ।"), speech("एमआरआई कहाँ होती है?"), speech("ये मुझे मैसेज में मिलेगा?"),
         speech("रजिस्ट्रेशन कहाँ होता है?"), speech("CBC test लेना है, कहाँ जाऊँ?"))
     caller = RTCPeerConnection()
     mouth = wa_call.Speaker()
@@ -199,7 +199,7 @@ async def main():
     check("hospital is understood", "टाटा" in reply or "Tata" in reply, reply)
     t1 = time.monotonic()
     reply = await ask(question)
-    check("spoken question gets the Endoscopy room", "B-201" in reply, reply)
+    check("spoken question gets the MRI building from the booklet", "गोल्डन जुबली" in reply or "GJB" in reply, reply)
     ok = await wait_for(lambda: loud(t1 + 1) > 1.0, 15)
     check("caller hears the answer", ok, f"{loud(t1 + 1):.1f} s of voice")
     check("she says the map is in the WhatsApp chat", "WhatsApp चैट" in reply or "WhatsApp chat" in reply, reply)

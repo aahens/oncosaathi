@@ -91,9 +91,16 @@ QUESTION_RX = (r"\?|\b(kahan|kaha|kahaan|kidhar|kaise|kab|where|how|when)\b|"
 HELP_RX = (r"\b(help|madad|sahayata)\b|(?<![\u0900-\u097F])(मदद|सहायता|हेल्प)(?![\u0900-\u097F])")
 CONFIRM_RX = (r"\b(floor|manzil|manjil|wing|room|sahi|theek|right|correct|na)\b|"
               r"(?<![\u0900-\u097F])(मंज़िल|मंजिल|फ्लोर|फ़्लोर|विंग|कमरा|सही|ठीक|ना)(?![\u0900-\u097F])")
-FLOOR_WORDS = {"G": r"ground|ग्राउंड|नीचे|neeche|niche", "1": r"\bfirst\b|\b1st\b|pehli|pahli|पहली|पहले (फ्लोर|फ़्लोर|माले|मंज़िल|मंजिल)",
+FLOOR_WORDS = {"B": r"basement|बेसमेंट|तहखान", "G": r"ground|ग्राउंड|नीचे|neeche|niche",
+               "1": r"\bfirst\b|\b1st\b|pehli|pahli|पहली|पहले (फ्लोर|फ़्लोर|माले|मंज़िल|मंजिल)",
                "2": r"\bsecond\b|\b2nd\b|doosri|dusri|doosre|dusre|दूसरी|दूसरे", "3": r"\bthird\b|\b3rd\b|teesri|tisri|teesre|तीसरी|तीसरे",
-               "4": r"\bfourth\b|\b4th\b|chauthi|chauthe|चौथी|चौथे"}
+               "4": r"\bfourth\b|\b4th\b|chauthi|chauthe|चौथी|चौथे", "5": r"\bfifth\b|\b5th\b|paanchvi|panchvi|पाँचवीं|पांचवीं|पाँचवें|पांचवें",
+               "6": r"\bsixth\b|\b6th\b|chhathi|chhathe|छठी|छठे", "7": r"\bseventh\b|\b7th\b|saatvi|satvi|सातवीं|सातवें",
+               "8": r"\beighth\b|\b8th\b|aathvi|आठवीं|आठवें", "10": r"\btenth\b|\b10th\b|dasvi|दसवीं|दसवें"}
+# "main private patient hoon", "general category", "VIP": which of the booklet's two locations is theirs
+CATEGORY_RX = {"private": r"\b(private|pvt|vip|paying)\s*(patient|category|wala|wale|wali|hoon|hun|hu|room)?\b|प्राइवेट|प्रायवेट|वीआईपी",
+               "general": r"\bgeneral\s*(patient|category|wala|wale|wali|hoon|hun|hu)\b|\bnormal\s*(patient|category)\b|जनरल\s*(मरीज़|मरीज|पेशेंट|कैटेगरी|वाला|वाले)|सामान्य\s*(मरीज़|मरीज|श्रेणी)"}
+CATEGORY_ONLY_RX = r"^\W*(private|pvt|vip|general|प्राइवेट|जनरल|सामान्य)\W*$"
 FLOOR_LIST_RX = (r"\bk(?:au|o)ne?\s*-?\s*s[aei]\b|\b(kya kya|kya-kya|kaun kaun|kon kon|kya hai|saare|sare|sab|list|data|"
                  r"what is on|what's on|which department|which departments|what department|what departments)\b|"
                  r"(?<![\u0900-\u097F])(क्या क्या|क्या-क्या|कौन कौन|कौन-कौन|कौन सा|कौन से|कौन सी|कौनसा|कौनसे|क्या है|"
@@ -159,7 +166,8 @@ def aspect_from_words(text):
 # ---------------- classifier (labels only, never words for the caller) ----------------
 def _place_line(u):
     also = core.SYNONYMS.get(u["id"])
-    where = f"{BLOCKS[u['block']]['name']}, {FLOORS[u['floor']]['name']}" if "block" in u else "campus"
+    where = (core.where_say(u, "en") if "block" in u else "not in the booklet" if u.get("unlisted") else
+             "depends on cancer type" if u.get("dmg") else "campus")
     staff = " [staff only]" if u.get("public") is False else ""
     return f"{u['id']}: {u['name']} / {u.get('name_hi', '')} ({where}){staff}" + (f" — also called: {', '.join(also)}" if also else "")
 
@@ -425,10 +433,9 @@ def _name(u, lang):
 
 
 def _wing(u, lang):
-    if u["block"] == "CORE":
-        return "बीच वाली मुख्य लिफ़्ट के पास" if lang == "hi" else "the centre, by the main lift"
+    """The building (it was a wing in the old sample layout)."""
     b = BLOCKS[u["block"]]
-    return b["name_hi"].split("·")[0].strip() if lang == "hi" else b["name"]
+    return b["name_hi"] if lang == "hi" else b["name"]
 
 
 def _floor(u, lang):
@@ -439,26 +446,36 @@ def _floor(u, lang):
 def _lift(u, lang):
     if u["floor"] == "G":
         return ""
-    return f"मुख्य लिफ़्ट से {_floor(u, lang)} पर जाइए।" if lang == "hi" else f"Take the main lift to the {_floor(u, lang)}."
+    if u["floor"] == "B":
+        return "लिफ़्ट से नीचे बेसमेंट में जाइए।" if lang == "hi" else "Take the lift down to the basement."
+    return f"लिफ़्ट से {_floor(u, lang)} पर जाइए।" if lang == "hi" else f"Take the lift to the {_floor(u, lang)}."
 
 
-def place_short(u, lang):
-    """'Wing A, first floor, rooms 101 to 105' — for dates and next steps."""
+def help_desk(lang):
+    return core.HELP_DESK["hi" if lang == "hi" else "en"]
+
+
+def place_short(u, lang, category=None):
+    """'Golden Jubilee Building (GJB), first floor, rooms 140 to 142' — for dates and next steps."""
+    if u.get("unlisted"):
+        return f"{_name(u, lang)} ({_name(PLACES[u['ask']], lang)}: {core.where_say(PLACES[u['ask']], lang)})"
     if "block" not in u:
-        return _name(u, lang)
-    return f"{_wing(u, lang)}, {_floor(u, lang)}, {_f(u, 'rooms', lang)}"
+        return core.where_say(u, lang) or _name(u, lang)
+    return core.where_text(core.location_of(u, category), lang)
 
 
-def say_place(u, aspect, lang, mode):
+def say_place(u, aspect, lang, mode, category=None):
     hi = lang == "hi"
     name = _name(u, lang)
     if mode == "chat" and aspect == "where":
-        return core.directory_answer(u, lang)
+        return core.directory_answer(u, lang, category)
+    if u.get("unlisted") or u.get("dmg"):
+        return core.directory_answer(u, lang, category).replace("\n➡️ ", " " if hi else " ").replace("\n", " ")
     if "block" not in u:
         return f"{name}: {_f(u, 'note', lang)}।" if hi else f"{name}: {_f(u, 'note', lang)}."
     if u.get("public") is False:
-        return (f"{name} सिर्फ़ स्टाफ़ के लिए है। वहाँ जाने को कहा गया हो, तो गेट 1 के हेल्प डेस्क पर पूछिए।" if hi else
-                f"{name} is for staff only. If you were asked to go there, please ask at the help desk at Gate 1.")
+        return (f"{name} सिर्फ़ स्टाफ़ के लिए है। वहाँ जाने को कहा गया हो, तो {help_desk(lang)} पर पूछिए।" if hi else
+                f"{name} is for staff only. If you were asked to go there, please ask at {help_desk(lang)}.")
     if aspect == "bring":
         bring = _f(u, "bring", lang) if u.get("bring") else ""
         fasting = _f(u, "note", lang) if re.search(r"fast", u.get("note") or "", re.I) else ""
@@ -470,8 +487,8 @@ def say_place(u, aspect, lang, mode):
     if aspect == "detail":
         if u.get("note"):
             return f"{name}: {_f(u, 'note', lang)}।" if hi else f"{name}: {_f(u, 'note', lang)}."
-        return (f"{name} के बारे में यह बात मेरे पास पक्की नहीं है। वहीं के काउंटर पर या गेट 1 के हेल्प डेस्क पर पूछ लीजिए।" if hi else
-                f"I don't have that detail for {name}. Please ask at its counter or the help desk inside Gate 1.")
+        return (f"{name} के बारे में यह बात मेरे पास पक्की नहीं है। वहीं के काउंटर पर या {help_desk(lang)} पर पूछ लीजिए।" if hi else
+                f"I don't have that detail for {name}. Please ask at its counter or at {help_desk(lang)}.")
     if aspect == "prep":
         fasting = re.search(r"fast", u.get("note") or "", re.I)
         if fasting:
@@ -484,22 +501,28 @@ def say_place(u, aspect, lang, mode):
                (" बाक़ी बातें वहाँ के डॉक्टर अच्छे से समझा देंगे।" if hi else " The doctors there will explain the rest.")
     if aspect == "note":
         note = _f(u, "note", lang) if u.get("note") else ""
-        return ((f"{name}: {note}।" if note else f"{name} के बारे में यह जानकारी मेरे पास नहीं है। गेट 1 के हेल्प डेस्क पर पूछिए।") if hi else
-                (f"{name}: {note}." if note else f"I don't have that detail for {name}. Please ask at the help desk inside Gate 1."))
+        return ((f"{name}: {note}।" if note else f"{name} के बारे में यह जानकारी मेरे पास नहीं है। {help_desk(lang)} पर पूछिए।") if hi else
+                (f"{name}: {note}." if note else f"I don't have that detail for {name}. Please ask at {help_desk(lang)}."))
     if aspect == "hours":
         if not u.get("hours"):
-            return (f"{name} का समय मेरे पास नहीं है। गेट 1 के हेल्प डेस्क पर पूछिए।" if hi else
-                    f"I don't have the timings for {name}. Please ask at the help desk at Gate 1.")
+            return (f"बुकलेट में {name} का समय नहीं लिखा है। {help_desk(lang)} पर पूछिए।" if hi else
+                    f"The booklet doesn't give the timings for {name}. Please ask at {help_desk(lang)}.")
         return f"{name} का समय: {_f(u, 'hours', lang)}।" if hi else f"{name} timings: {_f(u, 'hours', lang)}."
-    if aspect == "way" and u.get("path"):
-        return (u.get("path_hi") or u["path"]) if hi else u["path"]
-    where = (f"{name} {_wing(u, lang)}, {_floor(u, lang)} पर है, {_f(u, 'rooms', lang)}।" if hi else
-             f"{name} is in {_wing(u, lang)}, {_floor(u, lang)}, {_f(u, 'rooms', lang)}.")
-    if mode == "voice" and len(path_steps(u, lang)) >= 2:
-        first = path_steps(u, lang)[0].rstrip("।.")
+    loc = core.location_of(u, category)
+    if aspect == "way" and loc.get("path"):
+        return (loc.get("path_hi") or loc["path"]) if hi else loc["path"]
+    several = "private" in u and category not in core.CATEGORY_LABEL or u.get("also")
+    if several:                                   # general and private (or two places): say each, then the way for the general one
+        where = f"{name}: {core.where_say(u, lang, category)}।" if hi else f"{name}: {core.where_say(u, lang, category)}."
+    else:
+        where = (f"{name} {core.where_text(loc, lang)} पर है।" if hi else f"{name} is in the {core.where_text(loc, lang)}.")
+    if mode == "voice" and len(path_steps(u, lang, category)) >= 2 and not several:
+        first = path_steps(u, lang, category)[0].rstrip("।.")
         return (f"{where} {first}। वहाँ पहुँचकर बताइए, आगे का रास्ता बता दूँगी।" if hi else
                 f"{where} {first}. Tell me when you get there and I'll guide you on.")
-    return f"{where} {_lift(u, lang)}".strip()
+    if several and "private" in u and mode == "voice":
+        return where + (" आप जनरल मरीज़ हैं या प्राइवेट?" if hi else " Are you a general or a private patient?")
+    return f"{where} {_lift(loc, lang)}".strip()
 
 
 def _when(task, lang):
@@ -573,16 +596,34 @@ def say_documents(lang, mode):
     return "\n".join([head] + [f"• {d}" for d in always] + ["", more] + [f"• {d}" for d in extra])
 
 
-def say_floor(fid, lang, mode):
-    """Everything public on one floor, wing by wing, from hospital.json."""
+def say_floor(fid, lang, mode, block=None):
+    """Everything listed on one floor, building by building (or in one building), from hospital.json."""
     hi = lang == "hi"
-    us = [u for u in H["units"] if u["floor"] == fid and u.get("public", True)]
     fname = FLOORS[fid]["name_hi"] if hi else FLOORS[fid]["name"].lower()
+    by_b = {}
+    for sid in route_map.SPOTS:
+        s = route_map.SPOTS[sid]
+        if s["floor"] == fid and (block is None or s["block"] == block):
+            by_b.setdefault(s["block"], []).append(s)
+    if not by_b:
+        return (f"बुकलेट में {fname} पर कोई विभाग नहीं लिखा है।" if hi else f"The booklet doesn't list any department on the {fname}.")
+    bname = lambda b: BLOCKS[b]["name_hi"] if hi else BLOCKS[b]["name"]
+    if mode == "voice" and len(by_b) > 1:
+        names = ", ".join(by_b)
+        return (f"{fname} पर विभाग इन बिल्डिंग में हैं: {names}। आप किस बिल्डिंग में हैं?" if hi else
+                f"On the {fname} there are departments in {names}. Which building are you in?")
     if mode == "voice":
-        names = ", ".join(_name(u, lang) for u in us)
-        return (f"{fname} पर ये हैं: {names}। किसका रास्ता बताऊँ?" if hi else f"On the {fname}: {names}. Which one should I guide you to?")
-    lines = [f"{fname} पर:" if hi else f"On the {fname}:"]
-    lines += [f"• {_name(u, lang)}: {_wing(u, lang)}, {_f(u, 'rooms', lang)}" for u in us]
+        groups = [f"{bname(b)} में " + ", ".join(_name(s['unit'], lang) for s in ss) if hi else
+                  f"in the {bname(b)}: " + ", ".join(_name(s['unit'], lang) for s in ss) for b, ss in by_b.items()]
+        return (f"{fname} पर " + "; ".join(groups) + "। किसका रास्ता बताऊँ?" if hi else
+                f"On the {fname}, " + "; ".join(groups) + ". Which one should I guide you to?")
+    lines = []
+    for b, ss in by_b.items():
+        lines.append(f"{bname(b)}, {fname}:" if hi else f"{bname(b)}, {fname}:")
+        for s in ss:
+            who = f" ({core.CATEGORY_LABEL['private']['hi' if hi else 'en']})" if s["kind"] == "private" else ""
+            rooms = s["unit"].get("private", {}).get("rooms_hi" if hi else "rooms") if s["kind"] == "private" else _f(s["unit"], "rooms", lang)
+            lines.append(f"• {_name(s['unit'], lang)}{who}" + (f": {rooms}" if rooms and s["kind"] != "also" else ""))
     return "\n".join(lines)
 
 
@@ -598,9 +639,10 @@ def two_places(t):
     return hits[:2] if len(hits) >= 2 else None
 
 
-def path_steps(u, lang):
-    """The walking path as separate steps: lift / turn / door. Split on sentence ends and on ', then' / ', फिर'."""
-    text = (u.get("path_hi") or u.get("path")) if lang == "hi" else u.get("path")
+def path_steps(u, lang, category=None):
+    """The walking path as separate steps: building / lift / signs. Split on sentence ends and on ', then' / ', फिर'."""
+    loc = core.location_of(u, category) if "block" in u else u
+    text = (loc.get("path_hi") or loc.get("path")) if lang == "hi" else loc.get("path")
     if not text:
         return []
     parts = re.split(r"(?<=[।.])\s+|,\s*(?=फिर |then )", text)
@@ -611,9 +653,9 @@ def path_steps(u, lang):
 def say_nav(u, state, lang, text):
     """Next step of the walk, from where the caller says they are."""
     hi = lang == "hi"
-    steps = path_steps(u, lang)
+    steps = path_steps(u, lang, state.get("category"))
     if not steps:
-        return say_place(u, "where", lang, "voice")
+        return say_place(u, "where", lang, "voice", state.get("category"))
     t = " " + text.lower() + " "
     lift_i = next((i for i, st in enumerate(steps) if re.search(LIFT_RX, st.lower())), None)
     floor_said = next((f for f, rx in FLOOR_WORDS.items() if re.search(rx, t)), None)
@@ -625,8 +667,9 @@ def say_nav(u, state, lang, text):
         idx = (state.get("path_step") if state.get("path_step") is not None else -1) + 1
     if idx >= len(steps):                                             # already at the end of the path
         state["path_step"] = len(steps) - 1
-        return (f"आप लगभग पहुँच गए हैं: {_f(u, 'rooms', lang)} वहीं है। न दिखे तो पास के किसी स्टाफ़ से पूछ लीजिए।" if hi else
-                f"You're nearly there: {_f(u, 'rooms', lang)} is right there. If you can't see it, ask any staff member nearby.")
+        here = _f(core.location_of(u, state.get("category")), "rooms", lang) or _name(u, lang)
+        return (f"आप लगभग पहुँच गए हैं: {here} वहीं है। न दिखे तो पास के किसी स्टाफ़ से पूछ लीजिए।" if hi else
+                f"You're nearly there: {here} is right there. If you can't see it, ask any staff member nearby.")
     state["path_step"] = idx
     step = steps[idx]
     if hi and step.startswith("फिर "):
@@ -659,70 +702,93 @@ def _start_markers(key, t):
     return None
 
 
+GATE_WORDS = {"GATE2": r"back gate|pichla gate|peeche wala gate|पिछला गेट|पीछे वाला गेट|\bgate\s*(?:2|two|do)\b|गेट\s*(?:2|दो)",
+              "GATE1": r"main gate|entrance gate|\bgate\s*(?:1|one|ek)\b|गेट\s*(?:1|एक)|मेन गेट|\bentrance\b|\blobby\b|लॉबी"}
+
+
 def spoken_start(text, dest=None):
-    """Where the patient says they are standing, as a route_map place, or None. Returns (place, 'at' or 'from')."""
+    """Where the patient says they are standing, as a route_map place, or None. Returns (place, 'at' or 'from').
+    dest is the place they are being guided to (a route_map place); a lift or a bare floor is taken to be in its building."""
     t = " " + text.lower() + " "
-    m = re.search(r"\bgate\s*(1|2|one|two|ek|do)\b|गेट\s*(1|2|एक|दो)", t)
-    if m:
-        place = "GATE2" if (m.group(1) or m.group(2)) in ("2", "two", "do", "दो") else "GATE1"
-        if _start_markers(m.group(0), t):
-            return place, _start_markers(m.group(0), t)
-    for key in ("main gate", "entrance", "lobby", "मेन गेट", "लॉबी"):
-        if key in t and _start_markers(key, t):
-            return "GATE1", _start_markers(key, t)
+    for gate, rx in GATE_WORDS.items():
+        m = re.search(rx, t)
+        if m and _start_markers(m.group(0).strip(), t):
+            return gate, _start_markers(m.group(0).strip(), t)
     floor = next((f for f, rx in FLOOR_WORDS.items() if re.search(rx, t)), None)
+    block = route_map.building_of(dest) if dest and route_map.is_place(dest) else None
+    named_b = next((b for b in BLOCKS if re.search(rf"\b{b.lower()}\b", t)), None) or block
     lift = re.search(LIFT_RX, t)
-    if lift and _start_markers(lift.group(0), t):
-        return f"LIFT-{floor or (route_map.floor_of(dest) if dest else 'G')}", _start_markers(lift.group(0), t)
+    if lift and _start_markers(lift.group(0), t) and named_b:
+        fl = floor or (route_map.floor_of(dest) if dest and named_b == block else "G")
+        if route_map.is_place(f"LIFT-{named_b}-{fl}"):
+            return f"LIFT-{named_b}-{fl}", _start_markers(lift.group(0), t)
     keys = sorted(((k.lower(), uid) for uid, ks in core.SYNONYMS.items() for k in ks if route_map.is_place(uid)), key=lambda x: -len(x[0]))
     named = [(uid, _start_markers(k, t)) for k, uid in keys if core.hit(k, t) and _start_markers(k, t)]
     for uid, kind in named:
-        if uid != dest:
+        if uid != (dest or "").split("@")[0]:
             return uid, kind
     if named:
         return named[0]
-    if floor and re.search(_I_AM_RX, t) and not re.search(QUESTION_RX, t):
-        return f"LIFT-{floor}", "at"                     # "second floor par hoon": the lift lobby is the one point we know
+    if floor and named_b and re.search(_I_AM_RX, t) and not re.search(QUESTION_RX, t) and route_map.is_place(f"LIFT-{named_b}-{floor}"):
+        return f"LIFT-{named_b}-{floor}", "at"          # "second floor par hoon": the lift lobby there is the one point we know
     return None
 
 
 def place_name(place, lang):
     hi = lang == "hi"
     if place == "GATE1":
-        return "गेट 1" if hi else "Gate 1"
+        return "मेन गेट" if hi else "the main gate"
     if place == "GATE2":
-        return "गेट 2" if hi else "Gate 2"
+        return "GJB का पिछला गेट" if hi else "the GJB back gate"
     if place.startswith("LIFT-"):
-        return "मुख्य लिफ़्ट" if hi else "the main lift"
-    return _name(PLACES[place], lang)
+        b = place.split("-")[1]
+        return f"{b} की लिफ़्ट" if hi else f"the {b} lift"
+    s = route_map.SPOTS.get(place)
+    u = s["unit"] if s else PLACES[place]
+    return _name(u, lang) + (f" ({BLOCKS[s['block']]['name_hi' if hi else 'name']})" if s and s["kind"] == "also" else "")
+
+
+def spot_place(sid):
+    """(unit, location) for a route_map place id like 'C-1-MRI@private'."""
+    s = route_map.SPOTS[sid]
+    return s["unit"], s
 
 
 def walk_text(start, dest, lang):
-    """The same walk the map draws, in words. No 'left' or 'right' out of a door: those depend on which way you face."""
+    """The same walk the map draws, in words: which building, which floor, then the signs. Inside a floor we don't know the
+    real layout, so there is no 'second door on the left'."""
     hi = lang == "hi"
-    u = PLACES[dest]
-    trip = route_map.legs(start, dest)
+    u, loc = spot_place(dest)
+    sb, db = (None if start in route_map.GATES else route_map.building_of(start)), loc["block"]
+    sf, df = route_map.floor_of(start), loc["floor"]
+    B = lambda b: BLOCKS[b]["name_hi"] if hi else BLOCKS[b]["name"]
+    F = lambda f: FLOORS[f]["name_hi"] if hi else FLOORS[f]["name"].lower()
+    frm = place_name(start, lang)
     parts = []
-    if len(trip) > 1 or (trip[0]["floor"] != route_map.floor_of(start)):
-        parts.append(f"{place_name(start, lang)} से कॉरिडोर में होकर मुख्य लिफ़्ट तक जाइए और {_floor(u, lang)} पर आइए।" if hi else
-                     f"From {place_name(start, lang)}, walk along the corridor to the main lift and go to the {_floor(u, lang)}.")
-    elif start.startswith("LIFT-"):
-        parts.append(f"लिफ़्ट से निकलकर कॉरिडोर में आइए।" if hi else "Leave the lift and step into the corridor.")
-    if len(trip) > 1:
-        lead = "लिफ़्ट से निकलकर" if hi else "Leave the lift and"
-    elif start.startswith("LIFT-"):
-        lead = "फिर" if hi else "Then"
+    if sb != db:
+        if sb is None:
+            parts.append(f"{frm} से {B(db)} तक चलिए।" if hi else f"From {frm}, walk to the {B(db)}.")
+        elif sf != "G":
+            parts.append(f"{frm} से लिफ़्ट से ग्राउंड फ़्लोर पर आइए, {sb} से बाहर निकलकर {B(db)} तक चलिए।" if hi else
+                         f"From {frm}, take the lift down to the ground floor, leave the {sb} and walk to the {B(db)}.")
+        else:
+            parts.append(f"{frm} से {sb} से बाहर निकलकर {B(db)} तक चलिए।" if hi else f"From {frm}, leave the {sb} and walk to the {B(db)}.")
+        if df == "B":
+            parts.append("लिफ़्ट से नीचे बेसमेंट में जाइए।" if hi else "Take the lift down to the basement.")
+        elif df != "G":
+            parts.append(f"लिफ़्ट से {F(df)} पर जाइए।" if hi else f"Take the lift to the {F(df)}.")
+        else:
+            parts.append("यह ग्राउंड फ़्लोर पर है।" if hi else "It is on the ground floor.")
+    elif sf != df:
+        to = "नीचे बेसमेंट में" if hi and df == "B" else f"{F(df)} पर" if hi else ("down to the basement" if df == "B" else f"to the {F(df)}")
+        parts.append(f"{frm} से लिफ़्ट से {to} जाइए।" if hi else f"From {frm}, take the lift {to}.")
+    rooms = loc.get("rooms_hi" if hi else "rooms") or ""
+    tail = f", {rooms}" if rooms else ""
+    if sb == db and sf == df:
+        parts.append(f"{frm} से {_name(u, lang)} के बोर्ड देखते हुए जाइए{tail}।" if hi else
+                     f"From {frm}, follow the signs to {_name(u, lang)}{tail}.")
     else:
-        lead = f"{place_name(start, lang)} से" if hi else f"From {place_name(start, lang)},"
-    hand = route_map.side(start, dest)
-    rooms = _f(u, "rooms", lang)
-    if hi:
-        at = {"left": f"{rooms} आपके बाएँ हाथ पर है।", "right": f"{rooms} आपके दाएँ हाथ पर है।", "ahead": f"{rooms} सामने है।"}[hand]
-        parts.append(f"{lead} कॉरिडोर में {_wing(u, lang)} की तरफ़ चलिए। {at}")
-    else:
-        at = {"left": f"{rooms} is on your left.", "right": f"{rooms} is on your right.", "ahead": f"{rooms} is straight ahead."}[hand]
-        parts.append(f"{lead} walk along the corridor towards {_wing(u, lang)}. {at}" if lead.endswith(",") else
-                     f"{lead} walk along the corridor towards {_wing(u, lang)}. {at}")
+        parts.append(f"फिर {_name(u, lang)} के बोर्ड देखते हुए जाइए{tail}।" if hi else f"Then follow the signs to {_name(u, lang)}{tail}.")
     return f"{_name(u, lang)}: " + " ".join(parts)
 
 
@@ -730,8 +796,9 @@ def map_for(start, dest, lang, told):
     """What the chat needs to show the map: the image link and a short caption saying where the line starts."""
     hi = lang == "hi"
     where = place_name(start, lang)
+    name = place_name(dest, lang)
     if told:
-        caption = f"📍 रास्ता: {where} से {_name(PLACES[dest], lang)} तक।" if hi else f"📍 Your route from {where} to {_name(PLACES[dest], lang)}."
+        caption = f"📍 रास्ता: {where} से {name} तक।" if hi else f"📍 Your route from {where} to {name}."
     else:
         caption = (f"📍 मैंने {where} से रास्ता बनाया है। आप कहीं और खड़े हैं तो बताइए, जैसे \"मैं फ़ार्मेसी पर हूँ\"।" if hi else
                    f"📍 I started this route at {where}. If you're standing somewhere else, tell me, like \"I'm at the pharmacy\".")
@@ -739,24 +806,29 @@ def map_for(start, dest, lang, told):
 
 
 def walk_dest(decision, state):
-    """The room this answer sends them to, if any. Safety answers never carry a map."""
+    """The map spot this answer sends them to, if any: the patient's own location (private or general) for a department,
+    and for a department the booklet doesn't list, the desk that can tell them. Safety answers never carry a map."""
     label, aspect = decision["label"], decision["aspect"]
     if label in SAFETY:
         return None
-    dest = None
+    uid = None
     if label in PLACES and aspect in ("where", "way", "calm", "again"):
-        dest = label
+        uid = label
     elif label == "FOLLOWUP" and aspect in ("where", "way"):
-        dest = state.get("place")
+        uid = state.get("place")
     elif label == "TWO_PLACES":
-        dest = aspect.split("|")[0]
+        uid = aspect.split("|")[0]
     elif label in ("STAY_PLUS", "NAV_NEXT"):
-        dest = aspect
+        uid = aspect
     elif label == "FIRST_VISIT":
-        dest = "A-G-REG"
+        uid = "A-G-REG"
     elif label in ("NEXT_STEP", "TASK_DONE"):
-        dest = state.get("place")
-    return dest if route_map.is_place(dest) and dest not in route_map.GATE_X else None
+        uid = state.get("place")
+    u = PLACES.get(uid or "")
+    if u and u.get("unlisted"):
+        uid = u["ask"]
+    dest = route_map.spot_for(uid, state.get("category")) if uid else None
+    return dest if dest and route_map.is_place(dest) else None
 
 
 def say_after(uid, state, lang, mode):
@@ -764,18 +836,19 @@ def say_after(uid, state, lang, mode):
     hi = lang == "hi"
     if state.get("pid") and store.next_tasks(state["pid"], actor=f"brain-{mode}", limit=1):
         return say_journey(state, lang, mode)
-    opd, report = PLACES["A-1-MED"], PLACES["B-G-REPORT"]
+    report, reg = PLACES["B-G-REPORT"], PLACES["A-G-REG"]
     nxt = {
-        "A-G-REG": ("रजिस्ट्रेशन के बाद अपना UHID कार्ड लेकर ओपीडी जाइए: विंग A, पहली मंज़िल, मुख्य लिफ़्ट से। कमरा नंबर आपकी ओपीडी पर्ची पर होगा। "
-                    "रजिस्ट्रेशन अभी बाकी हो तो पहले काउंटर 1 से 6 पर कराइए।",
-                    "After registration, take your UHID card to the OPD: Wing A, first floor, by the main lift. Your room number is on your OPD slip. "
-                    "If you haven't registered yet, do that first at counters 1 to 6."),
-        "A-G-BILL": ("पैसे जमा करके रसीद लीजिए, फिर उस जाँच की जगह जाइए जो पर्ची पर लिखी है। जाँच का नाम बताइए या पर्ची की फ़ोटो भेजिए, मैं रास्ता बता दूँगी।",
-                     "After paying, keep the receipt and go to the test written on your slip. Tell me the test name or send a photo of the slip and I'll guide you."),
-        "B-G-SAMPLE": (f"सैंपल देने के बाद रिपोर्ट {place_short(report, lang)} के रिपोर्ट काउंटर से मिलती है। {_f(report, 'note', lang)}।",
-                       f"After the sample, collect the report at the report counter, {place_short(report, lang)}. {_f(report, 'note', lang)}."),
-        "A-G-HELP": ("नए मरीज़ हैं तो पहले रजिस्ट्रेशन: मेन लॉबी, काउंटर 1 से 6। पहले से रजिस्टर हैं तो बताइए किस विभाग जाना है, या पर्ची की फ़ोटो भेजिए।",
-                     "If you're a new patient, register first at the main lobby, counters 1 to 6. If you're already registered, tell me the department or send a photo of your slip."),
+        "A-G-REG": ("रजिस्ट्रेशन के बाद स्मार्ट कार्ड और केस फ़ाइल मिलती है, फिर आपको अपनी ओपीडी भेजा जाता है। ओपीडी काउंटर आपके कैंसर के प्रकार (DMG) "
+                    "पर निर्भर है, जो केस फ़ाइल पर लिखा होता है; वह बताइए, मैं काउंटर बता दूँगी।",
+                    "After registration you get a smart card and a case file, and you're sent to your OPD. The OPD counter depends on your "
+                    "cancer type (DMG), written on your case file; tell me what it says and I'll give you the counter."),
+        "A-G-BILL": ("पैसे जमा करने के बाद उस जाँच की जगह जाइए जो पर्ची पर लिखी है। जाँच का नाम बताइए या पर्ची की फ़ोटो भेजिए, मैं रास्ता बता दूँगी।",
+                     "After paying, go to the test written on your slip. Tell me the test name or send a photo of the slip and I'll guide you."),
+        "B-G-SAMPLE": (f"सैंपल देने के बाद: {_f(report, 'note', lang)}",
+                       f"After the sample: {_f(report, 'note', lang)}"),
+        "A-G-HELP": (f"नए मरीज़ हैं तो पहले रजिस्ट्रेशन: {core.where_say(reg, lang)}। पहले से रजिस्टर हैं तो बताइए किस विभाग जाना है, या पर्ची की फ़ोटो भेजिए।",
+                     f"If you're a new patient, register first: {core.where_say(reg, lang)}. If you're already registered, tell me the department "
+                     "or send a photo of your slip."),
     }
     if uid in nxt:
         return nxt[uid][0 if hi else 1]
@@ -854,8 +927,8 @@ def say_stay(text, lang, mode, page=0, costs=False):
         order = {"free": 0, "under_300": 1, "300_1000": 2, "unknown": 3}
         picks = sorted(places, key=lambda p: order.get(p["band"], 9))[:3]
         parts = [f"{p['name']}: {p['cost']}" for p in picks]
-        return (("खर्चा जगह के हिसाब से है: " + "; ".join(parts) + "। फ़ोन का पैसा न हो तो अस्पताल में सामाजिक कार्य डेस्क (विंग A, काउंटर 12–13) मुफ़्त में मदद करता है।") if hi else
-                ("It depends on the place: " + "; ".join(parts) + ". If you can't afford a phone call, the social work desk at the hospital (Wing A, counters 12–13) helps for free."))
+        return (("खर्चा जगह के हिसाब से है: " + "; ".join(parts) + f"। पैसों की दिक्कत हो तो अस्पताल में {MSW['hi']} मदद करते हैं।") if hi else
+                ("It depends on the place: " + "; ".join(parts) + f". If money is a problem, the {MSW['en']} at the hospital can help."))
     if mode == "voice":
         picks = places[2 * page:2 * page + 2] or places[:2]
         parts = [f"{p['name']}, {p['area']}, नंबर {p['phones'][0]}" if hi else f"{p['name']} in {p['area']}, number {p['phones'][0]}" for p in picks]
@@ -864,9 +937,14 @@ def say_stay(text, lang, mode, page=0, costs=False):
     lines = ["टाटा मेमोरियल के पास रहने की जगहें:" if hi else "Places to stay near Tata Memorial:"]
     for p in places[:6]:
         lines.append(f"• {p['name']} ({p['area']}): {', '.join(p['phones'])}. {p['cost']}.")
-    lines += ["", note, "सामाजिक कार्य डेस्क (विंग A, काउंटर 12–13) भी मदद कर सकता है।" if hi else
-              "The social work desk (Wing A, counters 12–13) can also help you find a place."]
+    lines += ["", note, f"{MSW['hi']} भी रहने की जगह ढूँढने में मदद करते हैं।" if hi else
+              f"The {MSW['en']} can also help you find a place."]
     return "\n".join(lines)
+
+
+MSW = {"en": "Medical Social Worker (Golden Jubilee Building, ground floor)", "hi": "मेडिकल सोशल वर्कर (गोल्डन जुबली बिल्डिंग, ग्राउंड फ़्लोर)"}
+COUNSEL = {"en": "the Psychiatry and counselling department, Golden Jubilee Building, seventh floor",
+           "hi": "मनोरोग और काउंसलिंग विभाग, गोल्डन जुबली बिल्डिंग, सातवीं मंज़िल"}
 
 
 VOICE_SAFETY = {
@@ -875,21 +953,24 @@ VOICE_SAFETY = {
                   "hi": "आपने बताया, बहुत अच्छा किया। आपकी ज़िंदगी बहुत क़ीमती है। अभी किसी अपने या स्टाफ़ के पास रहिए, "
                         "और टेली-मानस 14416 पर कॉल कीजिए। यह मुफ़्त है, चौबीसों घंटे, आपकी भाषा में।"},
     "CLINICAL": {"en": "That's a question for your doctor or nurse; I can't advise on medicines or treatment. "
-                       "Please ask the nurse or help desk on your floor, or the help desk inside Gate 1.",
+                       f"Please ask the nurse on your floor, or at {core.HELP_DESK['en']}.",
                  "hi": "यह सवाल डॉक्टर या नर्स का है, मैं दवा या इलाज की सलाह नहीं दे सकती। "
-                       "अपनी मंज़िल की नर्स या हेल्प डेस्क से पूछिए, या गेट 1 के अंदर हेल्प डेस्क से।"},
-    "EMOTIONAL": {"en": "I understand, this is a hard time, and you are not alone. Our counsellors in Wing A, fourth floor, rooms 401 to 403, "
-                        "can talk with you today. Any time, day or night, you can also call Tele-MANAS on 14416, free.",
-                  "hi": "मैं समझ सकती हूँ, यह मुश्किल समय है, आप अकेले नहीं हैं। विंग A, चौथी मंज़िल, कमरा 401 से 403 में काउंसलर आज ही आपसे बात कर सकते हैं। "
+                       f"अपनी मंज़िल की नर्स से पूछिए, या {core.HELP_DESK['hi']} पर।"},
+    "EMOTIONAL": {"en": f"I understand, this is a hard time, and you are not alone. You can talk to someone at {COUNSEL['en']}. "
+                        "Any time, day or night, you can also call Tele-MANAS on 14416, free.",
+                  "hi": f"मैं समझ सकती हूँ, यह मुश्किल समय है, आप अकेले नहीं हैं। {COUNSEL['hi']} में आप किसी से बात कर सकते हैं। "
                         "दिन हो या रात, टेली-मानस 14416 पर भी मुफ़्त बात कर सकते हैं।"},
 }
+CASUALTY = {"en": "The Casualty (Emergency) is on the Main Building ground floor, open 24 hours.",   # TMH booklet §23
+            "hi": "कैज़ुअल्टी (इमरजेंसी) मेन बिल्डिंग के ग्राउंड फ़्लोर पर है, 24 घंटे खुली रहती है।"}
 EMERGENCY = {
-    "in": {"en": "This could be an emergency. Tell the nearest nurse or the help desk on this floor right now.",
-           "hi": "यह इमरजेंसी हो सकती है। अभी तुरंत पास की नर्स को या इसी मंज़िल के हेल्प डेस्क को बताइए।"},
+    "in": {"en": "This could be an emergency. Tell the nearest nurse right now. " + CASUALTY["en"],
+           "hi": "यह इमरजेंसी हो सकती है। अभी तुरंत पास की नर्स को बताइए। " + CASUALTY["hi"]},
     "coming": {"en": "This could be an emergency. Call 108 right now, or go to the nearest emergency.",
                "hi": "यह इमरजेंसी हो सकती है। अभी 108 पर कॉल कीजिए या सबसे पास की इमरजेंसी में जाइए।"},
-    None: {"en": "This could be an emergency. If you're in the hospital, tell the nearest nurse or floor help desk right now. If you're at home, call 108.",
-           "hi": "यह इमरजेंसी हो सकती है। अस्पताल में हैं तो अभी पास की नर्स या मंज़िल के हेल्प डेस्क को बताइए। घर पर हैं तो 108 पर कॉल कीजिए।"},
+    None: {"en": "This could be an emergency. If you're in the hospital, tell the nearest nurse right now; " + CASUALTY["en"][0].lower()
+                 + CASUALTY["en"][1:] + " If you're at home, call 108.",
+           "hi": "यह इमरजेंसी हो सकती है। अस्पताल में हैं तो अभी पास की नर्स को बताइए; " + CASUALTY["hi"] + " घर पर हैं तो 108 पर कॉल कीजिए।"},
 }
 AGAIN = {
     "EMOTIONAL": {"en": "I'm here and I'm listening. It's okay to feel this way. Would you like me to guide you to the counsellors now? "
@@ -912,8 +993,10 @@ COMFORT = {   # rotating fixed lines for someone who keeps needing comfort: warm
            "Looking after yourself matters too. Have some water, eat something. Ask me anything whenever you're ready."],
 }
 LINE_BUSY_RX = r"(phone|फोन|फ़ोन|call|कॉल).{0,30}(nahi utha|नहीं उठा|not answer|no answer|busy|व्यस्त|नहीं लग)"
-UNKNOWN = {"en": "Sorry, I'm not sure about that. Please ask at the help desk inside Gate 1, on the left.",
-           "hi": "माफ़ कीजिए, इसकी पक्की जानकारी मेरे पास नहीं है। गेट 1 के अंदर बाईं ओर हेल्प डेस्क पर पूछिए।"}
+UNKNOWN = {"en": f"Sorry, I'm not sure about that. Please ask at {core.HELP_DESK['en']}, or a Kevat patient navigator "
+                 "(Golden Jubilee Building, ground floor, counter 50).",
+           "hi": f"माफ़ कीजिए, इसकी पक्की जानकारी मेरे पास नहीं है। {core.HELP_DESK['hi']} पर पूछिए, या किसी केवट (पेशेंट नेविगेटर) से "
+                 "(गोल्डन जुबली बिल्डिंग, ग्राउंड फ़्लोर, काउंटर 50)।"}
 TELE_ACTION = [{"label": "📞 Tele-MANAS 14416", "tel": TELE_MANAS}]
 
 
@@ -963,16 +1046,16 @@ def say(decision, state, lang, mode, text):
     if label == "TRAVEL":
         return say_travel(text, lang, mode), []
     if label == "LINE_BUSY":
-        return ("कभी-कभी लाइन व्यस्त रहती है, थोड़ी देर में फिर कोशिश कीजिए। अस्पताल में हैं तो विंग A, चौथी मंज़िल पर काउंसलर से सीधे मिल सकते हैं, "
+        return (f"कभी-कभी लाइन व्यस्त रहती है, थोड़ी देर में फिर कोशिश कीजिए। अस्पताल में हैं तो {COUNSEL['hi']} में सीधे मिल सकते हैं, "
                 "और तब तक मैं यहीं हूँ, आप मुझसे बात कर सकते हैं।" if hi else
-                "Sometimes the line is busy; please try again in a little while. If you're at the hospital, you can see the counsellors directly on Wing A, "
-                "fourth floor. Until then I'm here, you can talk to me."), TELE_ACTION
+                f"Sometimes the line is busy; please try again in a little while. If you're at the hospital, you can go to {COUNSEL['en']}. "
+                "Until then I'm here, you can talk to me."), TELE_ACTION
     if label == "DOCTOR_CONNECT":
-        h = PLACES["A-G-HELP"]
-        return (f"मैं सीधे डॉक्टर से नहीं जोड़ सकती। हेल्प डेस्क ({place_short(h, lang)}) की नर्स नेविगेटर आपकी बात डॉक्टर तक पहुँचाती हैं, "
-                "और ओपीडी में आप डॉक्टर से सीधे पूछ सकते हैं।" if hi else
-                f"I can't connect you to a doctor directly. The nurse navigator at the help desk ({place_short(h, lang)}) passes your question to the doctor, "
-                "and at the OPD you can ask the doctor directly."), []
+        k = PLACES["KEVAT"]
+        return (f"मैं सीधे डॉक्टर से नहीं जोड़ सकती। केवट (पेशेंट नेविगेटर) अस्पताल में आपकी मदद करते हैं ({place_short(k, lang)}; हर ओपीडी का अपना "
+                "केवट भी होता है), और ओपीडी में आप डॉक्टर से सीधे पूछ सकते हैं।" if hi else
+                f"I can't connect you to a doctor directly. The Kevat patient navigators help you inside the hospital ({place_short(k, lang)}; each OPD "
+                "also has its own Kevat), and at the OPD you can ask the doctor directly."), []
     if label == "SCHEDULE":
         if state.get("pid") and store.next_tasks(state["pid"], actor=f"brain-{mode}", limit=1):
             return say_journey(state, lang, mode), []
@@ -988,9 +1071,9 @@ def say(decision, state, lang, mode, text):
     if label == "COST":
         u = PLACES[aspect]
         return (f"{_name(u, lang)} में ख़र्चे या मुफ़्त दवा की पक्की जानकारी मेरे पास नहीं है, वहीं पूछ लीजिए। "
-                f"पैसों की दिक्कत हो तो सामाजिक कार्य और आर्थिक मदद डेस्क (विंग A, ग्राउंड फ़्लोर, काउंटर 12 से 13) मदद करता है।" if hi else
+                f"पैसों की दिक्कत हो तो {MSW['hi']} मदद करते हैं।" if hi else
                 f"I don't have confirmed cost details for {_name(u, lang)}; please ask there. If money is a problem, "
-                f"the social work and financial aid desk (Wing A, ground floor, counters 12 to 13) can help."), []
+                f"the {MSW['en']} can help."), []
     if label == "NAV_NEXT":
         return say_nav(PLACES[aspect], state, lang, text), []
     if label == "ASK_HOSPITAL":
@@ -1057,7 +1140,11 @@ def say(decision, state, lang, mode, text):
         state["place"] = None
         return ("अच्छा, वहाँ नहीं। तो बताइए, कहाँ जाना है?" if hi else "Okay, not there. Where do you need to go?"), []
     if label == "FLOOR_LIST":
-        return say_floor(aspect, lang, mode), []
+        t = " " + text.lower() + " "
+        block = next((b for b in BLOCKS if re.search(rf"\b{b.lower()}\b", t)), None)
+        if not block and route_map.is_place(state.get("walk_to") or ""):
+            block = route_map.building_of(state["walk_to"])        # the building they are being guided in
+        return say_floor(aspect, lang, mode, block), []
     if label == "FOLLOWUP":
         label = state.get("place") or "NONE"
         if label == "NONE":
@@ -1065,21 +1152,20 @@ def say(decision, state, lang, mode, text):
                     "Which department do you mean? For example CT scan, chemo or OPD."), []
     if label in ("C-2-PET", "C-1-CT") and aspect == "where" and re.search(PET_CT_RX, text.lower()):
         state["place"] = "C-2-PET"        # "पेट सीटी" can be PET-CT or a CT of the stomach: give both, from the JSON
-        pet, ct = PLACES["C-2-PET"], PLACES["C-1-CT"]
-        return (f"पेट-सीटी स्कैन {place_short(pet, lang)} पर है। अगर पेट का सादा सीटी स्कैन है, तो {place_short(ct, lang)}।" if hi else
-                f"PET-CT is in {place_short(pet, lang)}. A regular CT scan is in {place_short(ct, lang)}."), []
+        tok, ct = PLACES["C-1-RADREC"], PLACES["C-1-CT"]
+        return (f"पेट-सीटी (PET) के लिए पहले टोकन लीजिए: {place_short(tok, lang)}। अगर पेट का सादा सीटी स्कैन है, तो {core.where_say(ct, lang)}।" if hi else
+                f"For a PET scan, first take a token at {place_short(tok, lang)}. A regular CT scan is in the {core.where_say(ct, lang)}."), []
     if label in PLACES:
         if state.get("place") != label:
             state["path_step"] = 0                   # a new destination: the walk starts again (step 0 was just said)
         state["place"] = label
-        return say_place(PLACES[label], aspect, lang, mode), []
+        return say_place(PLACES[label], aspect, lang, mode, state.get("category")), []
     if label == "SCAN_GENERIC":
         return ("कौन सा स्कैन? सीटी, एमआरआई, एक्स-रे, अल्ट्रासाउंड या पेट-सीटी?" if hi else
                 "Which scan is it: CT, MRI, X-ray, ultrasound, or PET-CT?"), []
     if label == "OPD_GENERIC":
-        state["place"] = "A-1-MED"                 # all OPDs are on Wing A, first floor: "pehli manzil?" can be confirmed
-        return ("ओपीडी विंग A, पहली मंज़िल पर है, मुख्य लिफ़्ट से जाइए। आपका कमरा नंबर ओपीडी पर्ची पर छपा है।" if hi else
-                "The OPDs are in Wing A, first floor; take the main lift. Your room number is printed on your OPD slip."), []
+        state["place"] = "A-1-MED"                 # the counter depends on the cancer type (DMG): ask for it
+        return say_place(PLACES["A-1-MED"], "where", lang, "voice").replace(_name(PLACES["A-1-MED"], lang), "ओपीडी" if hi else "OPD", 1), []
     if label == "GREETING":
         p = store.get(state["pid"], actor=f"brain-{mode}") if state.get("pid") else None
         nm = p and p.get("name")
@@ -1097,9 +1183,10 @@ def say(decision, state, lang, mode, text):
         state["misses"] = 0                       # "pehli manzil pe hai?" -> confirm (or correct) the last place
         u = PLACES[state["place"]]
         said = next((f for f, rx in FLOOR_WORDS.items() if re.search(rx, low)), None)
-        wrong = said is not None and "floor" in u and said != u["floor"]
+        floors = {loc["floor"] for _, _, loc in core.locations(u)}
+        wrong = said is not None and floors and said not in floors
         lead = ("नहीं जी, ध्यान दीजिए: " if hi else "No, please note: ") if wrong else ("जी हाँ। " if hi else "Yes. ")
-        return lead + say_place(u, "where", lang, "voice"), []
+        return lead + say_place(u, "where", lang, "voice", state.get("category")), []
     state["misses"] = state.get("misses", 0) + 1
     if state["misses"] < 2:                       # first miss: ask, don't send them away
         return ("माफ़ कीजिए, मैं ठीक से समझ नहीं पाई। किस विभाग या काम के बारे में पूछ रहे हैं? जैसे ओपीडी, सीटी स्कैन, कीमो, रजिस्ट्रेशन। पर्ची हो तो उसकी फ़ोटो चैट में भेजिए।" if hi else
@@ -1361,10 +1448,22 @@ async def _respond(text, state, lang, original=None):
     # "मैं फ़ार्मेसी पर हूँ" on its own: remember it, and redraw the route they were following from there
     unsafe = safety_hit or any(w in low for w in core.CLINICAL + core.EMOTIONAL)
     spot = None if unsafe or state.get("hospital") != "tata-parel" else spoken_start(text, state.get("walk_to"))
+    if spot and route_map.spot_for(spot[0], state.get("category")):    # "pharmacy par hoon": the pharmacy they would use
+        spot = (route_map.spot_for(spot[0], state.get("category")), spot[1])
     if spot and spot[1] == "at" and not re.search(QUESTION_RX + "|" + WHERE_NEXT_RX, low) and not two_places(low):
         state["here"], state["here_told"] = spot[0], True
         return i_am_at(state, lang)
-    decision, source = await decide(text, state)
+    # "private" / "main general patient hoon": many departments have one place for each in the booklet
+    said_cat = next((c for c, rx in CATEGORY_RX.items() if re.search(rx, low)), None)
+    if not said_cat and re.search(CATEGORY_ONLY_RX, text.strip().lower()):
+        said_cat = "private" if re.search(r"private|pvt|vip|प्राइवेट", text.lower()) else "general"
+    if said_cat:
+        state["category"] = said_cat
+    prev = PLACES.get(state.get("place") or "") or {}
+    if said_cat and not unsafe and len(text.split()) <= 6 and "private" in prev and not public_match(low)[0]:
+        decision, source = {"label": prev["id"], "aspect": "where"}, "rules-category"   # answer the last place again, for them
+    else:
+        decision, source = await decide(text, state)
     label = decision["label"]
     if spot:
         state["here"], state["here_told"] = spot[0], True
@@ -1404,8 +1503,8 @@ async def _respond(text, state, lang, original=None):
     if re.search(META_RX, low) and decision["label"] in PLACES:
         reply = ("माफ़ कीजिए। " if lang == "hi" else "Sorry about that. ") + reply
     said_floor = next((f for f, rx in FLOOR_WORDS.items() if re.search(rx, low)), None)
-    if decision["label"] in PLACES and said_floor and "floor" in PLACES[decision["label"]] and said_floor != PLACES[decision["label"]]["floor"] \
-            and decision["aspect"] == "where":
+    floors = {loc["floor"] for _, _, loc in core.locations(PLACES.get(decision["label"], {}))}
+    if decision["label"] in PLACES and said_floor and floors and said_floor not in floors and decision["aspect"] == "where":
         reply = ("ध्यान दीजिए, यह उस मंज़िल पर नहीं है। " if lang == "hi" else "Note: it's not on that floor. ") + reply
     if reply == state.get("last_reply") and decision["label"] in ("TRAVEL", "DOCUMENTS", "STAY") and state.get("last_reply_lang") == state.get("lang"):
         if decision["label"] == "DOCUMENTS":
@@ -1424,7 +1523,7 @@ async def _respond(text, state, lang, original=None):
         u = PLACES[rep_place]
         for alt in ("hours", "note", "bring", "way"):
             if u.get(alt if alt != "way" else "path"):
-                cand = say_place(u, alt, lang, "voice")
+                cand = say_place(u, alt, lang, "voice", state.get("category"))
                 if cand != reply:
                     reply = cand
                     break
@@ -1435,7 +1534,7 @@ async def _respond(text, state, lang, original=None):
         if start != dest:
             state["walk_to"] = dest
             walk = map_for(start, dest, lang, told)
-            if start != "GATE1" and decision["label"] == dest:     # the stored path starts at Gate 1; this one must not
+            if start != "GATE1" and decision["label"] == dest.split("@")[0]:   # the stored path starts at the main gate; this one must not
                 reply = walk_text(start, dest, lang)
     state["last_reply"], state["last_label"], state["last_reply_lang"] = reply, decision["label"], state.get("lang")
     if state.get("pid"):

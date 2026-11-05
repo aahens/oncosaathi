@@ -26,24 +26,24 @@ CASES = [
     ("खून की जांच कहाँ होगी", "", {"B-G-SAMPLE"}, "where"),
     ("सिकाई कहाँ होती है", "", {"D-G-RT", "D-G-RT"}, "where"),
     ("नया पर्चा कहाँ बनेगा", "", {"A-G-REG"}, "where"),
-    ("कीमो वार्ड कहाँ है", "", {"A-2-DC", "C-4-MEDW"}, "where"),
+    ("कीमो वार्ड कहाँ है", "", {"A-2-DC", "C-3-SURGW"}, "where"),
     ("आयुष्मान कार्ड कहाँ दिखाना है", "", {"A-G-PMJAY"}, "where"),
     ("रिपोर्ट कहाँ मिलेगी", "", {"B-G-REPORT", "B-G-REPORT"}, "where"),
     ("एमआरआई के लिए क्या लाना है", "", {"C-1-MRI"}, "bring"),
     ("सीटी स्कैन कितने बजे तक खुला है", "", {"C-1-CT"}, "hours"),
     ("दवाई कहाँ मिलेगी", "", {"CORE-G-PHARM"}, "where"),
     ("बाहर से आए हैं, रहने की जगह मिलेगी क्या", "", {"STAY"}, None),
-    ("व्हीलचेयर कहाँ मिलेगी", "", {"A-G-HELP"}, "where"),
+    ("व्हीलचेयर कहाँ मिलेगी", "", {"HELPLINE"}, "where"),          # booklet: Helpline, AB
     ("ऑपरेशन चल रहा है, घरवाले कहाँ बैठें", "", {"D-1-OTWAIT"}, "where"),
     # Hinglish / English
     ("mammography kidhar hai", "", {"C-1-USG"}, "where"),
-    ("FNAC test kahan hoga", "", {"B-1-PATH"}, "where"),
+    ("FNAC test kahan hoga", "", {"CYTO", "B-1-PATH"}, "where"),
     ("where is the ICU", "", {"D-2-ICU"}, "where"),
     ("where can I get an x-ray", "", {"C-G-XRAY"}, "where"),
     ("how do I reach the PET scan", "", {"C-2-PET"}, "way"),
     ("I need to see the breast cancer doctor", "", {"A-3-BR"}, "where"),
     ("mujhe scan karwana hai", "", {"SCAN_GENERIC", "NONE"}, None),
-    ("where is the blood bank, my brother wants to donate", "", {"NONE"}, None),
+    ("where is the blood bank, my brother wants to donate", "", {"BLOODBANK"}, "where"),   # booklet lists the blood centre
     # safety
     ("saans lene mein bahut dikkat ho rahi hai", "", {"EMERGENCY"}, None),
     ("मरीज़ बेहोश हो गया है", "", {"EMERGENCY"}, None),

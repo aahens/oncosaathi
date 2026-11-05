@@ -190,3 +190,26 @@ browser mic (16 kHz PCM) → /ws/call → voice_call.py: energy VAD + barge-in
 - **First real calls (3 Nov 2026, Sneha's phone):** answered, understood Hindi/English mix, right rooms (Endoscopy, CBC -> sample collection), replies ~1-1.8 s after she stopped talking. Two fixes from them, both now in the test: (1) the caller couldn't tell the map had gone to the chat and asked "ये मुझे message में मिलेगा?", so she now says so, and asking for it as a message sends it again; (2) speech while she was talking was dropped as "the bot's own voice" (the web call's echo filter). A phone cancels its own echo, so on WhatsApp (`WhatsAppCall.ECHO = False`) it now counts as the caller interrupting. Map sends and undelivered replies are now logged.
 - **Calls now use the hosted Sarvam agent (3 Nov 2026, Sneha's choice):** `CALL_ENGINE=sarvam_agent` with the teammate's agent (its IDs and key are in .env only, never in GitHub). The user preferred how it talks: friendly, patient with interruptions and half-finished sentences. One switch covers both the web page's 📞 and WhatsApp 📞; the shared code is `samvaad_call.py` (moved out of server.py). Everything else stays ours: WhatsApp text/voice-note replies, maps, slip photos, reminders and memory. **Known difference:** the agent answers from its own instructions on Sarvam (real booklet buildings: MB, HBB, GJB), while messages and maps use hospital.json (sample layout: Wings A-D), so a call and a chat can name different places; agent calls send no map. `CALL_ENGINE=local` brings back our pipeline for calls. Test: `python wa_agent_test.py` (WhatsApp call to the real agent: all passed).
 - **Slip photos (3 Nov 2026):** read for everyone; only saving the steps waits for "yes" (a photo sent before "yes" used to be dropped with "reply yes first"). PDFs are read too. **Laptop:** today's outages were the laptop sleeping (lid closed / battery ran out at 18:11), not the code; keep it plugged in with the lid open. keep_link.py no longer mistakes cloudflared's error address for a link.
+
+## 12. Tata Memorial booklet layout (5 Nov 2026)
+
+- **What changed:** the made-up sample layout (Wings A–D, floors G–4) is replaced by the **TMH Patient Booklet 2025**: the 5 buildings
+  (MB, HBB, GJB, AB, SB), the 61-item Departments/Services Location Directory (§2), the OPD counters by cancer type (§2.1),
+  registration (§3.1), scan tokens at the HBB 1st-floor Rotunda, counters 129–131 (§6.2), reports (§6.3), Casualty on the MB ground
+  floor (§23), Kevat navigators (§26). Many departments have one place for **general** and another for **private** patients.
+- **Source of truth:** `build_hospital.py` holds the booklet table and writes `hospital.json` (run it after any edit). Unit ids from
+  the old layout are kept where the department is the same, so their letters no longer mean wing or floor.
+- **Real vs drawn:** building, floor and counter are the booklet's. The booklet has **no map**, so building positions on the campus and
+  room positions inside a floor are drawn by us (OpenStreetMap has the campus outline but no building names); every map says so, and
+  walking words only say building, floor and "follow the signs".
+- **Not in the booklet:** endoscopy, ultrasound, genetic counselling, tobacco clinic, the surgery waiting area, wards, a PM-JAY desk,
+  and where the PET machine is. OncoSaathi says so and sends them to the Helpdesk / Kevat / Admissions / MSW / scan token counter.
+- **General or private:** answers give both places and (on calls) ask; "private" / "main general patient hoon" is remembered in the
+  conversation and the next answers, maps and slips use that location.
+- **Maps:** `route_map.py` (Pillow only, no Chrome) draws up to 3 panels: start floor → lift/exit, campus building → building, lift or
+  entrance → department. `/map` is a new directory page (search, campus, every building floor). `make_floor_plans.py` exports PNGs.
+- **His agent:** `python build_agent_prompt.py` now writes the same booklet facts; pasting them into his Sarvam agent would make calls
+  and chat name the same places.
+- **Tests:** all updated to booklet facts and passing (route 9,800 routes, journey, language, WhatsApp, Meta, eval 39/39, web call,
+  WhatsApp call on our pipeline and with his agent).
+

@@ -84,7 +84,7 @@ with client:
     # 1. a stranger asks in Hindi text: she asks which hospital first (the 23 Oct hospital-first rule), consent asked, nothing stored
     out = turn("एंडोस्कोपी कहाँ होती है?")
     text = out[0]["body"] if out else ""
-    check("asks which hospital before giving a room", "अस्पताल" in text and "B-201" not in text, text)
+    check("asks which hospital before giving a room", "अस्पताल" in text and "GJB" not in text, text)
     check("no map before the hospital is known", not any("route.jpg" in (m["media"] or "") for m in out), out)
     check("voice note sent as .ogg", any(m["media"] and m["media"].endswith(".ogg") for m in out), out)
     check("consent asked once", any("हाँ" in (m["body"] or "") for m in out), out)
@@ -109,8 +109,8 @@ with client:
     check("opening greeting after consent", out and "ओन्कोसाथी" in out[0]["body"], out)
     out = turn("टाटा मेमोरियल, मैं अस्पताल में हूँ")
     check("hospital answer accepted", out and "टाटा" in out[0]["body"], out)
-    out = turn("एंडोस्कोपी कहाँ होती है?")
-    check("signed-in answer still Wing B", out and "B-201" in out[0]["body"], out)
+    out = turn("एमआरआई कहाँ होती है?")
+    check("signed-in answer from the booklet", out and "गोल्डन जुबली" in out[0]["body"], out)
     photo = next((m for m in out if m["media"] and "/map/route.jpg" in m["media"]), None)
     check("walkthrough map sent as a photo with a caption", bool(photo and photo["body"]), out)
     check("map comes after the text", photo is not None and out.index(photo) == 1, out)
@@ -141,9 +141,9 @@ with client:
 
     r, msgs = twiml_turn("Tata Memorial")
     check("TwiML reply is XML", r.status_code == 200 and r.headers["content-type"].startswith("text/xml") and len(msgs) >= 1, r.text[:200])
-    r, msgs = twiml_turn("Where is endoscopy?")
+    r, msgs = twiml_turn("Where is the MRI?")
     media = [m.findtext("Media") or "" for m in msgs]
-    check("TwiML has text first", "B-201" in (msgs[0].findtext("Body") or ""), r.text[:300])
+    check("TwiML has text first", "Golden Jubilee" in (msgs[0].findtext("Body") or ""), r.text[:300])
     check("TwiML has the map second, with a caption", "route.jpg" in media[1] and "&amp;" in r.text and msgs[1].findtext("Body"), r.text[:400])
     check("TwiML has the voice note", any(x.endswith(".ogg") for x in media), media)
 

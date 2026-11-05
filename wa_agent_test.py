@@ -164,7 +164,7 @@ async def main():
     texts = [b or "" for _, b, u in sent if not u]
     print(f"     after the call: {[t[:60] for t in texts]}\n     maps: {maps()}")
     check("after the call, the chat gets the routes header", any("📞" in t for t in texts), texts)
-    check("...the CT scan route in writing and on the map", any("to=C-1-CT" in u for u in maps()) and any("C-101" in t for t in texts), sent)
+    check("...the CT scan route in writing and on the map", any("to=C-1-CT" in u for u in maps()) and any("मेन बिल्डिंग" in t or "Main Building" in t for t in texts), sent)
     check("...and the pharmacy route too", any("to=CORE-G-PHARM" in u for u in maps()), maps())
 
 

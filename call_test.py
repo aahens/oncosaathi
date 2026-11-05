@@ -31,12 +31,12 @@ SR = 16000
 # (spoken question, language, substrings any of which must appear in the reply)
 TURNS = [
     ("मैं टाटा मेमोरियल हॉस्पिटल में हूँ।", "hi", ["टाटा"]),       # every new call: the hospital first
-    ("एंडोस्कोपी कहाँ होती है?", "hi", ["B-201"]),
-    ("वहाँ क्या लेकर आना है?", "hi", ["अपॉइंटमेंट"]),
+    ("रजिस्ट्रेशन कहाँ होता है?", "hi", ["गोल्डन जुबली", "GJB"]),
+    ("वहाँ क्या लेकर आना है?", "hi", ["आधार"]),
     # STT sometimes drops "पेट" and hears "CT scan"; either way the reply must be a real room
-    ("पेट सीटी स्कैन के लिए कहाँ जाना है?", "hi", ["C-201", "C-101"]),
+    ("पेट सीटी स्कैन के लिए कहाँ जाना है?", "hi", ["129", "बेसमेंट"]),
     ("कीमो के बाद तेज़ बुखार है", "hi", ["नर्स", "108"]),
-    ("Where is the mammography room?", "en", ["C-105"]),
+    ("Where is the mammography room?", "en", ["Main Building"]),
     ("आज मुझे क्या करना है?", "hi", ["ओपीडी", "OPD"]),
 ]
 

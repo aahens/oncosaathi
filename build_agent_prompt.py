@@ -6,6 +6,8 @@ Then paste PART 1 / PART 2 / PART 3 into the agent on indus.sarvam.ai and commit
 import json
 import os
 
+import core
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 H = json.load(open(os.path.join(HERE, "hospital.json"), encoding="utf-8"))
 S = json.load(open(os.path.join(HERE, "stay.json"), encoding="utf-8"))
@@ -16,7 +18,7 @@ FLOORS = {f["id"]: f for f in H["floors"]}
 
 RULES = """# WHO YOU ARE
 You are "OncoSaathi" (ओन्कोसाथी), a warm companion for cancer patients and their families at Tata Memorial Hospital, Parel, Mumbai. You walk beside them like a caring elder sister: patient, gentle, never rushed. Your only job is LOGISTICS: where to go, what to bring, what to pay, where to stay, and the next step. You are NOT a doctor or nurse.
-(Internal note, never say it to callers: the floor map is a sample layout made for this prototype.)
+(Internal note: buildings, floors and counters are from the public TMH Patient Booklet 2025, not verified by the hospital; positions inside a floor are not known, so never invent left/right or room positions.)
 
 # HOW TO OPEN
 1. The app has already said: "नमस्ते, मैं ओन्कोसाथी हूँ। मैं आपकी कैसे मदद कर सकती हूँ?" Ask nothing else up front.
@@ -54,7 +56,7 @@ If a tool fails, say "यह जानकारी मेरे पास पक
    - At home or travelling: "अभी 108 पर कॉल कीजिए या सबसे पास की इमरजेंसी में जाइए।"
    - Not sure where they are: say both.
 3. Medical questions (medicines, doses, symptoms, side effects, what a report means, stage, prognosis, diet): "यह सवाल डॉक्टर या नर्स का है, मैं दवा या इलाज की सलाह नहीं दे सकती। अपनी मंज़िल की नर्स या हेल्प डेस्क से पूछिए।" Never read or explain a report or a prescription's medicines.
-4. Fear, sadness, loneliness: name the feeling first, comfort sincerely ("आप अकेले नहीं हैं"), never promise outcomes. Offer the counsellor (Wing A, fourth floor, rooms 401–403) and Tele-MANAS 14416 (free, 24 hours, any language).
+4. Fear, sadness, loneliness: name the feeling first, comfort sincerely ("आप अकेले नहीं हैं"), never promise outcomes. Offer the Psychiatry and counselling department (Golden Jubilee Building, seventh floor) and Tele-MANAS 14416 (free, 24 hours, any language).
 5. Travel ("I'm in Odisha, how do I reach Tata Memorial?"): you DO help with this. Use the travel facts below; never refuse it as "outside the hospital".
    Stays and guest houses near the hospital: you DO help with this too, from the list below. Give names and phone numbers only from the list, say "पहले फ़ोन करके पक्का कर लीजिए". Never book a room or an appointment.
 6. Never ask for Aadhaar numbers, OTPs or card numbers. Never criticise doctors or hospitals.
@@ -65,27 +67,32 @@ Repeat their next step in one line if they have one, ask "और कुछ म�
 
 
 def unit_line(u):
-    b = BLOCKS[u["block"]]
+    if u.get("unlisted"):
+        return f"- {u['name']} ({u['name_hi']}): NOT in the booklet. Say so: {u['note']}"
+    if u.get("dmg"):
+        return f"- {u['name']} ({u['name_hi']}): {u['where']} {u['note']}"
     if u.get("public") is False:
-        return f"- {u['name']} ({b['name']}, {u['rooms']}): staff only. Do not send patients."
-    bits = [f"- {u['name']} ({u['name_hi']}): {b['name']}, {FLOORS[u['floor']]['name']}, {u['rooms']}."]
+        return f"- {u['name']} ({core.where_say(u, 'en')}): staff only. Do not send patients."
+    bits = [f"- {u['name']} ({u['name_hi']}): {core.where_say(u, 'en')}."]
     for k, label in (("hours", "Timings"), ("bring", "Bring")):
         if u.get(k):
             bits.append(f"{label}: {u[k]}.")
     if u.get("note"):
         bits.append(u["note"])
     if u.get("path"):
-        bits.append(f"Way: {u['path']}")
+        bits.append(f"Way{' (general patients)' if 'private' in u else ''}: {u['path']}")
     return " ".join(bits)
 
 
 facts = ["# FALLBACK FACTS (use only if a tool is unavailable; never add anything not written here)",
          f"Hospital: {H['name']}. {H['disclaimer']}",
-         "Layout: Gate 1 (main entrance, west) opens into the Wing A lobby. Wings run west to east: Wing A, central core (main lift, "
-         "pharmacy), Wing B, Wing C, Wing D. Gate 2 (emergency, east) opens into Wing D. Floors: Ground, 1 to 4.", ""]
-for f in H["floors"][::-1]:
-    facts.append(f"{f['name']}:")
-    facts += [unit_line(u) for u in H["units"] if u["floor"] == f["id"]]
+         "Layout (TMH Patient Booklet 2025): 5 buildings: " + ", ".join(b["name"] for b in H["blocks"]) + ". The main gate is on "
+         "Dr Ernest Borges Road; there is also a GJB back gate. Many departments have one place for general patients and another "
+         "for private patients: if it matters and you don't know, ask 'are you a general or a private patient?'. Inside a floor, "
+         "only say 'follow the signs': the booklet has no floor plans.", ""]
+for cat, c in H["categories"].items():
+    facts.append(f"{c['label']}:")
+    facts += [unit_line(u) for u in H["units"] if u["cat"] == cat]
     facts.append("")
 facts.append("Campus: " + " ".join(f"{c['name']}: {c['note']}" for c in H["campus"]))
 facts += ["", "Documents to bring (first visit): " + "; ".join(d[0] for d in J["documents"]["always"]) +

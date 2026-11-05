@@ -112,10 +112,10 @@ with client:
     out = turn("Tata Memorial")
     check("reply goes to the sender's number", out and out[0]["to"] == "919876500003", out)
     check("nothing stored before consent", store.find_by_phone("+919876500003") is None)
-    out = turn("Where is endoscopy?")
+    out = turn("Where is the MRI?")
     kinds = [m["type"] for m in out]
     check("text, then map, then voice note", kinds[:3] == ["text", "image", "audio"], kinds)
-    check("text has the room", "B-201" in out[0]["text"]["body"], out[0])
+    check("text has the booklet building", "Golden Jubilee" in out[0]["text"]["body"], out[0])
     check("map has a caption", bool(out[1]["image"].get("caption")), out[1])
     check("map is uploaded, not linked", "id" in out[1]["image"] and "link" not in out[1]["image"], out[1])
     check("map uploaded as a JPEG", UPLOADS[0][1] == "image/jpeg" and UPLOADS[0][0][:2] == b"\xff\xd8", UPLOADS[0][1])
@@ -151,7 +151,7 @@ with client:
     p4 = "919876500004"
     out = turn(message={"from": p4, "id": "wamid.slip1", "type": "image", "image": {"id": "slip-jpg", "mime_type": "image/jpeg"}})
     body = out[0]["text"]["body"] if out and out[0]["type"] == "text" else ""
-    check("slip photo from a new person is read", "सीटी" in body and "बिलिंग" in body, out[:1])
+    check("slip photo from a new person is read", "सीटी" in body and "स्मार्ट कार्ड" in body, out[:1])
     check("...with the map to the first step", any(m["type"] == "image" for m in out), [m["type"] for m in out])
     p = store.find_by_phone("+" + p4)
     units = {t["unit_id"] for t in store.tasks(p["id"], "pending", actor="test")} if p else set()

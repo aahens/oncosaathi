@@ -24,7 +24,8 @@ TTS_VOICE = ({"hi": "ritu_hi_medical", "en": "ritu_en_medical"} if TTS_MODEL.sta
              else {"hi": "ritu", "en": "ritu"})
 STT_MODEL = "saaras:v4"                                          # latest Sarvam STT
 KEYTERMS = ["CBC", "OPD", "pathology", "biopsy", "chemo", "chemotherapy", "radiation", "PET CT", "CT scan", "MRI", "UHID",
-            "Ayushman", "Tata Memorial", "endoscopy", "dharamshala"]
+            "Ayushman", "Tata Memorial", "endoscopy", "dharamshala", "GJB", "HBB", "Homi Bhabha", "Golden Jubilee", "Rotunda", "Kevat",
+            "daycare", "smart card"]
 SARVAM = "https://api.sarvam.ai"
 
 # ---------------- Safety keywords (checked before anything else, deterministic) ----------------
@@ -103,55 +104,105 @@ NAME_STOP = {"scan", "test", "tests", "clinic", "room", "rooms", "ward", "wards"
              "area", "lounge", "hall", "centre", "center", "main", "oncology", "care", "and", "with", "office", "lab", "labs",
              "treatment", "before", "after", "only", "exit", "क्लिनिक", "वार्ड", "कक्ष", "और", "लैब", "डेस्क", "केंद्र", "विभाग", "ऑफ़िस",
              "इलाज", "रास्ता", "जाने", "आने", "बाहर", "पहले", "बाद", "लिए", "वाले", "सभी", "समय", "जाँच", "जांच", "सिर्फ़", "करना",
-             "गेट", "मुख्य", "बैठने", "जगह", "परिवार", "स्कैन", "काउंटर", "कमरा", "hospital", "अस्पताल", "हॉस्पिटल"}
+             "गेट", "मुख्य", "बैठने", "जगह", "परिवार", "स्कैन", "काउंटर", "कमरा", "hospital", "अस्पताल", "हॉस्पिटल",
+             # words in many booklet department names, or about the patient: never enough on their own to pick a place
+             "opd", "ओपीडी", "patient", "patients", "मरीज़", "मरीज", "पेशेंट", "general", "जनरल", "private", "प्राइवेट", "medical",
+             "मेडिकल", "new", "नए", "old", "पुराने", "building", "बिल्डिंग", "first", "token", "टोकन", "help", "मदद",
+             # everyday words that the booklet's Hindi names brought in ("योजनाओं में मदद", "बच्चों का कैंसर ओपीडी")
+             "में", "कैंसर", "cancer", "ऑपरेशन", "operation", "medicine", "मेडिसिन", "सेंटर", "रोग"}
 # Colloquial / Hinglish ways people ask for each department (matched in addition to the department's own name words).
+# Ids are the hospital.json unit ids (TMH booklet layout, see build_hospital.py).
 SYNONYMS = {
-    "A-G-HELP": ["help desk", "wheelchair", "व्हीलचेयर", "enquiry", "inquiry", "पूछताछ", "lost", "khoya"],
-    "A-G-REG": ["registration", "register", "parcha", "parchi banani", "naya parcha", "new patient", "uhid card", "रजिस्ट्रेशन", "पर्चा", "नया मरीज़", "नया पर्चा"],
-    "A-G-BILL": ["billing", "bill", "payment", "pay", "paise jama", "fees", "बिल", "पैसे जमा", "फ़ीस"],
+    "A-G-HELP": ["help desk", "helpdesk", "enquiry", "inquiry", "पूछताछ", "हेल्पडेस्क", "हेल्प डेस्क", "lost", "khoya", "rotunda", "रोटुंडा"],
+    "HELPLINE": ["wheelchair", "व्हीलचेयर", "stretcher", "स्ट्रेचर", "helpline", "हेल्पलाइन"],
+    "KEVAT": ["kevat", "केवट", "navigator", "नेविगेटर", "guide", "गाइड"],
+    "A-G-REG": ["registration", "register", "parcha", "parchi banani", "naya parcha", "new patient", "uhid card", "case file", "रजिस्ट्रेशन",
+                "पर्चा", "नया मरीज़", "नया पर्चा", "केस फ़ाइल"],
+    "SMARTCARD": ["smart card", "smartcard", "स्मार्ट कार्ड", "naya card", "card kho"],
+    "A-G-BILL": ["billing", "bill", "payment", "pay", "paise jama", "fees", "cash counter", "top up", "top-up", "recharge", "बिल", "पैसे जमा",
+                 "फ़ीस", "कैश काउंटर", "रिचार्ज"],
+    "ACCOUNTS": ["refund", "रिफ़ंड", "रिफंड", "accounts"],
+    "A-G-SW": ["social worker", "सोशल वर्कर", "msw", "financial", "paisa nahi", "paise nahi", "aarthik", "free treatment", "ngo", "scheme",
+               "yojana", "आर्थिक", "योजना", "पैसे नहीं"],
     "A-G-PMJAY": ["ayushman", "pmjay", "pm-jay", "आयुष्मान"],
-    "A-G-SW": ["financial", "paisa nahi", "paise nahi", "aarthik", "free treatment", "ngo", "scheme", "yojana", "आर्थिक", "योजना", "पैसे नहीं"],
-    "A-G-CANT": ["canteen", "khana", "food", "कैंटीन", "खाना", "paani", "water"],
-    "CORE-G-PHARM": ["pharmacy", "pharmacology", "pharmacist", "फार्माकोलॉजी", "medical store", "chemist", "dawai kahan", "dawa kahan", "दवाई कहाँ", "दवा कहाँ", "फ़ार्मेसी", "फार्मेसी"],
-    "B-G-SAMPLE": ["pathology", "पैथोलॉजी", "blood collection", "ब्लड कलेक्शन", "blood test", "blood sample", "khoon ki jaanch", "khoon ki janch", "khoon", "cbc", "urine", "peshab", "खून", "पेशाब", "ब्लड"],
-    "B-G-REPORT": ["report counter", "report kahan", "report kab", "report collect", "रिपोर्ट कहाँ", "रिपोर्ट कब", "रिपोर्ट कलेक्ट", "रिपोर्ट लेनी"],
-    "C-G-XRAY": ["x-ray", "xray", "x ray", "एक्स-रे", "एक्सरे"],
-    "D-G-RT": ["radiation", "radiotherapy", "रेडियोथेरेपी", "रेडियोथेरपी", "sikai", "sekai", "सिकाई", "सेकाई", "रेडिएशन", "rt card", "linac"],
-    "D-G-ER": ["emergency", "casualty", "इमरजेंसी"],
+    "INSURANCE": ["insurance", "mediclaim", "reimbursement", "इंश्योरेंस", "मेडिक्लेम", "cro"],
+    "PRO": ["complaint", "shikayat", "शिकायत", "feedback", "grievance"],
+    "D-4-ADMIN": ["superintendent", "medical superintendent", "सुपरिंटेंडेंट"],
+    "ADMIN-OFF": ["admin", "administration", "प्रशासन"],
+    "ADMIT": ["admission", "admit", "bharti", "bharti hona", "भर्ती", "एडमिशन"],
+    "MEDREC": ["medical records", "records department", "मेडिकल रिकॉर्ड"],
+    "TELECONSULT": ["teleconsultation", "online consultation", "video consultation", "टेलीकंसल्टेशन"],
+    "A-G-CANT": ["canteen", "cafeteria", "khana", "food", "कैंटीन", "खाना", "paani", "water", "chai", "चाय"],
+    "ATM": ["atm", "एटीएम", "cash nikal", "पैसे निकाल"],
+    "BANK": ["bank", "बैंक"],
+    "STORAGE": ["luggage", "samaan", "saman", "सामान", "cloak room", "bag rakhna"],
+    "CORE-G-PHARM": ["pharmacy", "pharmacology", "pharmacist", "dispensary", "डिस्पेंसरी", "फार्माकोलॉजी", "medical store", "chemist",
+                     "medicine kahan", "medicines kahan", "medicine counter", "medicine lena",
+                     "dawai kahan", "dawa kahan", "दवाई कहाँ", "दवा कहाँ", "फ़ार्मेसी", "फार्मेसी"],
+    "B-G-SAMPLE": ["blood collection", "ब्लड कलेक्शन", "blood test", "blood sample", "sample collection", "sample dena", "khoon ki jaanch",
+                   "khoon ki janch", "khoon", "cbc", "urine", "peshab", "खून", "पेशाब", "ब्लड", "सैंपल"],
+    "B-G-REPORT": ["report counter", "report kahan", "report kab", "report collect", "report enquiry", "रिपोर्ट कहाँ", "रिपोर्ट कब",
+                   "रिपोर्ट कलेक्ट", "रिपोर्ट लेनी"],
+    "C-1-RADREC": ["scan booking", "scan token", "scan department", "token counter", "imaging", "इमेजिंग", "स्कैन टोकन"],
+    "C-G-XRAY": ["x-ray", "xray", "x ray", "एक्स-रे", "एक्सरे", "radiology", "radiography", "radiographer", "radiodiagnosis",
+                 "radio diagnosis", "रेडियोलॉजी", "रेडिओलॉजी", "रेडियोलॉजी डिपार्टमेंट"],
+    "C-1-CT": ["ct scan", "ct", "सीटी", "सिटी स्कैन"],
+    "C-1-MRI": ["mri", "एमआरआई"],
+    "C-2-PET": ["pet scan", "pet-ct", "pet ct", "pet", "spect", "पेट-सीटी", "पेट सीटी", "पीईटी"],
+    "C-1-USG": ["mammography", "mammogram", "मैमोग्राफी", "मैमोग्राफ़ी"],
+    "USG": ["usg", "ultrasound", "sonography", "sonografi", "सोनोग्राफी", "अल्ट्रासाउंड"],
+    "IR-OPD": ["interventional radiology", "interventional", "इंटरवेंशनल"],
+    "B-1-PATH": ["pathology", "पैथोलॉजी", "biopsy", "slide", "slides", "block", "histopathology", "बायोप्सी", "स्लाइड"],
+    "CYTO": ["cytology", "cytopathology", "fnac", "साइटोलॉजी"],
+    "BIOCHEM": ["biochemistry", "बायोकेमिस्ट्री"],
+    "MICRO": ["microbiology", "culture", "माइक्रोबायोलॉजी"],
+    "MOLPATH": ["molecular", "haematopathology", "hematopathology", "मॉलिक्यूलर"],
+    "B-3-PAC": ["pac", "fitness", "anaesthesia", "anesthesia", "operation se pehle", "ऑपरेशन से पहले"],
+    "B-3-CARDIO": ["ecg", "heart test", "ईसीजी"],
+    "ECHO": ["echo", "2d echo", "इको"],
+    "PFT": ["pft", "lung test", "lung function", "फेफड़ों की जाँच"],
     "A-1-MED": ["medical oncology", "chemo doctor", "chemo wale doctor", "medicine department", "मेडिकल ऑन्कोलॉजी"],
     "A-1-SURG": ["surgeon", "surgery opd", "surgery wale doctor", "operation wale doctor", "oncology surgery", "onco surgery", "oncosurgery",
                  "surgery department", "surgical department", "ऑन्कोलॉजी सर्जरी", "सर्जरी डिपार्टमेंट", "सर्जरी विभाग", "सर्जिकल"],
     "A-1-RTC": ["radiation doctor", "radiation consult", "radiation opd"],
-    "B-1-PATH": ["biopsy", "slide", "slides", "block", "fnac", "cytology", "histopathology", "बायोप्सी", "स्लाइड"],
-    "C-1-RADREC": ["radiology", "radiography", "radiographer", "radiodiagnosis", "radio diagnosis", "imaging", "scan booking", "scan department", "रेडियोलॉजी", "रेडिओलॉजी",
-                   "रेडियोलॉजी डिपार्टमेंट", "इमेजिंग"],
-    "C-1-CT": ["ct scan", "ct", "सीटी", "सिटी स्कैन"],
-    "C-1-MRI": ["mri", "एमआरआई"],
-    "C-1-USG": ["usg", "ultrasound", "sonography", "sonografi", "mammography", "mammogram", "सोनोग्राफी", "अल्ट्रासाउंड", "मैमोग्राफी"],
-    "D-1-OTWAIT": ["operation chal", "surgery waiting", "operation ke time", "intezaar", "इंतज़ार", "ऑपरेशन चल", "घरवाले"],
-    "A-2-DC": ["chemo", "chemotherapy", "day care", "kimo", "कीमो", "डे केयर", "drip"],
+    "A-3-BR": ["breast", "स्तन", "ब्रेस्ट"],
+    "A-3-HN": ["head and neck", "head & neck", "mouth cancer", "muh ka", "gale ka", "throat", "मुँह", "गले"],
+    "GASTRO-OPD": ["gastro", "gi opd", "liver", "intestine", "colon", "rectum", "food pipe", "oesophagus", "esophagus", "आंत", "आँत", "लिवर"],
+    "A-3-GYN": ["gynae", "gyne", "gynec", "cervix", "uterus", "ovary", "bachchedani", "बच्चेदानी", "स्त्री रोग"],
+    "URO-OPD": ["uro", "prostate", "kidney", "bladder", "प्रोस्टेट", "किडनी"],
+    "THOR-OPD": ["thoracic", "lung cancer", "chest cancer", "फेफड़े का कैंसर"],
+    "BONE-OPD": ["bone", "sarcoma", "soft tissue", "हड्डी"],
+    "NEURO-OPD": ["neuro", "brain", "brain tumour", "brain tumor", "दिमाग"],
+    "HEME-OPD": ["blood cancer", "leukemia", "leukaemia", "lymphoma", "myeloma", "haematology", "hematology", "ब्लड कैंसर"],
     "A-2-PEDS": ["children", "child", "bachche", "bachcha", "bachchon", "बच्चे", "बच्चा", "बच्चों", "paediatric", "pediatric"],
-    "B-2-ENDO": ["endoscopy", "colonoscopy", "doorbeen", "एंडोस्कोपी", "दूरबीन"],
-    "C-2-PET": ["pet scan", "pet-ct", "pet ct", "pet", "nuclear", "पेट-सीटी", "पेट सीटी", "पीईटी"],
-    "D-2-ICU": ["icu", "hdu", "आईसीयू"],
-    "A-3-HN": ["head and neck", "mouth cancer", "muh ka", "gale ka", "throat", "मुँह", "गले"],
-    "A-3-BR": ["breast", "स्तन"],
-    "A-3-GYN": ["gynae", "gyne", "cervix", "uterus", "bachchedani", "बच्चेदानी", "स्त्री रोग"],
-    "B-3-PAC": ["pac", "fitness", "anaesthesia", "anesthesia", "operation se pehle", "ऑपरेशन से पहले"],
-    "B-3-CARDIO": ["ecg", "echo", "heart test", "pft", "lung test", "ईसीजी", "इको"],
-    "C-3-SURGW": ["surgical ward", "operation ke baad ward", "ward"],
-    "A-4-PSY": ["counselling", "counseling", "counsellor", "psycho", "psychological", "psychology", "psychologist", "psychiatrist",
+    "DENTAL": ["dental", "teeth", "tooth", "daant", "dant", "दांत", "दाँत"],
+    "A-2-DC": ["chemo", "chemotherapy", "day care", "daycare", "kimo", "कीमो", "डे केयर", "डेकेयर", "drip"],
+    "D-G-RT": ["radiation", "radiotherapy", "रेडियोथेरेपी", "रेडियोथेरपी", "sikai", "sekai", "सिकाई", "सेकाई", "रेडिएशन", "rt card", "linac"],
+    "RMC": ["radiation medicine", "nuclear medicine", "nuclear", "रेडिएशन मेडिसिन"],
+    "A-4-PALL": ["palliative", "पैलिएटिव"],
+    "PAIN": ["pain clinic", "पेन क्लिनिक", "दर्द क्लिनिक"],
+    "A-4-PSY": ["counselling", "counseling", "counsellor", "psycho", "psychological", "psychology", "psychologist", "psychiatrist", "psychiatry",
                 "काउंसलर", "काउंसलिंग", "साइकोलॉजिकल", "साइकोलॉजी", "मनोवैज्ञानिक", "mann ki baat"],
-    "A-4-PALL": ["palliative", "pain clinic", "पैलिएटिव"],
     "A-4-NUT": ["diet", "dietician", "nutrition", "khana kya", "आहार", "डाइट"],
-    "A-4-TOB": ["tobacco", "gutka", "gutkha", "smoking", "bidi", "cigarette", "तंबाकू", "गुटखा", "बीड़ी"],
+    "PHYSIO": ["physiotherapy", "physio", "फ़िज़ियोथेरेपी", "फिजियोथेरेपी"],
+    "OCC-THER": ["occupational therapy"],
+    "SPEECH": ["speech therapy", "speech", "bolne", "स्पीच"],
+    "STOMA": ["stoma", "colostomy", "स्टोमा"],
+    "PREVENT": ["screening", "preventive", "cancer check", "स्क्रीनिंग"],
+    "GENMED": ["physician", "general medicine", "फ़िज़िशियन"],
+    "PULM": ["pulmonary", "पल्मोनरी"],
+    "BLOODBANK": ["blood bank", "blood donation", "blood donate", "donor", "रक्तदान", "ब्लड बैंक", "ब्लड सेंटर"],
+    "D-G-ER": ["emergency", "casualty", "इमरजेंसी", "कैज़ुअल्टी"],
+    "D-2-ICU": ["icu", "hdu", "आईसीयू"],
+    "D-1-OT": ["operation theatre", "operation theater", "ot"],
+    "MINOR-OT": ["minor ot", "minor operation", "माइनर"],
+    "D-1-OTWAIT": ["operation chal", "surgery waiting", "operation ke time", "intezaar", "इंतज़ार", "ऑपरेशन चल", "घरवाले"],
+    "C-3-SURGW": ["ward", "wards", "वार्ड", "bed number"],
+    "B-2-ENDO": ["endoscopy", "colonoscopy", "doorbeen", "एंडोस्कोपी", "दूरबीन"],
     "B-4-GEN": ["genetic", "brca", "जेनेटिक"],
-    "C-4-MEDW": ["medical ward", "chemo ward", "कीमो वार्ड"],
-    "D-4-ADMIN": ["admin", "superintendent", "complaint", "shikayat", "certificate", "शिकायत", "प्रशासन"],
-    "GATE1": ["gate 1", "main gate", "main entrance", "मेन गेट"],
-    "GATE2": ["gate 2"],
-    "GATE3": ["exit", "gate 3", "bahar jane", "bahar jaane", "बाहर जाने", "बाहर निकल"],
-    "STAND": ["taxi", "auto", "bus stop", "bus stand", "taxi stand", "टैक्सी", "ऑटो", "बस स्टॉप", "बस स्टैंड"],
+    "A-4-TOB": ["tobacco", "gutka", "gutkha", "smoking", "bidi", "cigarette", "तंबाकू", "गुटखा", "बीड़ी"],
+    "GATE1": ["gate 1", "main gate", "main entrance", "entrance gate", "मेन गेट"],
+    "GATE2": ["gate 2", "back gate", "pichla gate", "peeche wala gate", "पिछला गेट", "पीछे वाला गेट"],
 }
 
 
@@ -178,22 +229,73 @@ def directory_match(t):
     return best, score
 
 
-def directory_answer(u, lang):
-    """Full written answer for chat: where, timings, what to bring, note, and how to walk there."""
+UNIT = {u["id"]: u for u in HOSPITAL["units"] + HOSPITAL["campus"]}
+HELP_DESK = {"en": "the Helpdesk (Homi Bhabha Building, first floor, Rotunda)", "hi": "हेल्पडेस्क (होमी भाभा बिल्डिंग, पहली मंज़िल, रोटुंडा)"}
+CATEGORY_LABEL = {"general": {"en": "general patients", "hi": "जनरल मरीज़"}, "private": {"en": "private patients", "hi": "प्राइवेट मरीज़"}}
+
+
+def locations(u):
+    """[(kind, place id, location)] for a department: general first, then private, then its other listed places."""
+    if "block" not in u:
+        return []
+    out = [("general", u["id"], u)]
+    if "private" in u:
+        out.append(("private", u["id"] + "@private", u["private"]))
+    return out + [("also", f"{u['id']}@{i}", a) for i, a in enumerate(u.get("also", []), 2)]
+
+
+def location_of(u, category=None):
+    """The location to send someone to: the private one for private patients, else the general one."""
+    return u["private"] if category == "private" and "private" in u else u
+
+
+def where_text(loc, lang):
+    """'Golden Jubilee Building (GJB), ground floor, counters 54 to 55'."""
     hi = lang == "hi"
-    g = lambda f: (u.get(f + "_hi") or u.get(f)) if hi else u.get(f)
+    b, f = BLOCKS[loc["block"]], FLOORS[loc["floor"]]
+    parts = [b["name_hi"] if hi else b["name"], f["name_hi"] if hi else f["name"].lower()]
+    rooms = loc.get("rooms_hi" if hi else "rooms") or ""
+    return ", ".join(parts + ([rooms] if rooms else []))
+
+
+def where_say(u, lang, category=None):
+    """Where a department is, every listed place with whom it is for, or just the patient's own if we know their category."""
+    hi = lang == "hi"
+    if "block" not in u:
+        return (u.get("where_hi") or u.get("where") or "") if hi else (u.get("where") or "")
+    if category in CATEGORY_LABEL and "private" in u:
+        return where_text(location_of(u, category), lang)
+    lab = lambda k: CATEGORY_LABEL[k]["hi" if hi else "en"]
+    if "private" in u:
+        out = f"{lab('general')}: {where_text(u, lang)}; {lab('private')}: {where_text(u['private'], lang)}"
+    else:
+        out = where_text(u, lang)
+    for a in u.get("also", []):
+        out += f"; {'और' if hi else 'also'} {where_text(a, lang)}"
+    return out
+
+
+def directory_answer(u, lang, category=None):
+    """Full written answer for chat: where (each listed place), how to walk there, timings, what to bring, note."""
+    hi = lang == "hi"
+    g = lambda f, x=u: (x.get(f + "_hi") or x.get(f)) if hi else x.get(f)
     name = u.get("name_hi") if hi else u["name"]
-    if "block" not in u:                                     # campus place (gate, taxi stand…)
+    end = "।" if hi else "."
+    if u.get("unlisted"):                                     # not in the booklet: say so, and who can tell them
+        ask = UNIT[u["ask"]]
+        return f"{name}: {g('note')}\n➡️ {g('name', ask)}: {where_say(ask, lang, category)}{end}"
+    if u.get("dmg"):                                          # an OPD asked about without the cancer type
+        return f"{name}: {where_say(u, lang)}\n{g('note')}"
+    if "block" not in u:                                      # a gate
         return f"{name}: {g('note')}"
-    b, f = BLOCKS[u["block"]], FLOORS[u["floor"]]
-    wing = b["name_hi"].split("·")[0].strip() if hi else b["name"]
-    floor = f["name_hi"] if hi else f["name"].lower()
     if u.get("public") is False:
-        return (f"{name} ({wing}, {floor}) सिर्फ़ स्टाफ़ के लिए है। अगर आपको वहाँ जाने को कहा गया है, तो गेट 1 के पास हेल्प डेस्क पर पूछिए।" if hi else
-                f"{name} ({wing}, {floor}) is a staff-only area. If you've been asked to go there, please ask at the help desk near Gate 1.")
-    parts = [f"{name}: {wing}, {floor}, {g('rooms')}।" if hi else f"{name}: {wing}, {floor}, {g('rooms')}."]
-    if u.get("path"):
-        parts.append(("🚶 " + g("path")))
+        return (f"{name} ({where_say(u, lang)}) सिर्फ़ स्टाफ़ के लिए है। अगर आपको वहाँ जाने को कहा गया है, तो {HELP_DESK['hi']} पर पूछिए।" if hi else
+                f"{name} ({where_say(u, lang)}) is a staff-only area. If you've been asked to go there, please ask at {HELP_DESK['en']}.")
+    parts = [f"{name}: {where_say(u, lang, category)}{end}"]
+    loc = location_of(u, category)
+    if loc.get("path"):
+        lead = f"({CATEGORY_LABEL['general']['hi' if hi else 'en']}) " if "private" in u and category not in CATEGORY_LABEL else ""
+        parts.append("🚶 " + lead + g("path", loc))
     if u.get("hours"):
         parts.append(f"समय: {g('hours')}।" if hi else f"Timings: {g('hours')}.")
     if u.get("bring"):

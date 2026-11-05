@@ -23,16 +23,16 @@ def state():
 
 
 async def main():
-    for lang, q in [("en", "Where is endoscopy?"), ("hi", "एंडोस्कोपी कहाँ है?"), ("ta", "எண்டோஸ்கோபி எங்கே உள்ளது?"), ("kn", "ಎಂಡೋಸ್ಕೋಪಿ ಎಲ್ಲಿದೆ?")]:
+    for lang, q in [("en", "Where is the pharmacy?"), ("hi", "फ़ार्मेसी कहाँ है?"), ("ta", "பார்மசி எங்கே உள்ளது?"), ("kn", "ಫಾರ್ಮಸಿ ಎಲ್ಲಿದೆ?")]:
         o = await brain.respond(q, state())
         check(f"{lang}: answered in that language", o["lang"] == lang and re.search(SCRIPT[lang], o["text"]), o["text"][:80])
-        check(f"{lang}: room number kept", "201" in o["text"], o["text"][:120])
+        check(f"{lang}: counter number kept", "54" in o["text"], o["text"][:160])
         check(f"{lang}: map included", bool(o.get("map")), o.get("route"))
         path, b64 = core.tts(o["text"], o["lang"], "opus")
         os.remove(path)
         check(f"{lang}: voice note made", len(b64) > 1000)
-    o = await brain.respond("எண்டோஸ்கோபி எங்கே உள்ளது?", state())
-    check("ta: English department name kept", o["text"].startswith("Endoscopy"), o["text"][:60])
+    o = await brain.respond("பார்மசி எங்கே உள்ளது?", state())
+    check("ta: English department name kept", o["text"].startswith("Dispensary"), o["text"][:60])
 
     st = state()
     o = await brain.respond("speak in tamil, i dont understand hindi", st)

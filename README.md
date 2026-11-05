@@ -7,14 +7,15 @@ Built for KOITA Health-a-thon 2026 by Team Oslava.
 Open it in Chrome, sign in with a mobile number, and press the call button (allow the microphone).
 The first visit after a quiet spell can take about a minute while the free server wakes up.
 
-> The hospital map is a **sample layout** of Tata Memorial Hospital, Parel, made for this prototype. OncoSaathi gives
-> directions and logistics only. It never gives medical advice: emergencies go to the nearest nurse or help desk,
+> Buildings, floors and counters come from the public **TMH Patient Booklet 2025** (not verified by the hospital). The booklet
+> has no map, so where the buildings stand and where a room sits inside a floor are drawn by us and marked illustrative.
+> OncoSaathi gives directions and logistics only. It never gives medical advice: emergencies go to the nearest nurse or help desk,
 > and distress to Tele-MANAS 14416.
 
 ## What it does
 - Voice call in Hindi, English and 9 more Indian languages, with interruption
-- Step-by-step walking directions to 40 departments over 5 floors
-- A walkthrough map after each direction, with a line drawn from where the patient is standing to the room (chat, call screen and WhatsApp). Patients say where they are ("मैं फ़ार्मेसी पर हूँ") or pick it in the chat; until then the line starts at Gate 1 and the caption says so
+- Directions to the booklet's departments across the 5 buildings (MB, HBB, GJB, AB, SB), with the separate locations for general and private patients; departments the booklet doesn't list are said to be unlisted, never guessed
+- A walkthrough map after each direction, with a line drawn from where the patient is standing to the room (chat, call screen and WhatsApp). Patients say where they are ("मैं फ़ार्मेसी पर हूँ") or pick it in the chat; until then the line starts at the main gate and the caption says so
 - Reads a photo of the doctor's referral slip and names the right department
 - Real places to stay near the hospital (phone numbers only, never books), and travel from other states
 - Remembers the patient with consent; the data can be deleted at any time
@@ -32,8 +33,7 @@ CALL_ENGINE=local .venv/bin/python server.py
 ```
 Open http://127.0.0.1:7860. On Windows: `pip install -r requirements.txt`, then `python server.py`.
 
-`route_map.py` draws the map on `floor_plans/floor_*.png`. After changing `hospital.json`, run `python make_floor_plans.py` to redraw them.
-The earlier voice-note demo and the real Tata Memorial booklet data are in `old_demo/`.
+The hospital data is written by `build_hospital.py` from the booklet table inside it: edit that table, then run `python build_hospital.py` and `python make_floor_plans.py`. `route_map.py` draws the campus, each building floor and the route maps; `/map` on the server shows them all. The earlier voice-note demo is in `old_demo/`.
 
 ## WhatsApp
 Set `WHATSAPP_PROVIDER=meta` and the `WHATSAPP_` keys in `.env`, then point Meta's webhook at `<public link>/whatsapp/meta` and subscribe to `messages`. Run `python keep_link.py` beside `server.py`: it makes a free public link, tells Meta the address, and makes a new one whenever the link dies. A Twilio trial account receives messages but does not deliver the replies.

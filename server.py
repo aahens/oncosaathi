@@ -151,13 +151,16 @@ SLIP_STEPS = [
     ("ct", r"(?<!pet-)(?<!pet )\b(cect|hrct|ncct|ct)\b", "C-1-CT", "CT scan", "सीटी स्कैन"),
     ("mri", r"\bmri\b", "C-1-MRI", "MRI", "एमआरआई"),
     ("xray", r"\b(x-?ray|cxr)\b", "C-G-XRAY", "X-ray", "एक्स-रे"),
-    ("usg", r"\b(usg|ultrasound|sonography|mammo\w*)\b", "C-1-USG", "Ultrasound / mammography", "अल्ट्रासाउंड / मैमोग्राफ़ी"),
+    ("mammo", r"\bmammo\w*\b", "C-1-USG", "Mammography", "मैमोग्राफ़ी"),
+    ("usg", r"\b(usg|ultrasound|sonography)\b", "USG", "Ultrasound", "अल्ट्रासाउंड"),
     ("endo", r"\b(endoscopy|colonoscopy|ugie|ugi scopy|bronchoscopy)\b", "B-2-ENDO", "Endoscopy", "एंडोस्कोपी"),
     ("pac", r"\b(pac|pre-?ana?esthe\w*)\b", "B-3-PAC", "Pre-anaesthesia check-up", "ऑपरेशन से पहले की जाँच"),
-    ("cardio", r"\b(ecg|2d ?echo|echo|pft)\b", "B-3-CARDIO", "ECG / Echo / lung test", "ईसीजी / इको / फेफड़ों की जाँच"),
+    ("ecg", r"\becg\b", "B-3-CARDIO", "ECG", "ईसीजी"),
+    ("echo", r"\b(2d ?echo|echo)\b", "ECHO", "2D Echo", "2D इको"),
+    ("pft", r"\bpft\b", "PFT", "Lung function test", "फेफड़ों की जाँच"),
     ("medicine", r"\b(tab|cap|syp|inj|tablet|capsule|syrup)\b\.?|\d+\s?mg\b", "CORE-G-PHARM", "Collect medicines", "दवाइयाँ लेना"),
     # referrals to a department ("referred to radiology", "Ref: Surg Onco") -> that department's desk or OPD
-    ("radiology", r"\b(radiology|radiodiagnosis|radio-diagnosis|imaging)\b|रेडियोलॉजी", "C-1-RADREC", "Radiology reception", "रेडियोलॉजी रिसेप्शन"),
+    ("radiology", r"\b(radiology|radiodiagnosis|radio-diagnosis|imaging)\b|रेडियोलॉजी", "C-1-RADREC", "Scan token counter", "स्कैन टोकन काउंटर"),
     ("surg_onc", r"\b(surgical oncology|surg\.? ?onco\w*|onco-?surg\w*|oncology surgery)\b", "A-1-SURG", "Surgical Oncology OPD", "सर्जिकल ऑन्कोलॉजी ओपीडी"),
     ("med_onc", r"\b(medical oncology|med\.? ?onco\w*)\b", "A-1-MED", "Medical Oncology OPD", "मेडिकल ऑन्कोलॉजी ओपीडी"),
     ("rad_onc", r"\b(radiation oncology|radiotherapy|rad\.? ?onco\w*)\b", "A-1-RTC", "Radiation Oncology OPD", "रेडिएशन ऑन्कोलॉजी ओपीडी"),
@@ -165,27 +168,29 @@ SLIP_STEPS = [
     ("palliative", r"\bpalliative\b", "A-4-PALL", "Palliative care clinic", "पैलिएटिव केयर क्लिनिक"),
     ("nutrition", r"\b(nutrition|dietician|dietitian|diet)\b", "A-4-NUT", "Nutrition clinic", "पोषण क्लिनिक"),
 ]
-TEST_KINDS = {"blood", "biopsy", "pet", "ct", "mri", "xray", "usg", "endo", "pac", "cardio"}
+TEST_KINDS = {"blood", "biopsy", "pet", "ct", "mri", "xray", "mammo", "usg", "endo", "pac", "ecg", "echo", "pft"}
 
 
 def slip_steps(text):
     t = text.lower()
     found = [s for s in SLIP_STEPS if re.search(s[1], t)]
-    if any(f[0] in ("ct", "mri", "xray", "usg", "pet") for f in found):
+    if any(f[0] in ("ct", "mri", "xray", "mammo", "usg", "pet") for f in found):
         found = [f for f in found if f[0] != "radiology"]       # the scan itself is named: go straight to its room
     if any(s[0] in TEST_KINDS for s in found):
-        found.insert(0, ("billing", "", "A-G-BILL", "Pay at billing", "बिलिंग पर पैसे जमा करना"))
+        found.insert(0, ("billing", "", "A-G-BILL", "Add money to your smart card", "स्मार्ट कार्ड में पैसे जमा करना"))
     return found
 
 
-def slip_reply(found, lang, saved):
+def slip_reply(found, lang, saved, category=None):
     hi = lang == "hi"
     if not found:
-        return ("इस पर्ची पर मुझे कोई जाँच या विभाग नहीं मिला। कृपया इसे गेट 1 के हेल्प डेस्क पर दिखाइए।" if hi else
-                "I couldn't find any test or department on this slip. Please show it at the help desk inside Gate 1.")
+        return (f"इस पर्ची पर मुझे कोई जाँच या विभाग नहीं मिला। कृपया इसे {core.HELP_DESK['hi']} पर दिखाइए।" if hi else
+                f"I couldn't find any test or department on this slip. Please show it at {core.HELP_DESK['en']}.")
     lines = ["आपकी पर्ची के हिसाब से रास्ता:" if hi else "Your route from the slip:"]
     for i, (_, _, uid, title, title_hi) in enumerate(found, 1):
-        lines.append(f"{i}. {title_hi if hi else title}: {brain.place_short(brain.PLACES[uid], lang)}")
+        u = brain.PLACES[uid]
+        where = core.where_say(u, lang, category) if "block" in u else brain.place_short(u, lang)
+        lines.append(f"{i}. {title_hi if hi else title}: {where}")
     if any(s[0] == "medicine" for s in found):
         lines.append("दवा कैसे लेनी है, ये डॉक्टर या फ़ार्मासिस्ट बताएँगे।" if hi else "Your doctor or pharmacist will explain how to take the medicines.")
     lines.append("खाली पेट आना है या नहीं, पर्ची पर देखिए या काउंटर पर पूछिए।" if hi else "For preparation such as fasting, check the slip or ask at the counter.")
@@ -196,11 +201,13 @@ def slip_reply(found, lang, saved):
 
 
 def slip_map(found, st, lang):
-    """Map to the first step on the slip, from wherever the patient is."""
-    if not found or not route_map.is_place(found[0][2]):
+    """Map to the first step on the slip (the patient's own location of it), from wherever the patient is."""
+    if not found:
         return None
-    start, dest = st.get("here") or "GATE1", found[0][2]
-    if start == dest:
+    u = brain.PLACES[found[0][2]]
+    dest = route_map.spot_for(u["ask"] if u.get("unlisted") else u["id"], st.get("category"))
+    start = st.get("here") or "GATE1"
+    if not dest or start == dest:
         return None
     st["walk_to"] = dest
     return brain.map_for(start, dest, lang, bool(st.get("here_told")))
@@ -217,7 +224,8 @@ def save_slip(pid, found):
 async def slip_answer(found, st, lang, saved=True):
     """The slip's route and map, in the patient's language (written in Hindi or English, translated from English otherwise)."""
     base = "hi" if lang == "hi" else "en"
-    out = {"text": slip_reply(found, base, saved=saved and bool(found)), "lang": base, "route": "SLIP", "actions": []}
+    out = {"text": slip_reply(found, base, saved=saved and bool(found), category=st.get("category")), "lang": base, "route": "SLIP",
+           "actions": []}
     walk = slip_map(found, st, base)
     if walk:
         out["map"] = walk
@@ -253,9 +261,25 @@ def route_image(request: Request):
     return Response(route_map.draw(start, dest), media_type="image/jpeg", headers={"Cache-Control": "public, max-age=3600"})
 
 
+@app.get("/map/campus.png")
+def campus_image():
+    """The campus drawing for the hospital map page (building positions are illustrative)."""
+    return Response(route_map.png(route_map.campus_base()), media_type="image/png", headers={"Cache-Control": "public, max-age=3600"})
+
+
+@app.get("/map/floor.png")
+def floor_image(request: Request):
+    """One building floor with its departments, for the hospital map page."""
+    b, f = request.query_params.get("b", ""), request.query_params.get("f", "")
+    if (b, f) not in route_map.used_floors():
+        return Response(status_code=404)
+    return Response(route_map.png(route_map.floor_base(b, f)), media_type="image/png", headers={"Cache-Control": "public, max-age=3600"})
+
+
 @app.get("/api/places")
 def places():
-    return {"places": route_map.start_choices(), "floors": route_map.FLOOR_NAMES}
+    return {"places": route_map.start_choices(), "floors": route_map.FLOOR_NAMES,
+            "used_floors": [{"block": b, "floor": f} for b, f in route_map.used_floors()]}
 
 
 @app.post("/api/here")
@@ -526,8 +550,8 @@ WA_TEXT = {
                    "en": "🔒 Since you sent your slip, I've saved these steps so I can remind you later. Your number is stored "
                          "encrypted, and you can erase everything any time by sending \"delete\".\n\n"
                          "ℹ️ I'm an AI service, not medical advice. I can make mistakes, so please confirm at the help desk."},
-    "slip_fail": {"hi": "माफ़ कीजिए, ये फ़ोटो पढ़ नहीं पाई। पर्ची की साफ़, सीधी फ़ोटो फिर से भेजिए, या इसे गेट 1 के हेल्प डेस्क पर दिखाइए।",
-                  "en": "Sorry, I couldn't read that photo. Please send a clear, straight photo of the slip again, or show it at the help desk inside Gate 1."},
+    "slip_fail": {"hi": f"माफ़ कीजिए, ये फ़ोटो पढ़ नहीं पाई। पर्ची की साफ़, सीधी फ़ोटो फिर से भेजिए, या इसे {core.HELP_DESK['hi']} पर दिखाइए।",
+                  "en": f"Sorry, I couldn't read that photo. Please send a clear, straight photo of the slip again, or show it at {core.HELP_DESK['en']}."},
     "unsupported": {"hi": "मैं अभी लिखा हुआ सवाल, वॉइस नोट या पर्ची की फ़ोटो समझ सकती हूँ।",
                     "en": "Right now I understand typed questions, voice notes and photos of a slip."},
 }
