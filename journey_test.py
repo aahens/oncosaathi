@@ -102,6 +102,19 @@ async def main():
     import server
     found = server.slip_steps("Referred to the Radiology department")
     check("slip 'referred to radiology' -> Radiology department, same as typing it", [f[2] for f in found] == ["C-G-XRAY"], found)
+    st9 = {"pid": store.create("9000000019", actor="test")["id"], "mode": "chat", "hospital": "tata-parel"}
+    await turn(st9, "एमआरआई स्कैन कहाँ होता है?")
+    server.save_slip(st9["pid"], server.slip_steps("Refer to Radiology"))
+    r = await turn(st9, "aaj mujhe kya karna hai?")
+    check("next step after a slip -> map to that step, not the last place asked",
+          "रेडियोलॉजी" in r["text"] and (r.get("map") or {}).get("to", "").startswith("C-G-XRAY"), (r["text"], r.get("map")))
+    found = server.slip_steps("PAGE NO. DATE / /\n\nC/o Bleeding from Nose since 5 days C Burning sensation < Bending Now\n\n"
+                              "Rx 1. Rawofol 2g 2. Kubu - 20 3. May Plus 30/4d")     # Sarvam's read of a real handwritten slip, 6 Nov
+    check("handwritten prescription with only medicines -> collect medicines", [f[0] for f in found] == ["medicine"], found)
+    found = server.slip_steps("Hb 9.2 g/dl, sugar 110 mg/dl. Repeat CBC")
+    check("lab values (g/dl, mg/dl) are not medicines", [f[0] for f in found] == ["billing", "blood"], found)
+    found = server.slip_steps("Refer to Radiology. Review after 2 weeks with reports")
+    check("'review after 2 weeks' is not a medicine dose", [f[0] for f in found] == ["radiology"], found)
     found = server.slip_steps("Ref to radiology for USG abdomen")
     check("slip 'radiology for USG' -> radiology, then ultrasound (ask)", [f[0] for f in found] == ["billing", "radiology", "usg"], found)
     found = server.slip_steps("Refer to Radiology for CECT abdomen")

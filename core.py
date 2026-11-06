@@ -154,7 +154,8 @@ SYNONYMS = {
     "C-1-USG": ["mammography", "mammogram", "मैमोग्राफी", "मैमोग्राफ़ी"],
     "USG": ["usg", "ultrasound", "sonography", "sonografi", "सोनोग्राफी", "अल्ट्रासाउंड"],
     "IR-OPD": ["interventional radiology", "interventional", "इंटरवेंशनल"],
-    "B-1-PATH": ["pathology", "पैथोलॉजी", "biopsy", "slide", "slides", "block", "histopathology", "बायोप्सी", "स्लाइड"],
+    "B-1-PATH": ["pathology", "पैथोलॉजी", "biopsy", "slide", "slides", "biopsy block", "paraffin block", "histopathology", "बायोप्सी",
+                 "स्लाइड"],                       # not bare "block": "it is blocked" (Marathi via translation) is not pathology
     "CYTO": ["cytology", "cytopathology", "fnac", "साइटोलॉजी"],
     "BIOCHEM": ["biochemistry", "बायोकेमिस्ट्री"],
     "MICRO": ["microbiology", "culture", "माइक्रोबायोलॉजी"],

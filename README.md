@@ -47,7 +47,8 @@ Set `WHATSAPP_PROVIDER=meta` and the `WHATSAPP_` keys in `.env`, then point Meta
 `route_test.py` (walkthrough map, no API calls), `meta_test.py` and `wa_test.py` (WhatsApp with Meta or Twilio mocked),
 `journey_test.py` (journey, memory, consent, deletion), `eval_brain.py` (questions → right place),
 `call_test.py` (spoken end-to-end call), `web_agent_test.py` and `wa_agent_test.py` (calls through the hosted agent, with maps),
-`simulate_patients.py` (20 simulated patients).
+`simulate_patients.py` (20 simulated patients), `sim_regression_test.py` (the lines the simulation got wrong on 6 Nov, replayed).
+Test slip photos are in `samples/test_slips/`.
 
 ## Deployment
 `render.yaml` is a Render Blueprint for the browser version (free plan, Singapore, our own call engine). Render asks

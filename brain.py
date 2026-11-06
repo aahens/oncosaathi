@@ -69,7 +69,7 @@ REPORT_OBJECT_RX = r"(पुरानी|पुराने|old|purani|purane)\s
 NEEDS_HOSPITAL = {"NAV_NEXT", "FOLLOWUP", "SCAN_GENERIC", "OPD_GENERIC", "NEXT_STEP", "STAY", "TRAVEL", "FLOOR_LIST", "AT_PLACE"}
 
 ASPECT_WORDS = {
-    "prep": r"\b(khali pet|khaali pet|empty stomach|fasting|fast|bhookhe|kha ke|kha kar)\b|खाली पेट|भूखे|खा के|खाकर|खा कर",
+    "prep": r"\b(khali pet|khaali pet|khalipet|empty stomach|fasting|fast|bhookhe|kha ke|kha kar)\b|खाली पेट|खालीपेट|भूखे|खा के|खाकर|खा कर",
     "bring": r"\b(bring|carry|documents?|papers?|laana|lana|laaun|laun|lekar|leke|le ke|kagaz|kaagaz)\b|लाना|लाऊँ|लाऊं|लेकर|लेके|साथ में क्या|साथ ला|ले आऊँ|ले आऊं|ला सकती|ला सकता|लानी|कागज़|कागज|डॉक्यूमेंट",
     "hours": r"\b(timings?|time|open|close[sd]?|hours|khula|khulta|khulega|band|kab tak|kitne baje|kab|today|tomorrow|aaj hi|kal bhi)\b|समय|टाइम|खुल|बंद|कितने बजे|कब तक|कब|आज ही|कल भी",
     "way": r"\b(how (do|can) i (go|get|reach)|which lift|rasta|raasta|kaise (jaun|jaaun|jaye|jayen|pahunch))\b|रास्ता|कैसे जा|कैसे पहुँच|कैसे पहुंच|कौन सी लिफ़्ट|कौन सी लिफ्ट",
@@ -91,12 +91,17 @@ QUESTION_RX = (r"\?|\b(kahan|kaha|kahaan|kidhar|kaise|kab|where|how|when)\b|"
 HELP_RX = (r"\b(help|madad|sahayata)\b|(?<![\u0900-\u097F])(मदद|सहायता|हेल्प)(?![\u0900-\u097F])")
 CONFIRM_RX = (r"\b(floor|manzil|manjil|wing|room|sahi|theek|right|correct|na)\b|"
               r"(?<![\u0900-\u097F])(मंज़िल|मंजिल|फ्लोर|फ़्लोर|विंग|कमरा|सही|ठीक|ना)(?![\u0900-\u097F])")
+_FL = r"\s?(फ्लोर|फ़्लोर|floor|माला|माले)"   # floor numbers as words before "floor": "सेकंड फ्लोर", "दूसरा floor" (never "एक सेकंड")
 FLOOR_WORDS = {"B": r"basement|बेसमेंट|तहखान", "G": r"ground|ग्राउंड|नीचे|neeche|niche",
-               "1": r"\bfirst\b|\b1st\b|pehli|pahli|पहली|पहले (फ्लोर|फ़्लोर|माले|मंज़िल|मंजिल)",
-               "2": r"\bsecond\b|\b2nd\b|doosri|dusri|doosre|dusre|दूसरी|दूसरे", "3": r"\bthird\b|\b3rd\b|teesri|tisri|teesre|तीसरी|तीसरे",
-               "4": r"\bfourth\b|\b4th\b|chauthi|chauthe|चौथी|चौथे", "5": r"\bfifth\b|\b5th\b|paanchvi|panchvi|पाँचवीं|पांचवीं|पाँचवें|पांचवें",
-               "6": r"\bsixth\b|\b6th\b|chhathi|chhathe|छठी|छठे", "7": r"\bseventh\b|\b7th\b|saatvi|satvi|सातवीं|सातवें",
-               "8": r"\beighth\b|\b8th\b|aathvi|आठवीं|आठवें", "10": r"\btenth\b|\b10th\b|dasvi|दसवीं|दसवें"}
+               "1": r"\bfirst\b|\b1st\b|pehli|pahli|पहली|पहले (फ्लोर|फ़्लोर|माले|मंज़िल|मंजिल)|(फर्स्ट|फ़र्स्ट|पहला)" + _FL,
+               "2": r"\bsecond\b|\b2nd\b|doosri|dusri|doosre|dusre|दूसरी|दूसरे|(सेकंड|सेकेंड|सेकण्ड|दूसरा)" + _FL,
+               "3": r"\bthird\b|\b3rd\b|teesri|tisri|teesre|तीसरी|तीसरे|(थर्ड|तीसरा)" + _FL,
+               "4": r"\bfourth\b|\b4th\b|chauthi|chauthe|चौथी|चौथे|(फोर्थ|फ़ोर्थ|चौथा)" + _FL,
+               "5": r"\bfifth\b|\b5th\b|paanchvi|panchvi|पाँचवीं|पांचवीं|पाँचवें|पांचवें|(फिफ्थ|फ़िफ़्थ|पाँचवाँ|पांचवां|पांचवा)" + _FL,
+               "6": r"\bsixth\b|\b6th\b|chhathi|chhathe|छठी|छठे|(सिक्स्थ|छठा)" + _FL,
+               "7": r"\bseventh\b|\b7th\b|saatvi|satvi|सातवीं|सातवें|(सेवंथ|सेवेंथ|सातवाँ|सातवां|सातवा)" + _FL,
+               "8": r"\beighth\b|\b8th\b|aathvi|आठवीं|आठवें|(एटथ|एट्थ|आठवाँ|आठवां)" + _FL,
+               "10": r"\btenth\b|\b10th\b|dasvi|दसवीं|दसवें|(टेंथ|दसवाँ|दसवां)" + _FL}
 # "main private patient hoon", "general category", "VIP": which of the booklet's two locations is theirs
 CATEGORY_RX = {"private": r"\b(private|pvt|vip|paying)\s*(patient|category|wala|wale|wali|hoon|hun|hu|room)?\b|प्राइवेट|प्रायवेट|वीआईपी",
                "general": r"\bgeneral\s*(patient|category|wala|wale|wali|hoon|hun|hu)\b|\bnormal\s*(patient|category)\b|जनरल\s*(मरीज़|मरीज|पेशेंट|कैटेगरी|वाला|वाले)|सामान्य\s*(मरीज़|मरीज|श्रेणी)"}
@@ -133,7 +138,26 @@ AT_RX = (r"\b(main|mai|i am|i'm|hum)\b.{0,40}\b(par|pe|pr|at|near|paas|pass)\b|(
          r"\b(standing|i'm at|i am at)\b|(पर|पे|पास)\s*(खड़ा|खड़ी|खडा|खडी|हूँ|हूं|हैं)")
 ACK_RX = (r"^\W*(ok|okay|theek hai|thik hai|achha|accha|got it|thanks|thank you|dhanyavaad|shukriya)\b|^\W*(ठीक है|अच्छा|ओके|हाँ ठीक)|पहुँच रह|पहुंच रह|चला जाता|चली जाती|पूछ लेता|पूछ लेती|पता कर लेता|पता कर लेती|नोट कर लिया|\b(ja raha|ja rahi|jaa raha|"
           r"nikal raha|nikal rahi|samajh gaya|samajh gayi|samajh aa gaya|thank you|thanks)\b|धन्यवाद|शुक्रिया|जा रहा|जा रही|"
-          r"निकल रहा|निकल रही|समझ गया|समझ गई|समझ आ गया|सुन लिया")
+          r"निकल रहा|निकल रही|समझ गया|समझ गई|समझ आ गया|सुन लिया|मेहरबानी|थैंक यू|थैंक्स|पता करती|पता करता|पता करते|"
+          r"\b(meherbani|meharbani|dhanyawad|bahut shukriya|i'?m going|i am going|going in|on my way|heading there)\b")
+ACK_GOING_RX = (r"^\W*(ठीक है|ठीक हैं|अच्छा|ओके|हाँ|हां|जी|ok|okay|theek hai|thik hai|accha|achha|alright|fine)\W.{0,160}"
+                r"(जा रहा|जा रही|जा रहे|चला जाता|चली जाती|निकल रहा|निकल रही|पहुँचकर|पहुंचकर|पहुँच कर|पहुंच कर|"
+                r"\bgoing\b|\bheading\b|\bja raha\b|\bja rahi\b|\bon my way\b)")
+NOT_EMERGENCY_RX = (r"(emergency|इमरजेंसी|एमरजेंसी|इमर्जेंसी)\s*(नहीं|नही|nahi|nahin|nhi)|\b(not an? emergency|no emergency|"
+                    r"isn'?t an? emergency)\b|(कोई|koi)\s*(emergency|इमरजेंसी|एमरजेंसी)\s*(नहीं|नही|nahi)")
+# after an emergency answer: a follow-up about what to DO (go, call, can't walk, a doctor) stays the emergency; plain fear gets comfort
+EMERGENCY_NEXT_RX = (r"\b(hospital|aspatal|ambulance|108|112|doctor|daktar|phone|call|aa sakt\w*|aana|jaana|jana|chal nahi|walk|come)\b|"
+                     r"अस्पताल|हॉस्पिटल|एम्बुलेंस|एंबुलेंस|डॉक्टर|डाक्टर|फोन|फ़ोन|कॉल|आ सकत|आना|जाना|जाना पड़|चल नहीं|चल नही|कमज़ोर|कमजोर")
+# a report to COLLECT (the report counter), not reports to bring along (REPORT_OBJECT_RX) or a report to read (clinical)
+REPORT_PICKUP_RX = (r"(रिपोर्ट|report)\w*\s*(लेन|लेनी|लेना|लेने|चाहिए|मिलेग|कहाँ|कहां|किधर|का काउंटर|काउंटर|counter|collect|"
+                    r"lena|leni|lene|chahiye|milegi|milega|kahan|kaha|kidhar)|\b(collect|get|pick up)\s+(my\s+)?(\w+\s+)?reports?\b")
+OPD_RX = (r"(?<![a-z])opd(?![a-z])|ओपीडी|\b(oncology|cancer) clinic\b|(ऑन्कोलॉजी|ओंकोलॉजी|कैंसर)\s*(क्लिनिक|क्लीनिक|विभाग)")
+SCAN_OVER_RADIOLOGY = ("C-1-CT", "C-1-MRI", "C-2-PET", "C-1-USG")   # "radiology, for a CT": the named scan is where they go
+# "मैं जनरल मरीज़ हूँ, तो GJB ग्राउंड फ़्लोर जाऊँ ना?": a building they name, to confirm or correct
+BLOCK_WORDS = {"GJB": r"\bgjb\b|golden|जीजेबी|गोल्डन", "HBB": r"\bhbb\b|homi|bhabha|एचबीबी|होमी|भाभा",
+               "MB": r"main building|\bmb\b|मेन बिल्डिंग|मेन बिल्डींग|एमबी", "AB": r"annexe?|एनेक्सी|एनेक्स",
+               "SB": r"service building|सर्विस बिल्डिंग"}
+GO_CONFIRM_RX = r"\b(jaun|jaau|jaaun|chala jaun|chali jaun|right|correct|na)\b|जाऊँ|जाऊं|जाना है ना|सही|ना\?|है ना|ठीक है ना"
 # heard on WhatsApp calls, 3 Nov 2026: "Yes." / "Yeah." got "sorry, I didn't get that", and "Okay tell me is the radiology
 # department" (STT dropped "where") was taken as a plain "okay"
 YES_ONLY_RX = r"^\W*(yes|yeah|yep|yup|haan|haan ji|han|ji|ji haan|हाँ|हां|जी|जी हाँ|जी हां|हाँ जी|हां जी)\W*$"
@@ -266,6 +290,12 @@ def rule_decide(text, state):
 async def decide(text, state):
     """Return (decision, source). decision = {label, aspect}."""
     t = " " + text.lower() + " "
+    t = re.sub(r"खाली\s*पेट|\bkhaa?li\s+pet\b", "खालीपेट", t)     # "खाली पेट" = fasting: not the stomach, not a PET scan
+    t = re.sub(NOT_EMERGENCY_RX, " ", t)                            # "ये emergency नहीं है": the word, said to deny it
+    if re.search(TATA_RX, t) and not re.search(OTHER_NAMES_RX, t) and state.get("hospital") != "tata-parel":
+        state["hospital"] = "tata-parel"     # Tata named in ANY sentence, a worried one too: known before the safety rules answer
+        if state.get("pid"):
+            store.update(state["pid"], f"brain-{state.get('mode')}", hospital="tata-parel")
     if not any(w in t for w in core.SELF_HARM + core.EMERGENCY):
         if re.search(LINE_BUSY_RX, t):
             return {"label": "LINE_BUSY", "aspect": "where"}, "rules-line-busy"
@@ -302,14 +332,25 @@ async def decide(text, state):
         state["hospital"] = "tata-parel"                # named the hospital inside any sentence: remember it, never ask again
         if state.get("pid"):
             store.update(state["pid"], f"brain-{state.get('mode')}", hospital="tata-parel")
-    if re.search(YES_ONLY_RX, t) or (re.search(ACK_RX, t) and not re.search(QUESTION_RX + "|" + TELL_ME_RX, t) and len(t.split()) <= 12
-                                     and not re.search(NEXT_STEP_RX + "|" + STAY_RX, t)):
+    no_ask = not re.search(QUESTION_RX + "|" + TELL_ME_RX + "|" + NEXT_STEP_RX + "|" + STAY_RX, t)
+    if re.search(YES_ONLY_RX, t) or (re.search(ACK_RX, t) and no_ask and len(t.split()) <= 12) \
+            or (re.search(ACK_GOING_RX, t.strip()) and no_ask and len(t.split()) <= 25):
+        # (the last: "ठीक है, मैं मेन गेट से GJB की तरफ जा रही हूँ, वहाँ पहुँचकर बताऊँगी" names places but asks nothing)
         return {"label": "ACK", "aspect": "where"}, "rules-ack"          # "theek hai, main ja raha hoon", "dhanyavaad", "yes"
     if state.get("pid") and re.search(NAME_SAID_RX, t) and extract_name(text):
         return {"label": "NAME_SAID", "aspect": "where"}, "rules-name"
     if re.search(r"\b(which|kis|kaun sa|kaunse) (hospital|aspatal)\b|किस (हॉस्पिटल|अस्पताल|hospital)|कौन से (हॉस्पिटल|अस्पताल|hospital)", t) \
             and not re.search(TATA_RX + "|" + OTHER_NAMES_RX, t):
         return {"label": "ASK_HOSPITAL", "aspect": "where"}, "rules-ask-hospital"
+    if re.search(r"किसी से बात|\bkisi se baat\b|\btalk to someone\b|\bsomeone to talk\b", t) and not named:
+        return {"label": "EMOTIONAL", "aspect": "where"}, "rules-talk-to-someone"     # counsellor + Tele-MANAS, warmly
+    if re.search(REPORT_PICKUP_RX, t) and not re.search(REPORT_OBJECT_RX, t):
+        return {"label": "B-G-REPORT", "aspect": aspect_from_words(text)}, "rules-report-pickup"   # "blood report lene aayi hoon"
+    two = two_places(t)
+    if two and "C-G-XRAY" in two:
+        scan = next((p for p in two if p in SCAN_OVER_RADIOLOGY), None)
+        if scan:
+            return {"label": scan, "aspect": aspect_from_words(text)}, "rules-scan-over-radiology"
     hs = hospital_statement(t, named)
     if hs:
         return {"label": hs, "aspect": "where"}, "rules-hospital"
@@ -344,7 +385,8 @@ async def decide(text, state):
     if named and re.search(NEG_RX, t):
         return {"label": "NEGATED", "aspect": "where"}, "rules-negated"
     floor = next((f for f, rx in FLOOR_WORDS.items() if re.search(rx, t)), None)
-    if floor and re.search(FLOOR_LIST_RX, t):
+    if floor and re.search(FLOOR_LIST_RX, t) and not re.search(ASPECT_WORDS["prep"] + "|" + ASPECT_WORDS["bring"], t):
+        # ("PET ke liye HBB pehli manzil... khali pet aana hai aur kya laana hai?" is about the PET, not the floor's list)
         return {"label": "FLOOR_LIST", "aspect": floor}, "rules-floor-list"
     if state.get("place") and re.search(DEICTIC, t) and not named:
         return {"label": "FOLLOWUP", "aspect": aspect_from_words(text)}, "rules-followup"
@@ -356,6 +398,9 @@ async def decide(text, state):
             rest = t[m.end():].strip(" ,.।")
             if len(rest) >= 3:
                 d, src = await decide(rest, {**state, "pid": None})
+                if d["label"] in ("NONE", "NEXT_STEP") and re.search(OPD_RX, t) and not named:
+                    # "OPD ke liye aaya, registration ho gaya, ab aage kahan?": the OPD (said before "ho gaya")
+                    return {"label": "OPD_GENERIC", "aspect": "where"}, "rules-opd-after-done"
                 return d, src + "-after-done"
         else:
             return {"label": "TASK_DONE", "aspect": "where"}, "rules-done"
@@ -363,7 +408,7 @@ async def decide(text, state):
         return {"label": "NEXT_STEP", "aspect": "where"}, "rules-next-step"
     if re.search(STAY_RX, t) and not (named and public_match(t)[1] >= 3):
         return {"label": "STAY", "aspect": "where"}, "rules-stay"
-    if re.search(r"(?<![a-z])opd(?![a-z])|ओपीडी", t) and not named:
+    if re.search(OPD_RX, t) and (not named or public_match(t)[1] < 3):   # "oncology clinic": not the uro-ONCOLOGY OPD
         return {"label": "OPD_GENERIC", "aspect": "where"}, "rules-opd"
     if (re.search(TRAVEL_RX, t) or travel_state(t)) and not named:
         return {"label": "TRAVEL", "aspect": "where"}, "rules-travel"
@@ -373,10 +418,11 @@ async def decide(text, state):
         return {"label": named["id"], "aspect": "note"}, "rules-appointment"
     if re.search(COST_RX, t) and state.get("place") in PLACES and state["place"] != "A-G-SW" and not re.search(STAY_RX, t):
         return {"label": "COST", "aspect": state["place"]}, "rules-cost"
-    if re.search(ASPECT_WORDS["prep"], t) and not re.search(ASPECT_WORDS["bring"], t):
+    if re.search(ASPECT_WORDS["prep"], t):
         target = named if (named and named["id"] != "B-G-REPORT") else PLACES.get(state.get("place"))
-        if target:
-            return {"label": target["id"], "aspect": "prep"}, "rules-prep"
+        if target:                                 # "khali pet aana hai, aur saath kya laana hai?": both answers
+            both = re.search(ASPECT_WORDS["bring"], t) and not re.search(r"खा के|खाकर|खा कर|\bkha (ke|kar)\b", t)
+            return {"label": target["id"], "aspect": "prep_bring" if both else "prep"}, "rules-prep"
     if state.get("place") in PLACES and re.search(APPT_RX, t) and not named:
         return {"label": state["place"], "aspect": "note"}, "rules-appointment-followup"
     two = two_places(t)
@@ -467,8 +513,22 @@ def place_short(u, lang, category=None):
 def say_place(u, aspect, lang, mode, category=None):
     hi = lang == "hi"
     name = _name(u, lang)
+    if aspect == "prep_bring":                        # fasting AND what to bring, asked together
+        return say_place(u, "prep", lang, mode, category) + " " + say_place(u, "bring", lang, mode, category)
     if mode == "chat" and aspect == "where":
         return core.directory_answer(u, lang, category)
+    if u.get("unlisted") and aspect in ("bring", "hours", "prep"):
+        ask = PLACES[u["ask"]]                       # not placed by the booklet: the first stop's own facts (e.g. PET -> token counter)
+        an = _name(ask, lang)
+        if aspect == "prep":
+            return (f"{name} के लिए खाली पेट आना है या नहीं, यह आपकी पर्ची पर लिखा होगा; न लिखा हो तो {an} पर पूछ लीजिए।" if hi else
+                    f"Whether to come fasting for {name} is written on your slip; if it isn't, please ask at the {an}.")
+        if aspect == "bring" and ask.get("bring"):
+            return (f"{name} के लिए पहले {an} पर जाइए; वहाँ साथ लाइए: {_f(ask, 'bring', lang)}।" if hi else
+                    f"For {name}, go first to the {an}; bring {_f(ask, 'bring', lang)}.")
+        if aspect == "hours" and ask.get("hours"):
+            return (f"बुकलेट में {name} का समय नहीं लिखा है। {an} {_f(ask, 'hours', lang)} खुला रहता है; अपना समय वहीं पूछिए।" if hi else
+                    f"The booklet doesn't give the timings for {name}. The {an} is open {_f(ask, 'hours', lang)}; ask there for your time.")
     if u.get("unlisted") or u.get("dmg"):
         return core.directory_answer(u, lang, category).replace("\n➡️ ", " " if hi else " ").replace("\n", " ")
     if "block" not in u:
@@ -504,6 +564,12 @@ def say_place(u, aspect, lang, mode, category=None):
         return ((f"{name}: {note}।" if note else f"{name} के बारे में यह जानकारी मेरे पास नहीं है। {help_desk(lang)} पर पूछिए।") if hi else
                 (f"{name}: {note}." if note else f"I don't have that detail for {name}. Please ask at {help_desk(lang)}."))
     if aspect == "hours":
+        if not u.get("hours") and "Rotunda" in (u.get("note") or ""):    # CT, MRI: the scan token counter's hours are known
+            tok = PLACES["C-1-RADREC"]
+            return (f"बुकलेट में {name} का समय नहीं लिखा है। स्कैन का टोकन {place_short(tok, lang)} पर मिलता है, {_f(tok, 'hours', lang)}; "
+                    f"अपने {name} का समय वहीं पूछिए।" if hi else
+                    f"The booklet doesn't give the timings for {name}. Scan tokens are given at {place_short(tok, lang)}, "
+                    f"{_f(tok, 'hours', lang)}; ask there for your {name} time.")
         if not u.get("hours"):
             return (f"बुकलेट में {name} का समय नहीं लिखा है। {help_desk(lang)} पर पूछिए।" if hi else
                     f"The booklet doesn't give the timings for {name}. Please ask at {help_desk(lang)}.")
@@ -573,8 +639,8 @@ def say_journey(state, lang, mode, just_done=None):
     if not nxt:
         return lead + ("अभी आपका कोई अगला काम मेरे पास दर्ज नहीं है। डॉक्टर की पर्ची की फ़ोटो चैट में भेजिए, मैं बता दूँगी कहाँ जाना है।" if hi else
                        "I don't have another step for you yet. Send a photo of the doctor's slip in the chat and I'll tell you where to go.")
-    if state.get("place") is None and nxt[0].get("unit_id") in PLACES:
-        state["place"] = nxt[0]["unit_id"]
+    if nxt[0].get("unit_id") in PLACES:
+        state["place"] = nxt[0]["unit_id"]           # the step just read out is now "there": its map, and "wahan kaise jaun"
     first = _task_line(nxt[0], lang)
     if mode == "voice":
         return lead + (f"अगला कदम: {first}।" if hi else f"Next step: {first}.")
@@ -862,7 +928,9 @@ def hospital_statement(t, named):
     if named and public_match(t)[1] >= 3:
         return None                                   # "Tata Memorial mein CT kahan hai?" is about the CT
     if re.search(TATA_RX, t):
-        if travel_state(t) or re.search(COMING_RX, t) or re.search(r"(जाना है|आना है|jaana hai|jana hai|aana hai)", t):
+        if travel_state(t) or re.search(COMING_RX, t) or re.search(r"(जाना है|आना है|jaana hai|jana hai|aana hai|जा रहे|जा रही|"
+                                                                   r"जा रहा|आ रहे|आ रही|आ रहा|जाएंगे|जाएँगे|आएंगे|आएँगे|"
+                                                                   r"\bja rahe\b|\bja rahi\b|\bja raha\b)", t):
             return "HOSP_TATA_COMING"
         if re.search(IN_RX, t):
             return "HOSP_TATA_IN"
@@ -1005,7 +1073,17 @@ def say(decision, state, lang, mode, text):
     label, aspect = decision["label"], decision["aspect"]
     hi = lang == "hi"
     if label == "EMERGENCY":
-        state["times_EMERGENCY"] = state.get("times_EMERGENCY", 0) + 1
+        n = state["times_EMERGENCY"] = state.get("times_EMERGENCY", 0) + 1
+        if n >= 2:
+            # asked again ("108 nahi lag raha", "seedhe aa sakti hoon?"): the next thing to DO, not the same lines again
+            cas = place_short(PLACES["D-G-ER"], lang)
+            if state.get("where") == "in":
+                return (f"इंतज़ार मत कीजिए। अभी जो भी नर्स, डॉक्टर या स्टाफ़ दिखे, उसे बताइए। कैज़ुअल्टी (इमरजेंसी): {cas}, 24 घंटे खुली।" if hi else
+                        f"Don't wait. Tell any nurse, doctor or staff member you can see right now. Casualty (emergency): {cas}, open 24 hours."), []
+            return (f"हाँ, इंतज़ार मत कीजिए। 108 पर कॉल करके एम्बुलेंस बुलाइए; 108 न लगे तो 112 पर। या किसी पड़ोसी से कहिए कि ऑटो या टैक्सी से "
+                    f"आपको अभी सबसे पास के अस्पताल की इमरजेंसी ले जाए। टाटा मेमोरियल की कैज़ुअल्टी: {cas}, 24 घंटे खुली।" if hi else
+                    f"Yes, don't wait. Call 108 for an ambulance; if 108 doesn't connect, call 112. Or ask a neighbour to take you by auto or "
+                    f"taxi to the nearest hospital emergency now. Tata Memorial's Casualty: {cas}, open 24 hours."), []
         if aspect == "fever":
             where = state.get("where")
             return (("कीमो के दौरान या कंपकंपी के साथ तेज़ बुखार इमरजेंसी है, इंतज़ार मत कीजिए। " +
@@ -1029,6 +1107,9 @@ def say(decision, state, lang, mode, text):
             return ("अच्छा! आगे कुछ और जानना हो तो बताइए।" if hi else "Good. Tell me if you need anything else."), []
         return say_journey(state, lang, mode, just_done=done), []
     if label == "NEXT_STEP":
+        pending = state.get("pid") and store.next_tasks(state["pid"], actor=f"brain-{mode}", limit=1)
+        if not pending and re.search(OPD_RX, " " + text.lower() + " "):
+            return say({"label": "OPD_GENERIC", "aspect": "where"}, state, lang, mode, text)   # "OPD ke liye aaya, ab kahan?"
         return say_journey(state, lang, mode), []
     if label == "DOCUMENTS":
         return say_documents(lang, mode), []
@@ -1438,7 +1519,7 @@ async def _respond(text, state, lang, original=None):
     mode = state.get("mode", "chat")
     state["text"] = text
     low = " " + text.lower() + " "
-    safety_hit = any(w in low for w in core.SELF_HARM + core.EMERGENCY)
+    safety_hit = any(w in re.sub(NOT_EMERGENCY_RX, " ", low) for w in core.SELF_HARM + core.EMERGENCY)
     if state.get("awaiting") and state.get("pid") and not safety_hit:
         reply = handle_awaiting(text, state, lang)
         if reply:
@@ -1460,8 +1541,13 @@ async def _respond(text, state, lang, original=None):
     if said_cat:
         state["category"] = said_cat
     prev = PLACES.get(state.get("place") or "") or {}
-    if said_cat and not unsafe and len(text.split()) <= 6 and "private" in prev and not public_match(low)[0]:
-        decision, source = {"label": prev["id"], "aspect": "where"}, "rules-category"   # answer the last place again, for them
+    nm, sc = public_match(low)
+    confirming = re.search(GO_CONFIRM_RX, low) or any(re.search(rx, low) for rx in BLOCK_WORDS.values())
+    other_place = any(p != prev.get("id") for p in (two_places(low) or []))   # "radiology, for a CT": a new place, not a confirm
+    if said_cat and not unsafe and "private" in prev and (not nm or nm["id"] == prev["id"] or sc < 3) and not other_place \
+            and (len(text.split()) <= 6 or confirming):
+        # "main general patient hoon" / "...to GJB ground floor jaun na?": the last place again, for their category
+        decision, source = {"label": prev["id"], "aspect": "where"}, "rules-category"
     else:
         decision, source = await decide(text, state)
     label = decision["label"]
@@ -1480,6 +1566,18 @@ async def _respond(text, state, lang, original=None):
     held = state.pop("held_question", None)
     looks_like_hospital = (re.search(OTHER_NAMES_RX, low) or re.search(r"\b(hospital|medical|institute|clinic)\b|अस्पताल|हॉस्पिटल", low)) \
         and not re.search(QUESTION_RX + "|" + DEICTIC, low) and len(text.split()) <= 6
+    if state.get("last_label") == "EMERGENCY" and label in ("EMOTIONAL", "CLINICAL", "DOCTOR_CONNECT", "TELECONSULT", "OUTLOOK",
+                                                            "NONE", "META", "HOSP_OTHER") \
+            and re.search(EMERGENCY_NEXT_RX, low) and not re.search(NOT_EMERGENCY_RX, low):
+        # right after an emergency answer, "ghar pe akeli hoon", "chal nahi pa rahi", "doctor phone pe dekh sakta hai?" are
+        # still the emergency: the next thing to do (108 ambulance, 112, a neighbour, Casualty), not counselling or "which hospital?"
+        decision, source, label = {"label": "EMERGENCY", "aspect": "where"}, "rules-emergency-continues", "EMERGENCY"
+    if label == "D-G-ER" and hosp is None:
+        # "108 nahi lag raha, seedhe hospital aa sakti hoon?": an emergency never waits for "which hospital?"
+        decision, source, label = {"label": "EMERGENCY", "aspect": "where"}, "rules-emergency-place", "EMERGENCY"
+    if held and hosp == "tata-parel" and re.search(TATA_RX, low) and label in ("NONE", "ACK", "META", "HOSP_TATA"):
+        # "हम टाटा मेमोरियल जा रहे हैं, मेरे पति का इलाज वहाँ चलेगा": they named it, with more words around it
+        decision, source, label = {"label": "HOSP_TATA", "aspect": "where"}, "rules-held-tata", "HOSP_TATA"
     if held and not label.startswith("HOSP_") and label not in SAFETY and label not in PLACES and looks_like_hospital:
         decision, source, label = {"label": "HOSP_OTHER", "aspect": "where"}, "rules-held-other", "HOSP_OTHER"
     elif held and not label.startswith("HOSP_"):
@@ -1500,6 +1598,12 @@ async def _respond(text, state, lang, original=None):
     if (label in PLACES or label in (NEEDS_HOSPITAL - {"TRAVEL"}) or label in ("TWO_PLACES", "STAY_PLUS")) and hosp == "other":
         decision, source = {"label": "HOSP_OTHER", "aspect": "where"}, "rules-other-hospital"
     reply, actions = say(decision, state, lang, mode, text)
+    if source == "rules-category" and decision["label"] in PLACES:
+        named_b = next((b for b, rx in BLOCK_WORDS.items() if re.search(rx, low)), None)
+        right_b = core.location_of(PLACES[decision["label"]], state.get("category")).get("block")
+        if named_b and right_b:
+            reply = (("जी हाँ, सही। " if named_b == right_b else "नहीं, ") if lang == "hi" else
+                     ("Yes, that's right. " if named_b == right_b else "No: ")) + reply
     if re.search(META_RX, low) and decision["label"] in PLACES:
         reply = ("माफ़ कीजिए। " if lang == "hi" else "Sorry about that. ") + reply
     said_floor = next((f for f, rx in FLOOR_WORDS.items() if re.search(rx, low)), None)

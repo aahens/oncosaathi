@@ -158,7 +158,10 @@ SLIP_STEPS = [
     ("ecg", r"\becg\b", "B-3-CARDIO", "ECG", "ईसीजी"),
     ("echo", r"\b(2d ?echo|echo)\b", "ECHO", "2D Echo", "2D इको"),
     ("pft", r"\bpft\b", "PFT", "Lung function test", "फेफड़ों की जाँच"),
-    ("medicine", r"\b(tab|cap|syp|inj|tablet|capsule|syrup)\b\.?|\d+\s?mg\b", "CORE-G-PHARM", "Collect medicines", "दवाइयाँ लेना"),
+    # medicines: "Tab.", "10 mg", and handwritten prescriptions: "Rx", "2g", "30/4d", "1-0-1", "BD x 5 days" (names never read)
+    ("medicine", r"\b(tabs?|caps?|syp|syr|inj|tablets?|capsules?|syrup|ointment|drops)\b\.?|\d+\s?(mg|mcg|ml|gm|g)\b(?!\s?/\s?(dl|l|ml)\b)|"
+                 r"(^|\s)(rx|r/x|℞)(?=[\s.:]|$)|\b(od|bd|bid|tds|tid|qid|hs|sos)\b|\b\d+\s?/\s?\d+\s?d\b|\b[01]\s?-\s?[01]\s?-\s?[01]\b|"
+                 r"दवा|दवाई|दवाइयाँ|गोली", "CORE-G-PHARM", "Collect medicines", "दवाइयाँ लेना"),
     # referrals to a department ("referred to radiology", "Ref: Surg Onco") -> that department's desk or OPD
     # the booklet's Radiology department (same answer as typing "where is radiology"); a named scan replaces it below
     ("radiology", r"\b(radiology|radiodiagnosis|radio-diagnosis|imaging)\b|रेडियोलॉजी", "C-G-XRAY", "Radiology department", "रेडियोलॉजी विभाग"),
