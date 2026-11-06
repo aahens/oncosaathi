@@ -25,6 +25,10 @@ Speech (Sarvam Saaras v4) → safety rules first → Sarvam-105b picks a label o
 data files (`hospital.json`, `journey.json`, `stay.json`, `travel.json`) → speech (Sarvam Bulbul v3).
 The language model never writes room numbers itself, so it cannot invent them.
 
+Calls can also run on the team's hosted Sarvam Samvaad agent (`CALL_ENGINE=sarvam_agent`, see `samvaad_call.py`), which handles
+interruptions well. Its instructions are generated from the same hospital data by `build_agent_prompt.py` into
+`agent_prompt_new_agent.md`. During and after such a call, the route maps and written directions still come from our own data.
+
 ## Run it yourself
 ```bash
 python -m venv .venv && .venv/bin/pip install -r requirements.txt
@@ -41,7 +45,8 @@ Set `WHATSAPP_PROVIDER=meta` and the `WHATSAPP_` keys in `.env`, then point Meta
 ## Tests
 `route_test.py` (walkthrough map, no API calls), `meta_test.py` and `wa_test.py` (WhatsApp with Meta or Twilio mocked),
 `journey_test.py` (journey, memory, consent, deletion), `eval_brain.py` (questions → right place),
-`call_test.py` (spoken end-to-end call), `simulate_patients.py` (20 simulated patients).
+`call_test.py` (spoken end-to-end call), `web_agent_test.py` and `wa_agent_test.py` (calls through the hosted agent, with maps),
+`simulate_patients.py` (20 simulated patients).
 
 ## Deployment
 `render.yaml` deploys this repository on Render. Keys go in a Render Secret File named `.env`. Every push to `main` updates the live link automatically.

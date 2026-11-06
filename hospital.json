@@ -1531,6 +1531,28 @@
    "note": "The booklet doesn't list a PM-JAY desk. The Medical Social Worker helps with government schemes.",
    "note_hi": "बुकलेट में PM-JAY काउंटर नहीं लिखा है। सरकारी योजनाओं में मेडिकल सोशल वर्कर मदद करते हैं।",
    "source": "Not listed in the booklet"
+  },
+  {
+   "id": "MORTUARY",
+   "cat": "support",
+   "name": "Mortuary",
+   "name_hi": "मॉर्चरी (शवगृह)",
+   "unlisted": true,
+   "ask": "A-G-HELP",
+   "note": "We are very sorry for your loss. The booklet doesn't say where the mortuary is; the ward staff or the Helpdesk will take you there. Before the body is handed over: the doctor gives Form 4 (the medical certificate of the cause of death), and a blood relative gets a police NOC from Bhoiwada Police Station (near Sadakant Dhavan, Dadar East), taking the Aadhaar cards of the deceased and of the relative and a copy of Form 4. At the mortuary, security and mortuary staff check the NOC, the Aadhaar cards and Form 4, then hand over the body.",
+   "note_hi": "आपके इस दुख में हम आपके साथ हैं। बुकलेट में मॉर्चरी की जगह नहीं लिखी है; वार्ड स्टाफ़ या हेल्पडेस्क आपको वहाँ ले जाएँगे। शव सौंपने से पहले: डॉक्टर फ़ॉर्म 4 (मृत्यु के कारण का मेडिकल सर्टिफ़िकेट) देते हैं, और परिवार का कोई ख़ून का रिश्तेदार भोईवाड़ा पुलिस स्टेशन (सदाकांत ढवन के पास, दादर ईस्ट) से पुलिस NOC लेता है; साथ में मृतक और अपना आधार कार्ड और फ़ॉर्म 4 की कॉपी ले जाइए। मॉर्चरी में सिक्योरिटी और मॉर्चरी स्टाफ़ NOC, आधार कार्ड और फ़ॉर्म 4 देखकर शव सौंप देंगे।",
+   "source": "Not listed in the booklet"
+  },
+  {
+   "id": "DEATHCERT",
+   "cat": "support",
+   "name": "Death certificate",
+   "name_hi": "मृत्यु प्रमाण पत्र",
+   "unlisted": true,
+   "ask": "A-G-HELP",
+   "note": "We are very sorry for your loss. The hospital registers the death with the BMC through the F South Ward Office. After that, the family applies for the Death Certificate (Form 6) at any BMC Citizen Facilitation Centre (CFC) or at the F South Ward Office near Tata Memorial. Take Form 4 from the hospital, the Aadhaar cards of the deceased and of the applicant, the application form (available at the CFC) and the fee.",
+   "note_hi": "आपके इस दुख में हम आपके साथ हैं। अस्पताल मृत्यु की जानकारी BMC के F साउथ वार्ड ऑफ़िस को भेजकर पंजीकरण करवाता है। उसके बाद परिवार किसी भी BMC सिटिज़न फ़ैसिलिटेशन सेंटर (CFC) या टाटा मेमोरियल के पास F साउथ वार्ड ऑफ़िस में मृत्यु प्रमाण पत्र (फ़ॉर्म 6) के लिए आवेदन करता है। साथ ले जाइए: अस्पताल से मिला फ़ॉर्म 4, मृतक और आवेदक के आधार कार्ड, आवेदन फ़ॉर्म (CFC पर मिलता है) और फ़ीस।",
+   "source": "Not listed in the booklet"
   }
  ]
 }

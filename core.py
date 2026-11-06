@@ -109,7 +109,9 @@ NAME_STOP = {"scan", "test", "tests", "clinic", "room", "rooms", "ward", "wards"
              "opd", "ओपीडी", "patient", "patients", "मरीज़", "मरीज", "पेशेंट", "general", "जनरल", "private", "प्राइवेट", "medical",
              "मेडिकल", "new", "नए", "old", "पुराने", "building", "बिल्डिंग", "first", "token", "टोकन", "help", "मदद",
              # everyday words that the booklet's Hindi names brought in ("योजनाओं में मदद", "बच्चों का कैंसर ओपीडी")
-             "में", "कैंसर", "cancer", "ऑपरेशन", "operation", "medicine", "मेडिसिन", "सेंटर", "रोग"}
+             "में", "कैंसर", "cancer", "ऑपरेशन", "operation", "medicine", "मेडिसिन", "सेंटर", "रोग",
+             # "Death certificate": only its synonyms below pick it, so "income certificate" or "पत्र" alone don't
+             "death", "certificate", "मृत्यु", "प्रमाण", "पत्र"}
 # Colloquial / Hinglish ways people ask for each department (matched in addition to the department's own name words).
 # Ids are the hospital.json unit ids (TMH booklet layout, see build_hospital.py).
 SYNONYMS = {
@@ -203,6 +205,15 @@ SYNONYMS = {
     "A-4-TOB": ["tobacco", "gutka", "gutkha", "smoking", "bidi", "cigarette", "तंबाकू", "गुटखा", "बीड़ी"],
     "GATE1": ["gate 1", "main gate", "main entrance", "entrance gate", "मेन गेट"],
     "GATE2": ["gate 2", "back gate", "pichla gate", "peeche wala gate", "पिछला गेट", "पीछे वाला गेट"],
+    # after a death; never bare "body" ("body pain", "full body checkup")
+    "MORTUARY": ["mortuary", "mortury", "mortuory", "morchari", "morgue", "murda ghar", "murdaghar", "dead body", "deadbody",
+                 "body handover", "body release", "body lena", "body kahan", "body milegi", "police noc", "noc", "passed away",
+                 "died", "death ho gay", "death ho gai", "expire ho gay", "मॉर्चरी", "मोर्चरी", "मॉर्चुअरी", "मुर्दाघर", "मुर्दा घर", "शवगृह", "शव गृह", "शव",
+                 "लाश", "डेड बॉडी", "पार्थिव", "बॉडी कहाँ", "बॉडी कब", "बॉडी लेनी", "एनओसी", "गुज़र गए", "गुजर गए", "गुज़र गई",
+                 "गुजर गई", "देहांत", "मौत हो गई", "मृत्यु हो गई", "डेथ हो गई"],
+    "DEATHCERT": ["death certificate", "death certi", "death registration", "death register", "form 6", "मृत्यु प्रमाण",
+                  "मृत्यु का प्रमाण", "डेथ सर्टिफिकेट", "डेथ सर्टिफ़िकेट", "मौत का सर्टिफिकेट", "मौत का सर्टिफ़िकेट",
+                  "मृत्यु पंजीकरण"],
 }
 
 

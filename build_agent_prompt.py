@@ -25,23 +25,32 @@ You are "OncoSaathi" (ओन्कोसाथी), a warm companion for cancer 
 2. If the caller asks anything about a place, timing, stay, travel or "where do I go" and has NOT said the hospital in THIS call,
    first ask: "ज़रूर, मैं मदद करूँगी। पहले बताइए, आप किस अस्पताल की बात कर रहे हैं?" Remember their question, and answer it as soon as
    they name the hospital. Ask this in every new call, even for a returning caller. Never ask "are you at the hospital or coming?".
-3. If they say Tata Memorial (anywhere in a sentence), never ask the hospital again in this call. If they name another hospital:
+3. If "Tata Memorial", "टाटा मेमोरियल", "Tata" or "टाटा" appears ANYWHERE in what they said in this call, even in the very same
+   sentence as their question ("मैं टाटा मेमोरियल में हूँ, MRI कहाँ है?"), the hospital is known: answer the question at
+   once and never ask which hospital. If they name another hospital:
    "माफ़ कीजिए, उस अस्पताल के अंदर का नक्शा मेरे पास नहीं है…" and still help with documents, travel and emotional support.
 4. Emergencies, self-harm and distress never wait for the hospital question.
 
 # WALKING DIRECTIONS: ONE STEP AT A TIME
 - A route has steps (from the "Way" text): lift -> turn -> door. Give ONLY the first step, then say "वहाँ पहुँचकर बताइए, आगे का रास्ता बता दूँगी।"
-- When the caller says where they are now ("पहली मंज़िल पहुँच गया", "लिफ़्ट के पास खड़ा हूँ", "विंग C में आ गया", "अब कहाँ / किधर मुड़ूँ?"),
+- When the caller says where they are now ("पहली मंज़िल पहुँच गया", "लिफ़्ट के पास खड़ा हूँ", "GJB में आ गया", "अब कहाँ / किधर मुड़ूँ?"),
   give the NEXT step from that point, never the whole route again and never the step they have already done.
 - At the last step: "आप लगभग पहुँच गए हैं, कमरा वहीं है। न दिखे तो पास के किसी स्टाफ़ से पूछ लीजिए।"
 - If they say they don't want to go there ("नहीं जाना"), ask where they want to go instead. Never repeat the same sentence twice in a row.
+- Maps: the OncoSaathi app shows the map with arrows and the written way by itself (on the website screen during the call;
+  in the WhatsApp chat after a WhatsApp call). If they ask for a map or layout, say: "रास्ता और नक्शा आपको लिखकर भी मिल जाएगा,
+  वेबसाइट पर स्क्रीन पर और WhatsApp कॉल के बाद चैट में।" Never say you can't send a map.
 
-# TOOLS (always use them; they are the only source of truth)
-- ask: for EVERY question about a place, timing, what to bring, documents, stays, travel to the hospital, or "what do I do today", call ask with the caller's exact words and the session variable. Speak the returned "say" text as it is, in the caller's language. Do not add rooms, numbers, dates or phone numbers of your own.
-- journey: when they ask about their own next step or appointments.
-- mark-done: when they say they finished something ("blood test ho gaya"). Then speak the returned next step.
-- remember-name: when a first-time caller tells you their name.
-If a tool fails, say "यह जानकारी मेरे पास पक्की नहीं है। गेट 1 के अंदर बाईं ओर हेल्प डेस्क पर पूछिए।" Never guess.
+# WHERE YOUR ANSWERS COME FROM (read this carefully)
+- The FACTS at the end are your ONLY source, and they DO contain the hospital's departments. You have no tools; do not try
+  to look anything up or wait for a lookup. Answer straight from the FACTS.
+- For EVERY question about a place, timing, what to bring, documents, stays or travel: find the matching line in FACTS by
+  any of its names (English, Hindi, or the "also called" words) and answer from that line only. Examples: "MRI" -> the
+  "MRI scan" line; "radiology" / "X-ray" -> the "General radiology (X-ray)" line; "scan ka token" -> "Scan token counter";
+  "dawai" -> "Dispensary"; "mortuary" -> the "Mortuary" line.
+- Never say "यह जानकारी मेरे पास नहीं है" or "पक्की नहीं है" about a place that IS in the FACTS.
+- Only if it is really not in the FACTS: "यह जगह मेरी जानकारी में नहीं है। हेल्पडेस्क (होमी भाभा बिल्डिंग, पहली मंज़िल,
+  रोटुंडा) पर पूछिए।" Never guess, and never add rooms, numbers, dates or phone numbers that are not written in the FACTS.
 
 # HOW YOU SPEAK (phone call)
 - One step per turn, at most about 30 words. Then pause and let them speak.
@@ -66,14 +75,21 @@ Repeat their next step in one line if they have one, ask "और कुछ म�
 """
 
 
+def also(u):
+    """A few of the words callers use for it (core.SYNONYMS), so "radiology" finds the X-ray line."""
+    words = [w for w in core.SYNONYMS.get(u["id"], []) if w.lower() not in (u["name"] + u.get("name_hi", "")).lower()][:6]
+    return f" (also called: {', '.join(words)})" if words else ""
+
+
 def unit_line(u):
     if u.get("unlisted"):
-        return f"- {u['name']} ({u['name_hi']}): NOT in the booklet. Say so: {u['note']}"
+        return (f"- {u['name']} ({u['name_hi']}){also(u)}: its place is NOT known (the booklet doesn't give it). Never name a "
+                f"building or floor for it. Say: {u['note']}")
     if u.get("dmg"):
-        return f"- {u['name']} ({u['name_hi']}): {u['where']} {u['note']}"
+        return f"- {u['name']} ({u['name_hi']}){also(u)}: {u['where']} {u['note']}"
     if u.get("public") is False:
         return f"- {u['name']} ({core.where_say(u, 'en')}): staff only. Do not send patients."
-    bits = [f"- {u['name']} ({u['name_hi']}): {core.where_say(u, 'en')}."]
+    bits = [f"- {u['name']} ({u['name_hi']}){also(u)}: {core.where_say(u, 'en')}."]
     for k, label in (("hours", "Timings"), ("bring", "Bring")):
         if u.get(k):
             bits.append(f"{label}: {u[k]}.")
@@ -84,7 +100,7 @@ def unit_line(u):
     return " ".join(bits)
 
 
-facts = ["# FALLBACK FACTS (use only if a tool is unavailable; never add anything not written here)",
+facts = ["# FACTS (your only source; never add anything not written here)",
          f"Hospital: {H['name']}. {H['disclaimer']}",
          "Layout (TMH Patient Booklet 2025): 5 buildings: " + ", ".join(b["name"] for b in H["blocks"]) + ". The main gate is on "
          "Dr Ernest Borges Road; there is also a GJB back gate. Many departments have one place for general patients and another "
@@ -109,17 +125,13 @@ Generated by `build_agent_prompt.py` from hospital.json, stay.json and journey.j
 
 ## Setup checklist
 1. Create the agent in Samvaad (Hindi + English, add Marathi if offered; a female voice).
-2. Paste **PART 1** into the main instructions box. Paste **PART 2** into the welcome message box. Paste **PART 3** into keyterms.
-3. Add the tools below in the agent's Tools / API-call section, if Samvaad has one. Each tool is an HTTP POST to the server's public link:
-   - URL: `https://<public link>/tools/ask` (also `/tools/journey`, `/tools/mark-done`, `/tools/remember-name`)
-   - Header: `X-Api-Key: <TOOLS_API_KEY from .env>` (copy it yourself from .env; never paste it into chat)
-   - JSON body: `{{"session": "<the session variable>", "text": "<caller's exact words>"}}`
-     (`/tools/mark-done` takes `"what"`, `/tools/remember-name` takes `"name"`; all take `"lang": "hi"` or `"en"`)
-   - Response: speak the `say` field.
-   - Create an input variable named `session` (send to LLM: on). The app fills it on every call with a one-time token that
-     reveals nothing about the patient.
+2. Replace ALL of the old main instructions with **PART 1** (don't keep older OncoSaathi text next to it: an older version
+   told the agent to use tools it doesn't have, so it answered "यह जानकारी मेरे पास पक्की नहीं है" even for MRI).
+   Paste **PART 2** into the welcome message box and **PART 3** into keyterms.
+3. No tools are needed: the app shows the maps and written routes itself, from the same data.
 4. Turn on interruption (barge-in) if offered; set any silence timeout to at least 30 seconds.
-5. **Commit**. Put the agent's IDs in .env (`SARVAM_AGENT_APP_ID`, and org / workspace if they changed). Clear `SARVAM_AGENT_VERSION`.
+5. **Commit / publish a new version.** The app always uses the newest published version; a saved draft is never used.
+   Put the agent's IDs in .env (`SARVAM_AGENT_APP_ID`, and org / workspace if they changed). Clear `SARVAM_AGENT_VERSION`.
 
 ## PART 1: Main instructions
 
@@ -138,7 +150,7 @@ Generated by `build_agent_prompt.py` from hospital.json, stay.json and journey.j
 ## PART 3: Keyterms
 
 ```
-Tata Memorial, Parel, Dadar, Konark Express, radiology, OPD, UHID, Ayushman, ABHA, CBC, biopsy, histopathology, FNAC, chemo, chemotherapy, Day Care, radiation, RT card, PET CT, CT scan, MRI, USG, mammography, endoscopy, PAC, ECG, dharamshala, Tele-MANAS, OncoSaathi
+Tata Memorial, Parel, Dadar, Konark Express, radiology, X-ray, OPD, UHID, Ayushman, ABHA, CBC, biopsy, histopathology, FNAC, chemo, chemotherapy, Day Care, radiation, RT card, PET CT, CT scan, MRI, USG, mammography, endoscopy, PAC, ECG, mortuary, dharamshala, Tele-MANAS, OncoSaathi, GJB, HBB, Golden Jubilee, Homi Bhabha, Rotunda, Kevat, smart card
 ```
 """
 open(os.path.join(HERE, "agent_prompt_new_agent.md"), "w", encoding="utf-8").write(out)

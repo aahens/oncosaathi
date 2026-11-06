@@ -40,6 +40,14 @@ CASES = [
     ("FNAC test kahan hoga", "", {"CYTO", "B-1-PATH"}, "where"),
     ("where is the ICU", "", {"D-2-ICU"}, "where"),
     ("where can I get an x-ray", "", {"C-G-XRAY"}, "where"),
+    # after a death (5 Nov 2026: "take me to mortuary" was not understood)
+    ("take me to mortuary", "", {"MORTUARY"}, None),
+    ("मुझे मॉर्चरी ले चलो", "", {"MORTUARY"}, None),
+    ("मुर्दाघर कहाँ है", "", {"MORTUARY"}, "where"),
+    ("papa ki death ho gayi, body kahan milegi", "", {"MORTUARY"}, None),
+    ("death certificate kaise milega", "", {"DEATHCERT"}, None),
+    ("मृत्यु प्रमाण पत्र कहाँ बनेगा", "", {"DEATHCERT"}, None),
+    ("full body checkup kahan hota hai", "", {"PREVENT", "NONE", "A-G-HELP"}, None),   # "body" alone is not the mortuary
     ("how do I reach the PET scan", "", {"C-2-PET"}, "way"),
     ("I need to see the breast cancer doctor", "", {"A-3-BR"}, "where"),
     ("mujhe scan karwana hai", "", {"SCAN_GENERIC", "NONE"}, None),

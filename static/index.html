@@ -340,7 +340,7 @@ function caption(role, text) {
 }
 function callMap(m) {
   const c = document.createElement("div"); c.className = "c bot";
-  c.innerHTML = `<img class="route" src="${esc(m.url)}" alt="Map of the route to your room">`;
+  c.innerHTML = `${m.text ? `<div style="white-space:pre-line;margin-bottom:6px">${esc(m.text)}</div>` : ""}<img class="route" src="${esc(m.url)}" alt="Map of the route to your room">`;
   c.querySelector("img").onload = () => { $("captions").scrollTop = 1e9; };
   $("captions").appendChild(c); callMaps.push(m);
 }
@@ -421,7 +421,8 @@ function endCall() {
   micStream && micStream.getTracks().forEach((t) => t.stop()); micStream = null;
   stopPlayback(); try { actx && actx.close(); } catch {} actx = null;
   if (secs) add("bot", `<div class="text">📞 Voice call · ${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}${callLog.length ? "\n\n" + callLog.map(([r, t]) => (r === "user" ? "You: " : "OncoSaathi: ") + t).map(esc).join("\n") : ""}</div>`);
-  if (secs && callMaps.length) mapMessage(callMaps[callMaps.length - 1]);   // the last route stays in the chat after the call
+  // the routes stay in the chat after the call: the written way, then the map (the last three places asked about)
+  if (secs) callMaps.slice(-3).forEach((m) => { if (m.text) add("bot", `<div class="text">${esc(m.text)}</div>`); mapMessage(m); });
 }
 
 // ---------- ⋮ menu ----------

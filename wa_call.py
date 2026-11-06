@@ -248,7 +248,7 @@ class Session:
             # the same hosted agent as the web page's 📞; someone who hasn't agreed yet gets a throwaway caller id
             pid = store.patient_for_session(token) if token else None
             st = {"pid": pid, "mode": "voice", "awaiting": None, "where": None, "place": None}
-            job = samvaad_call.run(self.bridge, token or f"wa-{secrets.token_hex(8)}", st)
+            job = samvaad_call.run(self.bridge, token or f"wa-{secrets.token_hex(8)}", st, live_maps=False)
         else:
             call = WhatsAppCall(self.bridge, token)
             job = call.run()
@@ -273,20 +273,24 @@ class Session:
         hosp = st.get("hospital")
         if not hosp and st.get("pid"):
             hosp = (store.get(st["pid"], actor="whatsapp-call") or {}).get("hospital")
-        if hosp != "tata-parel" or not whatsapp.public_base():
+        if hosp not in (None, "tata-parel") or not whatsapp.public_base():
+            # Tata Memorial is the only layout we have, so a caller who never named a hospital gets it too (on 5 Nov 2026
+            # calls where nobody said "Tata Memorial" got no routes at all); another hospital named gets none
+            print(f"[wa-call] no routes after the call (hospital {hosp})", flush=True)
             return
-        state = {"pid": None, "mode": "chat", "awaiting": None, "where": None, "place": None, "hospital": hosp}
+        state = {"pid": None, "mode": "chat", "awaiting": None, "where": None, "place": None, "hospital": "tata-parel"}
         routes, lang = {}, "hi"
         for text in self.bridge.heard:                         # in order, so "wahan kaise jaun" follows the place before it
             try:
-                out = await brain.respond(text[:500], state)
+                outs = await samvaad_call.routes_in(text, state)
             except Exception as e:
                 print(f"[wa-call] route summary: {e!r}", flush=True)
                 continue
-            if out.get("map"):
+            for out in outs:
                 routes[out["map"]["to"]] = out
                 lang = out["lang"]
         if not routes:
+            print(f"[wa-call] no routes after the call: no hospital place heard in {len(self.bridge.heard)} lines", flush=True)
             return
         to = self.bridge.to
         head = AFTER_CALL.get(lang) or await brain.translate(AFTER_CALL["en"], "en-IN", core.LANG_CODE.get(lang, "hi-IN")) or AFTER_CALL["hi"]
@@ -314,12 +318,21 @@ class Session:
 async def handle(event, max_calls=3, minutes=10, engine="local"):
     """One "calls" webhook event from Meta. engine: server.CALL_ENGINE, so WhatsApp calls match the web page's 📞."""
     cid, kind = event.get("id", ""), event.get("event")
+    if kind not in ("connect", "terminate") or (kind == "connect" and cid in CALLS):
+        print(f"[wa-call] event {kind!r} ({'known' if cid in CALLS else 'new'} call) ignored", flush=True)
     if kind == "connect" and cid not in CALLS:
+        print(f"[wa-call] incoming call from {whatsapp.mask(event.get('from', ''))}", flush=True)
         if len(CALLS) >= max_calls:
             await whatsapp.call_action(cid, "reject")
             print("[wa-call] rejected: too many calls at once", flush=True)
             return
-        s = CALLS[cid] = Session(cid, event.get("from", ""))
+        try:
+            s = Session(cid, event.get("from", ""))
+        except Exception as e:                                 # seen as calls that only ever "ended (0 s)" in the log
+            print(f"[wa-call] could not start the call: {e!r}", flush=True)
+            await whatsapp.call_action(cid, "reject")
+            return
+        CALLS[cid] = s
         try:
             sdp = await s.answer(event["session"]["sdp"])
             for action in ("pre_accept", "accept"):            # pre_accept lets media start early, so the greeting isn't clipped
