@@ -207,7 +207,8 @@ def slip_reply(found, lang, saved, category=None):
         lines.append(f"{i}. {title_hi if hi else title}: {where}")
     if any(s[0] == "medicine" for s in found):
         lines.append("दवा कैसे लेनी है, ये डॉक्टर या फ़ार्मासिस्ट बताएँगे।" if hi else "Your doctor or pharmacist will explain how to take the medicines.")
-    lines.append("खाली पेट आना है या नहीं, पर्ची पर देखिए या काउंटर पर पूछिए।" if hi else "For preparation such as fasting, check the slip or ask at the counter.")
+    if any(s[0] in TEST_KINDS for s in found):              # fasting is about tests, not a medicines-only slip
+        lines.append("खाली पेट आना है या नहीं, पर्ची पर देखिए या काउंटर पर पूछिए।" if hi else "For preparation such as fasting, check the slip or ask at the counter.")
     if saved:
         lines.append("✅ ये कदम आपकी याद में सेव हो गए। जब पूछेंगे 'आज क्या करना है', मैं बता दूँगी।" if hi else
                      "✅ Saved to your steps. Ask 'what do I do today?' any time.")
