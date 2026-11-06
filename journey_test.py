@@ -101,7 +101,15 @@ async def main():
     check("oncology surgery department -> asks the cancer type (DMG)", "DMG" in r["text"], r["text"])
     import server
     found = server.slip_steps("Referred to the Radiology department")
-    check("slip 'referred to radiology' -> saved step", [f[2] for f in found] == ["C-1-RADREC"], found)
+    check("slip 'referred to radiology' -> Radiology department, same as typing it", [f[2] for f in found] == ["C-G-XRAY"], found)
+    found = server.slip_steps("Ref to radiology for USG abdomen")
+    check("slip 'radiology for USG' -> radiology, then ultrasound (ask)", [f[0] for f in found] == ["billing", "radiology", "usg"], found)
+    found = server.slip_steps("Refer to Radiology for CECT abdomen")
+    check("slip 'radiology for CT' -> straight to CT", [f[0] for f in found] == ["billing", "ct"], found)
+    reply = server.slip_reply(server.slip_steps("Refer to Radiology"), "en", saved=False)
+    check("slip reply names Radiology and GJB basement", "Radiology" in reply and "GJB" in reply and "basement" in reply, reply)
+    reply = server.slip_reply(server.slip_steps("USG abdomen"), "hi", saved=False)
+    check("unlisted test on a slip -> says booklet doesn't list it, ask Helpdesk", "बुकलेट में जगह नहीं" in reply and "हेल्पडेस्क" in reply, reply)
     q2 = store.create("9000000005", actor="test")
     st5 = {"pid": q2["id"], "mode": "voice"}
     brain.opening(st5)

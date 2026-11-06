@@ -160,7 +160,8 @@ SLIP_STEPS = [
     ("pft", r"\bpft\b", "PFT", "Lung function test", "फेफड़ों की जाँच"),
     ("medicine", r"\b(tab|cap|syp|inj|tablet|capsule|syrup)\b\.?|\d+\s?mg\b", "CORE-G-PHARM", "Collect medicines", "दवाइयाँ लेना"),
     # referrals to a department ("referred to radiology", "Ref: Surg Onco") -> that department's desk or OPD
-    ("radiology", r"\b(radiology|radiodiagnosis|radio-diagnosis|imaging)\b|रेडियोलॉजी", "C-1-RADREC", "Scan token counter", "स्कैन टोकन काउंटर"),
+    # the booklet's Radiology department (same answer as typing "where is radiology"); a named scan replaces it below
+    ("radiology", r"\b(radiology|radiodiagnosis|radio-diagnosis|imaging)\b|रेडियोलॉजी", "C-G-XRAY", "Radiology department", "रेडियोलॉजी विभाग"),
     ("surg_onc", r"\b(surgical oncology|surg\.? ?onco\w*|onco-?surg\w*|oncology surgery)\b", "A-1-SURG", "Surgical Oncology OPD", "सर्जिकल ऑन्कोलॉजी ओपीडी"),
     ("med_onc", r"\b(medical oncology|med\.? ?onco\w*)\b", "A-1-MED", "Medical Oncology OPD", "मेडिकल ऑन्कोलॉजी ओपीडी"),
     ("rad_onc", r"\b(radiation oncology|radiotherapy|rad\.? ?onco\w*)\b", "A-1-RTC", "Radiation Oncology OPD", "रेडिएशन ऑन्कोलॉजी ओपीडी"),
@@ -174,8 +175,13 @@ TEST_KINDS = {"blood", "biopsy", "pet", "ct", "mri", "xray", "mammo", "usg", "en
 def slip_steps(text):
     t = text.lower()
     found = [s for s in SLIP_STEPS if re.search(s[1], t)]
-    if any(f[0] in ("ct", "mri", "xray", "mammo", "usg", "pet") for f in found):
+    kinds = [f[0] for f in found]
+    if any(k in ("ct", "mri", "xray", "mammo", "pet") for k in kinds):
         found = [f for f in found if f[0] != "radiology"]       # the scan itself is named: go straight to its room
+    elif "radiology" in kinds and "usg" in kinds:               # "radiology for USG": the booklet has no USG room, so
+        rad = next(f for f in found if f[0] == "radiology")     # Radiology first, then the ultrasound step
+        found.remove(rad)
+        found.insert(kinds.index("usg"), rad)
     if any(s[0] in TEST_KINDS for s in found):
         found.insert(0, ("billing", "", "A-G-BILL", "Add money to your smart card", "स्मार्ट कार्ड में पैसे जमा करना"))
     return found
@@ -189,7 +195,12 @@ def slip_reply(found, lang, saved, category=None):
     lines = ["आपकी पर्ची के हिसाब से रास्ता:" if hi else "Your route from the slip:"]
     for i, (_, _, uid, title, title_hi) in enumerate(found, 1):
         u = brain.PLACES[uid]
-        where = core.where_say(u, lang, category) if "block" in u else brain.place_short(u, lang)
+        if u.get("unlisted"):                                   # the booklet doesn't say where: never guess, say who to ask
+            ask = brain.PLACES[u["ask"]]
+            where = (f"बुकलेट में जगह नहीं लिखी है; {ask['name_hi']} पर पूछिए: {core.where_say(ask, lang)}" if hi else
+                     f"the booklet doesn't say where; ask at the {ask['name']}: {core.where_say(ask, lang)}")
+        else:
+            where = core.where_say(u, lang, category) if "block" in u else brain.place_short(u, lang)
         lines.append(f"{i}. {title_hi if hi else title}: {where}")
     if any(s[0] == "medicine" for s in found):
         lines.append("दवा कैसे लेनी है, ये डॉक्टर या फ़ार्मासिस्ट बताएँगे।" if hi else "Your doctor or pharmacist will explain how to take the medicines.")
