@@ -9,6 +9,7 @@ Privacy rules this file enforces:
   (go to a hospital.json place, on a date, bring X).
 - Every read and write is written to the audit table. Consent time is recorded; delete_patient() erases a person.
 """
+import base64
 import datetime as dt
 import hashlib
 import hmac
@@ -25,7 +26,18 @@ from dotenv import load_dotenv
 HERE = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(HERE, ".env"))
 DB_PATH = os.environ.get("ONCO_DB") or os.path.join(HERE, "data", "oncosaathi.db")
-_fernet = Fernet(os.environ["PATIENT_DATA_KEY"].encode())
+
+
+def _fernet_key(raw):
+    """PATIENT_DATA_KEY as a Fernet key. A random secret made by the cloud host (not in Fernet's format) is turned into one."""
+    try:
+        Fernet(raw.encode())
+        return raw.encode()
+    except ValueError:
+        return base64.urlsafe_b64encode(hashlib.sha256(raw.encode()).digest())
+
+
+_fernet = Fernet(_fernet_key(os.environ["PATIENT_DATA_KEY"].strip()))
 _hash_key = os.environ["PATIENT_HASH_KEY"].encode()
 _lock = threading.Lock()
 SESSION_HOURS = 12

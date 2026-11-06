@@ -1,28 +1,33 @@
-# Render blueprint: every push to GitHub's main branch redeploys the public link automatically.
+# Render blueprint for the public browser version: every push to GitHub's main branch redeploys it automatically.
+# Calls use our own engine (CALL_ENGINE=local: voice_call.py + brain.py). WhatsApp is not set up here.
 services:
   - type: web
-    name: oncosaathi
+    name: oncosaathi-oslava
     runtime: python
     plan: free
+    region: singapore
     buildCommand: pip install -r requirements.txt
     startCommand: python server.py
     healthCheckPath: /api/config
     autoDeploy: true
     envVars:
+      - key: PYTHON_VERSION
+        value: "3.14"
       - key: HOST
         value: 0.0.0.0
       - key: CALL_ENGINE
         value: local
       - key: PYTHONUNBUFFERED
         value: "1"
-      # Secrets: Render asks for these once, in its dashboard. They are never stored in GitHub.
-      - key: SARVAM_API_KEY
-        sync: false
+      # Render makes these random secrets itself. They are never stored in GitHub.
       - key: PATIENT_DATA_KEY
-        sync: false
+        generateValue: true
       - key: PATIENT_HASH_KEY
-        sync: false
+        generateValue: true
       - key: STAFF_API_KEY
-        sync: false
+        generateValue: true
       - key: TOOLS_API_KEY
+        generateValue: true
+      # The only key a person types in, once, in Render's dashboard.
+      - key: SARVAM_API_KEY
         sync: false
