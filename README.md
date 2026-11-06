@@ -1,7 +1,10 @@
 ﻿# OncoSaathi
 
-A Hindi-first voice companion that guides cancer patients and their families through a hospital, one step at a time.
-Built for KOITA Health-a-thon 2026 by Team Oslava.
+**WhatsApp-based, multilingual, voice-first navigator for complex oncology care journeys. Powered by Sarvam.**
+
+OncoSaathi guides cancer patients and their families through a cancer hospital, one step at a time, by voice or text on
+WhatsApp and the web: in Hindi, English and Hinglish, and in Marathi, Bengali, Odia, Gujarati, Punjabi, Tamil, Telugu,
+Kannada and Malayalam. Built for KOITA Health-a-thon 2026 by Team Oslava.
 
 **Try it in your browser:** https://oncosaathi-oslava.onrender.com
 Open it in Chrome, sign in with a mobile number, and chat, send a photo of a referral slip, or press the call button
@@ -14,7 +17,8 @@ rules and our hospital data. The first visit after a quiet spell can take about 
 > and distress to Tele-MANAS 14416.
 
 ## What it does
-- Voice call in Hindi, English and 9 more Indian languages, with interruption
+- WhatsApp: text, voice notes, slip photos, route maps and voice calls
+- Voice calls in Hindi, English, Hinglish and 9 more Indian languages, with interruption
 - Directions to the booklet's departments across the 5 buildings (MB, HBB, GJB, AB, SB), with the separate locations for general and private patients; departments the booklet doesn't list are said to be unlisted, never guessed
 - A walkthrough map after each direction, with a line drawn from where the patient is standing to the room (chat, call screen and WhatsApp). Patients say where they are ("मैं फ़ार्मेसी पर हूँ") or pick it in the chat; until then the line starts at the main gate and the caption says so
 - Reads a photo of the doctor's referral slip and names the right department
