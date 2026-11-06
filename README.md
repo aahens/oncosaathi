@@ -3,9 +3,10 @@
 A Hindi-first voice companion that guides cancer patients and their families through a hospital, one step at a time.
 Built for KOITA Health-a-thon 2026 by Team Oslava.
 
-**Try it:** https://oncosaathi.onrender.com
-Open it in Chrome, sign in with a mobile number, and press the call button (allow the microphone).
-The first visit after a quiet spell can take about a minute while the free server wakes up.
+**Try it in your browser:** https://oncosaathi-oslava.onrender.com
+Open it in Chrome, sign in with a mobile number, and chat, send a photo of a referral slip, or press the call button
+(allow the microphone). This version runs on our own engine (`CALL_ENGINE=local`): Sarvam speech in and out, our safety
+rules and our hospital data. The first visit after a quiet spell can take about a minute while the free server wakes up.
 
 > Buildings, floors and counters come from the public **TMH Patient Booklet 2025** (not verified by the hospital). The booklet
 > has no map, so where the buildings stand and where a room sits inside a floor are drawn by us and marked illustrative.
@@ -49,5 +50,7 @@ Set `WHATSAPP_PROVIDER=meta` and the `WHATSAPP_` keys in `.env`, then point Meta
 `simulate_patients.py` (20 simulated patients).
 
 ## Deployment
-`render.yaml` deploys this repository on Render. Keys go in a Render Secret File named `.env`. Every push to `main` updates the live link automatically.
-Keys are set in Render's dashboard and are never stored in this repository.
+`render.yaml` is a Render Blueprint for the browser version (free plan, Singapore, our own call engine). Render asks
+for the Sarvam key once and makes the other secrets itself; no key is ever stored in this repository. To put a new
+commit online, press "Manual Deploy" on the service in Render (or connect the GitHub account to Render for automatic deploys).
+WhatsApp is not set up on this host: Render cannot carry WhatsApp call audio.
